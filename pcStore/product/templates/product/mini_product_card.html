@@ -1,6 +1,45 @@
-﻿{% block content %}
-    <div class="alert alert-warning">
-        <h4>Название товара</h4>
-        <p>Анонс</p>
+﻿{% load static %}
+<div class="col">
+  <div class="card h-100 shadow-sm border-0 position-relative product-card">
+    <!--Изображение-->
+    <div class="position-relative bg-light" style="height: 180px;">
+      {% if product.image %}
+        <a href="#" class="d-block h-100 w-100" onclick="alert('Страница товара: {{ product.title }}'); return false;">
+          <img src="{{ product.image.url }}"
+               alt="{{ product.title }}"
+               class="w-100 h-100"
+               style="object-fit: contain; padding: 12px;"
+               loading="lazy">
+        </a>
+      {% else %}
+        <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+          <i class="bi bi-box-seam fs-1"></i>
+        </div>
+      {% endif %}
     </div>
-{% endblock %}
+
+    <!--Название-->
+    <div class="card-body d-flex flex-column p-3">
+      <h6 class="card-title mb-2" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; height: 4.2em;">
+        <a href="{{ product.get_absolute_url|default:'#' }}" class="text-decoration-none text-dark stretched-link">
+          {{ product.title }}
+        </a>
+      </h6>
+
+      <!--Цена-->
+      <div class="fw-bold text-primary fs-5 mb-3">
+        {{ product.price }} ₽
+      </div>
+
+      <!--Кнопки-->
+      <div class="mt-auto d-flex gap-2 position-relative" style="z-index: 2;">
+        <button type="button" class="btn btn-dark btn-sm flex-grow-1">
+          <i class="bi bi-cart-plus me-1"></i> Купить
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-sm">
+          <i class="bi bi-heart"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,45 +1,38 @@
 ﻿{% extends 'main/layout.html' %}
-
-{% block title %}
-    Главная страница
-{% endblock %}
-
-
+<!--Основной контент-->
 {% block content %}
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 g-lg-5">
-        {% include 'product/mini_product_card.html' %}
-        {% include 'product/mini_product_card.html' %}
-        {% include 'product/mini_product_card.html' %}
-        {% include 'product/mini_product_card.html' %}
-        {% include 'product/mini_product_card.html' %}
-        {% include 'product/mini_product_card.html' %}
-    </div>
-    <div class="">
-        <h1>{{ title }}</h1>
-        <p>пу пу пу</p>
-        {% for el in values %}
-            <p>{{el}}</p>
+        {% for product in products %}
+            {% include 'product/mini_product_card.html' with product=product %}
+        {% empty %}
+            <div class="col-12 text-center py-5 text-muted">Товары пока не добавлены</div>
         {% endfor %}
     </div>
     <div class="">
-        <h1>{{ title }}</h1>
         <p>пу пу пу</p>
-        {% for el in values %}
-            <p>{{el}}</p>
-        {% endfor %}
-    </div>
-    <div class="">
-        <h1>{{ title }}</h1>
         <p>пу пу пу</p>
-        {% for el in values %}
-            <p>{{el}}</p>
-        {% endfor %}
-    </div>
-    <div class="">
-        <h1>{{ title }}</h1>
         <p>пу пу пу</p>
-        {% for el in values %}
-            <p>{{el}}</p>
-        {% endfor %}
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
+        <p>пу пу пу</p>
     </div>
+
 {% endblock %}

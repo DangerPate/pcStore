@@ -12,20 +12,20 @@
 </head>
 <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <body>
+    <!--Навбар-->
     <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="../../static/main/img/logo-main.svg" alt="" width="30px" height="30px" />
+                <img src="../../static/main/img/logo-main.svg" alt="" width="40px" height="40px" />
             </a>
-
-            <!-- Кнопка Каталога (только десктоп) -->
+            <!--Кнопка каталога-->
             <button class="btn btn-outline-dark d-none d-lg-flex align-items-center me-3" type="button"
                 data-bs-toggle="offcanvas" data-bs-target="#catalogOffcanvas" aria-controls="catalogOffcanvas"
                 aria-label="Открыть каталог">
                 <i class="bi bi-grid-3x3-gap me-2"></i> Каталог
             </button>
 
-            <!-- Сворачиваемая часть -->
+            <!--Сворачиваемая часть -->
             <div class="collapse navbar-collapse" id="navbarMain">
                 <!-- Поиск -->
                 <form class="d-flex mx-auto my-3 my-lg-0 w-100 w-lg-50" action="" method="get" role="search">
@@ -37,7 +37,7 @@
                     </div>
                 </form>
 
-                <!-- Иконки и авторизация -->
+                <!--Иконки и авторизация -->
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
                     <li class="nav-item">
                         <a class="nav-link text-dark position-relative px-2" href="" aria-label="Избранное">
@@ -68,7 +68,7 @@
         </div>
     </header>
 
-    <!-- 📂 OFFCANVAS КАТАЛОГ -->
+    <!--Каталог-->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="catalogOffcanvas" aria-labelledby="catalogOffcanvasLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="catalogOffcanvasLabel">
@@ -101,10 +101,12 @@
         </div>
     </div>
 
+    <!--Основной контент-->
     <main>
         <div class="container">{% block content %} {% endblock %}</div>
     </main>
 
+    <!--Футер-->
     <footer class="bg-white shadow mt-auto">
         <div class="container">
             <div class="row">
