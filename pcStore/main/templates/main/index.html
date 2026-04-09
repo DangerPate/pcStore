@@ -6,6 +6,40 @@
 
 
 {% block content %}
-    <h1>Главная страница</h1>
-    <p>пу пу пу</p>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 g-lg-5">
+        {% include 'product/mini_product_card.html' %}
+        {% include 'product/mini_product_card.html' %}
+        {% include 'product/mini_product_card.html' %}
+        {% include 'product/mini_product_card.html' %}
+        {% include 'product/mini_product_card.html' %}
+        {% include 'product/mini_product_card.html' %}
+    </div>
+    <div class="">
+        <h1>{{ title }}</h1>
+        <p>пу пу пу</p>
+        {% for el in values %}
+            <p>{{el}}</p>
+        {% endfor %}
+    </div>
+    <div class="">
+        <h1>{{ title }}</h1>
+        <p>пу пу пу</p>
+        {% for el in values %}
+            <p>{{el}}</p>
+        {% endfor %}
+    </div>
+    <div class="">
+        <h1>{{ title }}</h1>
+        <p>пу пу пу</p>
+        {% for el in values %}
+            <p>{{el}}</p>
+        {% endfor %}
+    </div>
+    <div class="">
+        <h1>{{ title }}</h1>
+        <p>пу пу пу</p>
+        {% for el in values %}
+            <p>{{el}}</p>
+        {% endfor %}
+    </div>
 {% endblock %}
