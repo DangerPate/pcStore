@@ -1,0 +1,172 @@
+﻿{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}{{ category.title }} - Каталог{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'main/css/catalog.css' %}">
+
+<div class="container py-4">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+            <li class="breadcrumb-item active">{{ category.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- 📦 ЛЕВАЯ ПАНЕЛЬ: Фильтры -->
+        <aside class="col-lg-3">
+            <div class="card border-0 shadow-sm sticky-filter">
+                <div class="card-body p-3">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-funnel"></i> Фильтры
+                    </h5>
+                    <form method="get" action="">
+                        <!-- Наличие -->
+                        <div class="mb-4">
+                            <h6 class="fw-semibold mb-2 small text-uppercase text-muted ls-1">Наличие</h6>
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox" name="in_stock" value="1" checked id="f_instock">
+                                <label class="form-check-label small" for="f_instock">В наличии</label>
+                            </div>
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox" name="in_stock" value="0" id="f_order">
+                                <label class="form-check-label small" for="f_order">Под заказ</label>
+                            </div>
+                        </div>
+
+                        <!-- Рейтинг -->
+                        <div class="mb-4">
+                            <h6 class="fw-semibold mb-2 small text-uppercase text-muted ls-1">Рейтинг</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="rating" value="4" id="f_rating">
+                                <label class="form-check-label small" for="f_rating">4 и выше</label>
+                            </div>
+                        </div>
+
+                        <!-- Цена -->
+                        <div class="mb-4">
+                            <h6 class="fw-semibold mb-2 small text-uppercase text-muted ls-1">Цена, ₽</h6>
+                            <div class="d-flex gap-2">
+                                <input type="number" name="price_min" class="form-control form-control-sm" placeholder="От">
+                                <input type="number" name="price_max" class="form-control form-control-sm" placeholder="До">
+                            </div>
+                        </div>
+
+                        <!-- Кнопка Применить -->
+                        <button type="submit" class="btn btn-primary w-100 fw-semibold shadow-sm">
+                            Применить
+                        </button>
+                        <a href="?" class="btn btn-link btn-sm w-100 text-decoration-none mt-2 text-center">Сбросить фильтры</a>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 🛒 ПРАВАЯ ЧАСТЬ: Товары -->
+        <main class="col-lg-9">
+            <!-- Верхняя панель: Сортировка и вид -->
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <span class="text-muted small">Найдено: <strong class="text-dark">{{ products.count }}</strong> товаров</span>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-sort-down me-1"></i> Сортировка: по умолчанию
+                        </button>
+                        <ul class="dropdown-menu shadow-sm">
+                            <li><a class="dropdown-item" href="?sort=price_asc">Сначала дешёвые</a></li>
+                            <li><a class="dropdown-item" href="?sort=price_desc">Сначала дорогие</a></li>
+                            <li><a class="dropdown-item" href="?sort=rating">По рейтингу</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-secondary active"><i class="bi bi-list-ul"></i></button>
+                    <button type="button" class="btn btn-outline-secondary"><i class="bi bi-grid-3x3-gap"></i></button>
+                </div>
+            </div>
+
+            <!-- Список товаров -->
+            <div class="catalog-list">
+                {% for product in products %}
+                <div class="card catalog-card mb-3 border-0 shadow-sm">
+                    <div class="row g-0 align-items-center">
+                        <!-- Изображение -->
+                        <div class="col-3 col-md-2 p-3">
+                            <a href="{% url 'catalog:product_detail' product.slug %}" class="d-block catalog-img-link">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.title }}" class="img-fluid">
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center h-100 bg-light rounded">
+                                        <i class="bi bi-box-seam text-muted fs-3"></i>
+                                    </div>
+                                {% endif %}
+                            </a>
+                        </div>
+
+                        <!-- Информация -->
+                        <div class="col-9 col-md-6 p-3">
+                            <a href="{% url 'catalog:product_detail' product.slug %}" class="text-decoration-none text-dark">
+                                <h6 class="fw-medium mb-1 catalog-title">{{ product.title }}</h6>
+                            </a>
+                            <p class="text-muted small mb-2 catalog-specs">{{ product.info|truncatechars:140 }}</p>
+
+                            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                <span class="badge bg-light text-dark border-0">
+                                    <i class="bi bi-star-fill text-warning"></i> 4.5
+                                </span>
+                                <span class="text-muted small">62 отзыва</span>
+                                <span class="badge bg-success-subtle text-success">
+                                    <i class="bi bi-check-circle"></i> В наличии
+                                </span>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-truck"></i> Доставка завтра
+                            </div>
+                        </div>
+
+                        <!-- Цена и действия -->
+                        <div class="col-12 col-md-4 p-3 text-md-end border-top border-md-top-0 mt-2 mt-md-0">
+                            <div class="fw-bold fs-5 text-primary mb-1">{{ product.price }} ₽</div>
+                            {% if product.old_price %}
+                                <div class="text-muted small text-decoration-line-through mb-2">{{ product.old_price }} ₽</div>
+                            {% endif %}
+
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end align-items-center">
+                                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-2 shadow-sm"
+                                        title="В избранное" onclick="event.stopPropagation()">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                                <button type="button" class="btn btn-dark btn-sm px-3 shadow-sm"
+                                        onclick="event.stopPropagation()">
+                                    <i class="bi bi-cart-plus me-1"></i> Купить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+                    <i class="bi bi-search fs-1 text-muted d-block mb-2"></i>
+                    <h5 class="fw-medium">Товары не найдены</h5>
+                    <p class="text-muted small">Попробуйте изменить параметры фильтрации</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Пагинация (заглушка) -->
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled"><a class="page-link" href="#">Назад</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Вперёд</a></li>
+                </ul>
+            </nav>
+        </main>
+    </div>
+</div>
+{% endblock %}

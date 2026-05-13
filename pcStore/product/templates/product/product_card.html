@@ -1,9 +1,160 @@
 ﻿{% extends 'main/layout.html' %}
+{% load static %}
 
-{% block title %}
-    Название товара
-{% endblock %}
+{% block title %}{{ product.title }}{% endblock %}
 
 {% block content %}
+<!-- Подключаем дополнительные стили -->
+<link rel="stylesheet" href="{% static 'main/css/product.css' %}">
 
+<div class="container py-4">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+            {% if product.categories.first %}
+            <li class="breadcrumb-item">
+                <a href="{% url 'catalog:category' product.categories.first.slug %}">
+                    {{ product.categories.first.title }}
+                </a>
+            </li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4 align-items-start">
+        <!-- 🖼️ Левая колонка: Изображение -->
+        <div class="col-lg-6">
+            <div class="product-image-wrapper bg-white rounded-4 shadow-sm p-3">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}" class="img-fluid product-main-image">
+                {% else %}
+                    <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted py-5">
+                        <i class="bi bi-box-seam fs-1 mb-2"></i>
+                        <span>Изображение отсутствует</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 📝 Правая колонка: Информация -->
+        <div class="col-lg-6">
+            <div class="product-info">
+                <!-- Бейджи -->
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if product.is_new %}<span class="badge bg-info-subtle text-info">Новинка</span>{% endif %}
+                    {% if product.is_hit %}<span class="badge bg-warning-subtle text-warning-emphasis">Хит продаж</span>{% endif %}
+                    {% if product.discount_percent > 0 %}<span class="badge bg-danger">-{{ product.discount_percent }}%</span>{% endif %}
+                </div>
+
+                <h1 class="h2 fw-bold mb-2">{{ product.title }}</h1>
+                <p class="text-muted mb-3 small">
+                    Артикул: <span class="text-dark">{{ product.sku|default:"—" }}</span>
+                    {% if product.brand %} | Бренд: <span class="text-dark fw-medium">{{ product.brand }}</span>{% endif %}
+                </p>
+
+                <!-- Цена -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="fs-2 fw-bold text-primary">{{ product.price }} ₽</span>
+                    {% if product.old_price %}
+                        <del class="text-muted fs-5">{{ product.old_price }} ₽</del>
+                    {% endif %}
+                </div>
+
+                <!-- Наличие и гарантия -->
+                <div class="d-flex flex-wrap gap-4 mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi {% if product.is_in_stock %}bi-check-circle-fill text-success{% else %}bi-x-circle-fill text-danger{% endif %} fs-5"></i>
+                        <span class="fw-medium {{ product.is_in_stock|yesno:'text-success,text-danger' }}">{{ product.stock_status_label }}</span>
+                    </div>
+                    {% if product.warranty %}
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-check text-primary fs-5"></i>
+                        <span class="fw-medium">Гарантия: {{ product.warranty }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Краткое описание -->
+                {% if product.info %}
+                    <p class="text-muted mb-4 small lh-lg">{{ product.info|linebreaks }}</p>
+                {% endif %}
+
+                <!-- Кнопки действий -->
+                <div class="d-flex gap-3 mb-4">
+                    <button type="button" class="btn btn-dark btn-lg px-4 flex-grow-1 product-btn-cart">
+                        <i class="bi bi-cart-plus me-2"></i>В корзину
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-lg product-btn-wish" title="В избранное">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                </div>
+
+                <!-- Быстрые характеристики -->
+                <div class="border-top pt-3">
+                    <h6 class="fw-bold mb-3 small text-uppercase text-muted ls-1">Основные параметры</h6>
+                    <dl class="row small mb-0 product-specs-quick">
+                        {% if product.brand %}
+                        <dt class="col-sm-4 text-muted">Производитель</dt>
+                        <dd class="col-sm-8">{{ product.brand }}</dd>
+                        {% endif %}
+                        {% if product.warranty %}
+                        <dt class="col-sm-4 text-muted">Гарантия</dt>
+                        <dd class="col-sm-8">{{ product.warranty }}</dd>
+                        {% endif %}
+                        {% if product.weight %}
+                        <dt class="col-sm-4 text-muted">Вес</dt>
+                        <dd class="col-sm-8">{{ product.weight }} кг</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📑 Табы: Описание / Характеристики / Отзывы -->
+    <div class="mt-5 pt-3">
+        <ul class="nav nav-tabs product-tabs" id="productTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">Описание</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">Характеристики</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Отзывы</button>
+            </li>
+        </ul>
+        <div class="tab-content p-4 bg-white border border-top-0 rounded-bottom-3 shadow-sm" id="productTabsContent">
+            <div class="tab-pane fade show active" id="desc" role="tabpanel">
+                {% if product.description %}
+                    <div class="product-description">{{ product.description|linebreaks }}</div>
+                {% else %}
+                    <p class="text-muted">Описание товара пока не добавлено.</p>
+                {% endif %}
+            </div>
+            <div class="tab-pane fade" id="specs" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <tbody>
+                            <tr><td class="w-25 text-muted fw-medium">Название</td><td>{{ product.title }}</td></tr>
+                            <tr><td class="text-muted fw-medium">Артикул</td><td>{{ product.sku|default:"—" }}</td></tr>
+                            {% if product.brand %}<tr><td class="text-muted fw-medium">Бренд</td><td>{{ product.brand }}</td></tr>{% endif %}
+                            {% if product.weight %}<tr><td class="text-muted fw-medium">Вес</td><td>{{ product.weight }} кг</td></tr>{% endif %}
+                            {% if product.warranty %}<tr><td class="text-muted fw-medium">Гарантия</td><td>{{ product.warranty }}</td></tr>{% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="reviews" role="tabpanel">
+                <div class="text-center py-4">
+                    <i class="bi bi-chat-square-text fs-1 text-muted mb-2 d-block"></i>
+                    <p class="text-muted mb-3">Отзывов пока нет. Будьте первым!</p>
+                    <button class="btn btn-outline-primary btn-sm">Оставить отзыв</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

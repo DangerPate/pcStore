@@ -1,0 +1,119 @@
+﻿.product-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    min-height: 320px;
+    max-height: 500px;
+    transition: box-shadow 0.3s ease;
+}
+
+.product-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: zoom-in;
+}
+
+.product-image-wrapper:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.product-image-wrapper:hover .product-main-image {
+    transform: scale(1.05);
+}
+
+/* Информация о товаре */
+.product-info h2 {
+    letter-spacing: -0.02em;
+}
+
+.ls-1 { letter-spacing: 0.1em; }
+
+/* Табы */
+.product-tabs .nav-link {
+    border: none;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.product-tabs .nav-link:hover {
+    color: #0d6efd;
+    background: rgba(13, 110, 253, 0.05);
+}
+
+.product-tabs .nav-link.active {
+    color: #0d6efd;
+    background: transparent;
+    font-weight: 600;
+}
+
+.product-tabs .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: #0d6efd;
+    border-radius: 3px 3px 0 0;
+}
+
+#productTabsContent {
+    border-top: none !important;
+}
+
+/* Кнопки действий */
+.product-btn-cart {
+    transition: all 0.2s ease;
+}
+
+.product-btn-cart:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.product-btn-wish {
+    transition: all 0.2s ease;
+}
+
+.product-btn-wish:hover {
+    background-color: #dc3545;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.product-btn-wish.active {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Таблицы характеристик */
+.product-specs-quick dt, .product-specs-quick dd {
+    margin-bottom: 0.5rem;
+}
+
+.product-description p, .product-description ul, .product-description ol {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+.product-description img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Адаптив */
+@media (max-width: 991.98px) {
+    .product-image-wrapper {
+        min-height: 250px;
+    }
+    .product-tabs .nav-link {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+}

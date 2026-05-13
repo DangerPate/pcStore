@@ -12,131 +12,180 @@
 </head>
 <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <body>
-    <!--Навбар-->
+    <!-- === НАВБАР === -->
     <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="../../static/main/img/logo-main.svg" alt="" width="40px" height="40px" />
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                <img src="{% static 'main/img/logo-main.svg' %}" alt="Logo" width="40" height="40" class="me-2"/>
             </a>
-            <!--Кнопка каталога-->
-            <button class="btn btn-outline-dark d-none d-lg-flex align-items-center me-3" type="button"
-                data-bs-toggle="offcanvas" data-bs-target="#catalogOffcanvas" aria-controls="catalogOffcanvas"
-                aria-label="Открыть каталог">
+
+            <!-- Кнопка каталога -->
+            <button class="btn btn-outline-dark d-none d-lg-flex align-items-center me-3"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#catalogOffcanvas"
+                    aria-controls="catalogOffcanvas"
+                    aria-label="Открыть каталог">
                 <i class="bi bi-grid-3x3-gap me-2"></i> Каталог
             </button>
 
-            <!--Сворачиваемая часть -->
+            <!-- Сворачиваемая часть -->
             <div class="collapse navbar-collapse" id="navbarMain">
                 <!-- Поиск -->
                 <form class="d-flex mx-auto my-3 my-lg-0 w-100 w-lg-50" action="" method="get" role="search">
                     <div class="input-group">
                         <input class="form-control border-end-0" type="search" name="q"
                             placeholder="Поиск компонентов..." aria-label="Поиск" />
-                        <span class="input-group-text bg-white border-start-0"><i
-                                class="bi bi-search text-muted"></i></span>
+                        <span class="input-group-text bg-white border-start-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
                     </div>
                 </form>
 
-                <!--Иконки и авторизация -->
+                <!-- Иконки и авторизация -->
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
                     <li class="nav-item">
-                        <a class="nav-link text-dark position-relative px-2" href="" aria-label="Избранное">
+                        <a class="nav-link text-dark position-relative px-2" href="#" aria-label="Избранное">
                             <i class="bi bi-heart fs-5"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 0.6rem">0</span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem">0</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark position-relative px-2" href="" aria-label="Корзина">
+                        <a class="nav-link text-dark position-relative px-2" href="#" aria-label="Корзина">
                             <i class="bi bi-cart3 fs-5"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary"
-                                style="font-size: 0.6rem">0</span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" style="font-size: 0.6rem">0</span>
                         </a>
                     </li>
                     <li class="nav-item ms-lg-1">
-                        <a class="btn btn-outline-dark btn-sm rounded-pill px-3" href="">
+                        <a class="btn btn-outline-dark btn-sm rounded-pill px-3" href="#">
                             <i class="bi bi-person-circle me-1"></i> Кабинет
                         </a>
                     </li>
                     <li class="nav-item ms-lg-1">
-                        <a class="btn btn-dark btn-sm rounded-pill px-3" href="">Войти</a>
+                        <a class="btn btn-dark btn-sm rounded-pill px-3" href="#">Войти</a>
                     </li>
                 </ul>
             </div>
         </div>
     </header>
 
-    <!--Каталог-->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="catalogOffcanvas" aria-labelledby="catalogOffcanvasLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="catalogOffcanvasLabel">
-                Каталог компонентов
+    <!-- === OFFCANVAS КАТАЛОГ === -->
+    <div class="offcanvas offcanvas-top no-overlap-header"
+         tabindex="-1"
+         id="catalogOffcanvas"
+         aria-labelledby="catalogOffcanvasLabel"
+         data-bs-backdrop="false"
+         data-bs-scroll="true">
+
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold" id="catalogOffcanvasLabel">
+                <i class="bi bi-grid-3x3-gap me-2 text-primary"></i>Каталог компонентов
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
         </div>
-        <div class="offcanvas-body">
-            <ul class="list-group list-group-flush">
-                
-                <li class="list-group-item">
-                    <a href="#" class="text-decoration-none">Процессоры</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="#" class="text-decoration-none">Видеокарты</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="#" class="text-decoration-none">Оперативная память</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="#" class="text-decoration-none">Материнские платы</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="#" class="text-decoration-none">Блоки питания</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="#" class="text-decoration-none">Корпуса и охлаждение</a>
-                </li>
-            </ul>
+
+        <div class="offcanvas-body py-4">
+            <div class="container">
+                <div class="row g-3 g-md-4">
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{% url 'catalog:category' 'cpu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
+                            <i class="bi bi-cpu fs-5 me-3"></i><span class="fw-medium">Процессоры</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{% url 'catalog:category' 'gpu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
+                            <i class="bi bi-display fs-5 me-3"></i><span class="fw-medium">Видеокарты</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{% url 'catalog:category' 'ram' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
+                            <i class="bi bi-memory fs-5 me-3"></i><span class="fw-medium">Оперативная память</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{% url 'catalog:category' 'motherboard' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
+                            <i class="bi bi-hdd-rack fs-5 me-3"></i><span class="fw-medium">Материнские платы</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{% url 'catalog:category' 'psu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
+                            <i class="bi bi-plug fs-5 me-3"></i><span class="fw-medium">Блоки питания</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{% url 'catalog:category' 'pc-case' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
+                            <i class="bi bi-box2-heart fs-5 me-3"></i><span class="fw-medium">Корпус</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{% url 'catalog:category' 'pc-cooling' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
+                            <i class="bi bi-box2-heart fs-5 me-3"></i><span class="fw-medium">Охлаждение</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{% url 'catalog:category' 'hdd' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
+                            <i class="bi bi-box2-heart fs-5 me-3"></i><span class="fw-medium">HDD</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="{% url 'catalog:category' 'ssd' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
+                            <i class="bi bi-box2-heart fs-5 me-3"></i><span class="fw-medium">SSD</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <h6 class="text-muted small fw-bold text-uppercase mb-3">Популярные разделы</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="#" class="badge bg-light text-dark text-decoration-none px-3 py-2 hover-bg-primary">
+                            <i class="bi bi-fire me-1"></i>Новинки
+                        </a>
+                        <a href="#" class="badge bg-light text-dark text-decoration-none px-3 py-2 hover-bg-primary">
+                            <i class="bi bi-percent me-1"></i>Акции
+                        </a>
+                        <a href="#" class="badge bg-light text-dark text-decoration-none px-3 py-2 hover-bg-primary">
+                            <i class="bi bi-truck me-1"></i>Доставка
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!--Основной контент-->
+    <!-- === ОСНОВНОЙ КОНТЕНТ === -->
     <main>
-        <div class="container">{% block content %} {% endblock %}</div>
+        <div class="container">{% block content %}{% endblock %}</div>
     </main>
 
-    <!--Футер-->
-    <footer class="bg-white shadow mt-auto">
+    <!-- === ФУТЕР === -->
+    <footer class="bg-white shadow mt-auto py-4">
         <div class="container">
             <div class="row">
-                <div class="col-md-3 mb-4">
-                    <h6 class="fw-bold md3">Компания</h6>
+                <div class="col-md-4 mb-4">
+                    <h6 class="fw-bold mb-3">Компания</h6>
                     <ul class="list-unstyled small">
-                        <li><a href="{% url 'about' %}" class="mb-2">О нас</a></li>
-                        <li><a href="{% url 'about' %}" class="mb-2">О нас</a></li>
-                        <li><a href="{% url 'about' %}" class="mb-2">О нас</a></li>
+                        <li><a href="{% url 'about' %}" class="text-decoration-none text-muted">О нас</a></li>
+                        <li><a href="{% url 'about' %}" class="text-decoration-none text-muted">Доставка</a></li>
+                        <li><a href="{% url 'about' %}" class="text-decoration-none text-muted">Контакты</a></li>
                     </ul>
                 </div>
-                <div class="col-md-3 mb-4">
-                    <h6 class="fw-bold md3">Покупателям</h6>
+                <div class="col-md-4 mb-4">
+                    <h6 class="fw-bold mb-3">Покупателям</h6>
                     <ul class="list-unstyled small">
-                        <li><a href="{% url 'about' %}" class="mb-2">О нас</a></li>
-                        <li><a href="{% url 'about' %}" class="mb-2">О нас</a></li>
-                        <li><a href="{% url 'about' %}" class="mb-2">О нас</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Гарантия</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Возврат</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">FAQ</a></li>
                     </ul>
                 </div>
-                <div class="col-md-3 mb-4">
-                    <h6 class="fw-bold md3">Связь</h6>
+                <div class="col-md-4 mb-4">
+                    <h6 class="fw-bold mb-3">Связь</h6>
                     <ul class="list-unstyled small">
-                        <li><a href="{% url 'about' %}" class="mb-2">О нас</a></li>
-                        <li><a href="{% url 'about' %}" class="mb-2">О нас</a></li>
-                        <li><a href="{% url 'about' %}" class="mb-2">О нас</a></li>
+                        <li><a href="tel:+79991234567" class="text-decoration-none text-muted">+7 (999) 123-45-67</a></li>
+                        <li><a href="mailto:support@example.com" class="text-decoration-none text-muted">support@example.com</a></li>
                     </ul>
                 </div>
             </div>
         </div>
     </footer>
 </body>
-
 </html>

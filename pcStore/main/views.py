@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from product.models import Product
+from catalog.models import Product, Category
 def index(request):
     products = Product.objects.all()
     return render(request, 'main/index.html', {'products': products})

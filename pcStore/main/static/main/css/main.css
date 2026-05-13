@@ -1,11 +1,65 @@
 ﻿body {
-    background: white;
+  background: white;
+  padding-top: var(--navbar-height);
 }
 
 header {
-    background-color: white;
+  background-color: white;
 }
 
 main {
-    padding-top: 56px;
+  padding-top: 0px;
+}
+
+:root {
+  --navbar-height: 72px;
+}
+body {
+  
+}
+
+/* === OFFCANVA CATALOG === */
+.offcanvas-top.no-overlap-header {
+  top: var(--navbar-height) !important;
+  height: calc(100vh - var(--navbar-height)) !important;
+  z-index: 1045; /* Поверх навбара (1030), но под модалками */
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+  /* Стартовая позиция: сдвинут вверх ровно на высоту навбара → спрятан за ним */
+  transform: translateY(calc(-1 * var(--navbar-height))) !important;
+  /* Переопределяем стандартную анимацию Bootstrap */
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* При добавлении класса .show от Bootstrap панель выезжает вниз */
+.offcanvas-top.no-overlap-header.show {
+  transform: translateY(0) !important;
+}
+
+/* Стили элементов каталога */
+.catalog-category {
+  padding: 0.75rem 1.25rem;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin: 0.25rem 0;
+}
+.catalog-category:hover {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  transform: translateX(4px); /* Плавный сдвиг без дёргания верстки */
+  text-decoration: none;
+}
+.catalog-category i {
+  width: 24px;
+  color: #6c757d;
+  transition: color 0.2s;
+}
+.catalog-category:hover i {
+  color: #0d6efd;
+}
+.hover-bg-primary:hover {
+  background-color: #0d6efd !important;
+  color: #fff !important;
+  transition: all 0.2s;
 }
