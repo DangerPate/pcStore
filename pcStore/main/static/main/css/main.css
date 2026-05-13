@@ -1,6 +1,7 @@
 ﻿body {
   background: white;
   padding-top: var(--navbar-height);
+  margin: 0;
 }
 
 header {
@@ -9,6 +10,15 @@ header {
 
 main {
   padding-top: 0px;
+}
+
+main.container, main .container {
+    padding-top: 1rem; /* Минимальный внутренний отступ для контента */
+    margin-top: 0 !important;
+}
+
+footer {
+    padding-top: 50px
 }
 
 :root {
