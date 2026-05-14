@@ -1,10 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Category
-from catalog.models import Product
+from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
-from cart.models import CartItem, Favorite
 from django.db.models import Exists, OuterRef
-
+from catalog.models import Product, Category
+from cart.models import Cart, CartItem, Favorite
 
 # Замените существующий category_view на:
 # catalog/views.py
@@ -31,10 +29,38 @@ def category_view(request, category_slug):
 
 
 def product_detail(request, slug):
-    """Рендерит ваш готовый шаблон product_card.html"""
     product = get_object_or_404(Product, slug=slug, is_active=True)
 
-    return render(request, 'product/product_card.html', {'product': product})
+    is_in_cart = False
+    is_favorited = False
+
+    if request.user.is_authenticated:
+        # 🔍 Проверяем БД
+        cart_item = CartItem.objects.filter(
+            cart__user=request.user,
+            product=product
+        ).first()
+
+        fav_item = Favorite.objects.filter(
+            user=request.user,
+            product=product
+        ).first()
+
+        is_in_cart = cart_item is not None
+        is_favorited = fav_item is not None
+
+        # 🔥 ОТЛАДКА
+        print(f"\n📦 DEBUG product_detail:")
+        print(f"   User: {request.user.email} (ID: {request.user.id})")
+        print(f"   Product: {product.title}")
+        print(f"   In cart: {is_in_cart}, Favorited: {is_favorited}")
+        print()
+
+    return render(request, 'product/product_card.html', {
+        'product': product,
+        'is_in_cart': is_in_cart,
+        'is_favorited': is_favorited,
+    })
 
 
 def search_view(request):

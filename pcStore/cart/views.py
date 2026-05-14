@@ -15,13 +15,25 @@ def cart_view(request):
 
 @login_required
 def add_to_cart(request, product_slug):
+    print(f"\n🛒 DEBUG add_to_cart:")
+    print(f"   User: {request.user.email} (ID: {request.user.id})")
+    print(f"   Product slug: {product_slug}")
+
     product = get_object_or_404(Product, slug=product_slug, is_active=True)
-    cart, _ = Cart.objects.get_or_create(user=request.user)
+    print(f"   Product found: {product.title} (ID: {product.id})")
+
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    print(f"   Cart: id={cart.id}, created={created}")
 
     item, created = CartItem.objects.get_or_create(cart=cart, product=product)
     if not created:
         item.quantity += 1
         item.save()
+        print(f"   CartItem exists, quantity increased to {item.quantity}")
+    else:
+        print(f"   CartItem created with quantity 1")
+
+    print(f"   Total items in cart: {cart.get_total_quantity()}\n")
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'status': 'ok', 'total': cart.get_total_quantity()})

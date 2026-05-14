@@ -82,9 +82,8 @@
                 {% endif %}
 
                 <!-- Кнопки действий -->
-
                 <div class="d-flex gap-3 mb-4" id="product-actions">
-                    {% if product.is_in_cart %}
+                    {% if is_in_cart %}
                     <button type="button" class="btn btn-success btn-lg px-4 btn-add-cart" data-slug="{{ product.slug }}">
                         <i class="bi bi-check-lg me-2"></i> Уже в корзине
                     </button>
@@ -94,8 +93,8 @@
                     </button>
                     {% endif %}
 
-                    <button type="button" class="btn btn-outline-danger btn-lg btn-toggle-fav {% if product.is_favorited %}active{% endif %}" data-slug="{{ product.slug }}">
-                        <i class="bi {% if product.is_favorited %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                    <button type="button" class="btn btn-outline-danger btn-lg btn-toggle-fav {% if is_favorited %}active{% endif %}" data-slug="{{ product.slug }}">
+                        <i class="bi {% if is_favorited %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
                     </button>
                 </div>
 
@@ -165,4 +164,11 @@
         </div>
     </div>
 </div>
+<script>
+    console.log('🔍 Django Context:', {
+        // ✅ Используем yesno для корректного вывода булевых значений в JS
+        is_in_cart: {{ is_in_cart|yesno:"true,false" }},
+        is_favorited: {{ is_favorited|yesno:"true,false" }}
+    });
+</script>
 {% endblock %}

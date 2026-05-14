@@ -17,57 +17,82 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el) el.textContent = value;
     }
 
-    // 🔑 Обновляет состояние кнопок, сохраняя их оригинальные классы (btn-lg, btn-sm и т.д.)
     function syncButtons(slug, type, isAdded, total = null) {
         const selector = `[data-slug="${slug}"]${type === 'cart' ? '.btn-add-cart' : '.btn-toggle-fav'}`;
+        const buttons = document.querySelectorAll(selector);
 
-        document.querySelectorAll(selector).forEach(btn => {
+        console.log(`🔄 syncButtons: ${type} | найдено: ${buttons.length} | isAdded: ${isAdded}`);
+
+        buttons.forEach(btn => {
+            // 🔑 1. Удаляем спиннер
+            const spinner = btn.querySelector('.spinner-border');
+            if (spinner) spinner.remove();
+
+            // 🔑 2. Сбрасываем inline-стили
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
+
             if (type === 'cart') {
                 if (isAdded) {
-                    // 🔑 Меняем только цвет и текст, сохраняя btn-lg/px-4 и другие классы
                     btn.classList.remove('btn-dark');
                     btn.classList.add('btn-success');
+                    btn.style.backgroundColor = '#198754';
+                    btn.style.color = '#fff';
+                    btn.style.borderColor = '#198754';
+                    // 🔑 Полностью заменяем HTML
                     btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> В корзине';
                     if (total !== null) updateBadge('.cart-count-badge', total);
                 }
             } else {
-                const icon = btn.querySelector('i');
+                // 🔑 ИЗБРАННОЕ — полностью перерисовываем кнопку
+                const iconHTML = isAdded
+                    ? '<i class="bi bi-heart-fill"></i>'
+                    : '<i class="bi bi-heart"></i>';
+
                 if (isAdded) {
                     btn.classList.add('active');
-                    if (icon) icon.classList.replace('bi-heart', 'bi-heart-fill');
+                    btn.style.backgroundColor = '#dc3545';
+                    btn.style.color = '#fff';
+                    btn.style.borderColor = '#dc3545';
                 } else {
                     btn.classList.remove('active');
-                    if (icon) icon.classList.replace('bi-heart-fill', 'bi-heart');
+                    // Возвращаем стандартные стили Bootstrap
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
                 }
+
+                // 🔑 Полностью заменяем HTML (важно!)
+                btn.innerHTML = iconHTML;
+
                 if (total !== null) updateBadge('.fav-count-badge', total);
             }
-            // 🔑 Снимаем блокировку и спиннер
+
+            // 🔑 3. Снимаем блокировку
             btn.disabled = false;
-            btn.dataset.processing = 'false';
+            btn.removeAttribute('data-processing');
+            console.log(`   ✅ Кнопка обновлена, HTML: "${btn.innerHTML}"`);
         });
     }
 
     function handleAction(e, type) {
         e.preventDefault();
         const btn = e.target.closest('.btn-add-cart, .btn-toggle-fav');
-        if (!btn) return;
-
-        // Если уже обрабатывается — игнорируем повторный клик
-        if (btn.dataset.processing === 'true') return;
+        if (!btn || btn.getAttribute('data-processing') === 'true') return;
 
         const slug = btn.dataset.slug;
         if (!slug) return;
 
-        // Для корзины: если уже добавлено → редирект
+        console.log(`🎯 Клик: ${type} | ${slug}`);
+
         if (type === 'cart' && (btn.classList.contains('btn-success') || btn.innerHTML.includes('В корзине'))) {
             window.location.href = '/cart/';
             return;
         }
 
-        // 🔑 Блокируем кнопку и показываем спиннер
-        btn.dataset.processing = 'true';
+        btn.setAttribute('data-processing', 'true');
         btn.disabled = true;
-        const originalHTML = btn.innerHTML;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>...';
 
         const url = type === 'cart' ? `/cart/add/${slug}/` : `/cart/favorites/toggle/${slug}/`;
@@ -81,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return res.json();
         })
         .then(data => {
+            console.log(`📦 Ответ:`, data);
             if (data.status === 'ok') {
                 if (type === 'cart') {
                     syncButtons(slug, 'cart', true, data.total);
@@ -89,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     let current = parseInt(favBadge?.textContent) || 0;
                     syncButtons(slug, 'fav', data.is_favorited, data.is_favorited ? current + 1 : Math.max(0, current - 1));
 
-                    // Удаляем карточку только на странице избранного
                     if (!data.is_favorited && isFavoritesPage) {
                         const col = btn.closest('[class*="col-"]');
                         if (col) {
@@ -99,24 +124,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 }
-            } else {
-                // Если сервер вернул ошибку — откатываем состояние
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-                btn.dataset.processing = 'false';
             }
         })
         .catch(err => {
-            console.error(`${type} error:`, err);
-            // 🔑 При ошибке сети — откатываем кнопку
-            btn.innerHTML = originalHTML;
+            console.error(`❌ Ошибка:`, err);
             btn.disabled = false;
-            btn.dataset.processing = 'false';
+            btn.removeAttribute('data-processing');
+            // Откат к исходному состоянию
+            if (type === 'cart') {
+                btn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Купить';
+            } else {
+                btn.innerHTML = '<i class="bi bi-heart"></i>';
+            }
         });
-        // ❌ Убираем .finally(), чтобы не дублировать разблокировку
     }
 
-    // Делегирование событий
     document.addEventListener('click', (e) => {
         if (e.target.closest('.btn-add-cart')) handleAction(e, 'cart');
         if (e.target.closest('.btn-toggle-fav')) handleAction(e, 'fav');

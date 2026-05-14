@@ -18,9 +18,12 @@ main.container, main .container {
 }
 
 footer {
-    padding-top: 50px
+    margin-top: 200px;
 }
 
+.mt-auto {
+    margin-top: 50;
+}
 :root {
   --navbar-height: 72px;
 }
