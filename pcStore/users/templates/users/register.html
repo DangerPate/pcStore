@@ -1,0 +1,81 @@
+﻿{% extends 'main/layout.html' %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold mb-4">Регистрация</h3>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        {% for field in form %}
+                            {% for error in field.errors %}<p class="mb-1 small">{{ error }}</p>{% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}<p class="mb-1 small">{{ error }}</p>{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Email <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control" placeholder="you@example.com"
+                                   value="{{ form.email.value|default:'' }}" required>
+                        </div>
+
+                        <!-- Телефон -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Телефон <span class="text-danger">*</span></label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+7 (999) 123-45-67"
+                                   value="{{ form.phone.value|default:'' }}" required>
+                        </div>
+
+                        <!-- Пароль (с глазом) -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Пароль <span class="text-danger">*</span></label>
+                            <div class="position-relative">
+                                <input type="password" name="password1" id="id_password1" class="form-control pe-5"
+                                       placeholder="••••••••" required>
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent text-muted"
+                                        onclick="togglePassword('id_password1', this)" title="Показать пароль">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Подтверждение (без глаза) -->
+                        <div class="mb-4">
+                            <label class="form-label small text-muted">Подтверждение пароля <span class="text-danger">*</span></label>
+                            <input type="password" name="password2" class="form-control" placeholder="••••••••" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark w-100">Зарегистрироваться</button>
+                    </form>
+                    <div class="text-center mt-3 small">
+                        Уже есть аккаунт? <a href="{% url 'users:login' %}" class="text-decoration-none fw-medium">Войти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Скрипт переключения видимости пароля -->
+<script>
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('bi-eye', 'bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('bi-eye-slash', 'bi-eye');
+    }
+}
+</script>
+{% endblock %}

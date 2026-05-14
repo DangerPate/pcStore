@@ -7,6 +7,7 @@ import random
 class Category(models.Model):
     title = models.CharField('Название', max_length=50)
     slug = models.SlugField('URL-метка', null=True, blank=True)  # 🔑 НОВОЕ ПОЛЕ
+    icon = models.CharField('Иконка (Bootstrap)', max_length=50, default='bi-box', blank=True)
 
     class Meta:
         verbose_name = 'Категория'
