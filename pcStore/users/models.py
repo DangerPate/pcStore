@@ -54,29 +54,8 @@ class Review(models.Model):
         unique_together = ('user', 'product')  # 1 отзыв от 1 пользователя на 1 товар
 
 
-class Favorite(models.Model):
-    """Избранное (явная модель для расширения: даты, заметки и т.д.)"""
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='favorites')
-    product = models.ForeignKey('catalog.Product', on_delete=models.CASCADE, related_name='favorited_by')
-    added_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = 'Избранное'
-        unique_together = ('user', 'product')
 
 
-class Cart(models.Model):
-    """Корзина пользователя"""
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='cart')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 
-class CartItem(models.Model):
-    """Товар в корзине"""
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey('catalog.Product', on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
 
-    class Meta:
-        unique_together = ('cart', 'product')

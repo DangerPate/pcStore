@@ -128,20 +128,27 @@
                         </div>
 
                         <!-- Цена и действия -->
-                        <div class="col-12 col-md-4 p-3 text-md-end border-top border-md-top-0 mt-2 mt-md-0">
-                            <div class="fw-bold fs-5 text-primary mb-1">{{ product.price }} ₽</div>
+                        <div class="col-12 col-md-4 p-3 d-flex flex-column justify-content-center border-top border-md-top-0">
+                            <div class="fs-5 fw-bold text-primary mb-1">{{ product.price }} ₽</div>
                             {% if product.old_price %}
-                                <div class="text-muted small text-decoration-line-through mb-2">{{ product.old_price }} ₽</div>
+                                <div class="text-muted small text-decoration-line-through mb-1">{{ product.old_price }} ₽</div>
                             {% endif %}
 
-                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end align-items-center">
-                                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-2 shadow-sm"
-                                        title="В избранное" onclick="event.stopPropagation()">
-                                    <i class="bi bi-heart"></i>
+                            <div class="d-flex gap-2 mt-2">
+                                <!-- Корзина -->
+                                {% if product.is_in_cart %}
+                                <button type="button" class="btn btn-success btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}">
+                                    <i class="bi bi-check-lg me-1"></i> В корзине
                                 </button>
-                                <button type="button" class="btn btn-dark btn-sm px-3 shadow-sm"
-                                        onclick="event.stopPropagation()">
+                                {% else %}
+                                <button type="button" class="btn btn-dark btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}">
                                     <i class="bi bi-cart-plus me-1"></i> Купить
+                                </button>
+                                {% endif %}
+
+                                <!-- Избранное -->
+                                <button type="button" class="btn btn-outline-danger btn-sm btn-toggle-fav {% if product.is_favorited %}active{% endif %}" data-slug="{{ product.slug }}">
+                                    <i class="bi {% if product.is_favorited %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
                                 </button>
                             </div>
                         </div>

@@ -82,12 +82,20 @@
                 {% endif %}
 
                 <!-- Кнопки действий -->
-                <div class="d-flex gap-3 mb-4">
-                    <button type="button" class="btn btn-dark btn-lg px-4 flex-grow-1 product-btn-cart">
-                        <i class="bi bi-cart-plus me-2"></i>В корзину
+
+                <div class="d-flex gap-3 mb-4" id="product-actions">
+                    {% if product.is_in_cart %}
+                    <button type="button" class="btn btn-success btn-lg px-4 btn-add-cart" data-slug="{{ product.slug }}">
+                        <i class="bi bi-check-lg me-2"></i> Уже в корзине
                     </button>
-                    <button type="button" class="btn btn-outline-danger btn-lg product-btn-wish" title="В избранное">
-                        <i class="bi bi-heart"></i>
+                    {% else %}
+                    <button type="button" class="btn btn-dark btn-lg px-4 btn-add-cart" data-slug="{{ product.slug }}">
+                        <i class="bi bi-cart-plus me-2"></i> В корзину
+                    </button>
+                    {% endif %}
+
+                    <button type="button" class="btn btn-outline-danger btn-lg btn-toggle-fav {% if product.is_favorited %}active{% endif %}" data-slug="{{ product.slug }}">
+                        <i class="bi {% if product.is_favorited %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
                     </button>
                 </div>
 

@@ -20,20 +20,26 @@
                 </div>
             </div>
             <hr>
+
+            <!--  Кликабельные карточки с реальными счётчиками -->
             <div class="row g-3 mt-2">
                 <div class="col-md-4">
-                    <div class="p-3 bg-light rounded-3 text-center">
-                        <i class="bi bi-heart fs-3 text-danger"></i>
-                        <p class="mt-2 mb-0 fw-medium">Избранное</p>
-                        <small class="text-muted">0 товаров</small>
-                    </div>
+                    <a href="{% url 'cart:favorites' %}" class="text-decoration-none">
+                        <div class="p-3 bg-light rounded-3 text-center h-100 hover-shadow transition-all">
+                            <i class="bi bi-heart fs-3 text-danger"></i>
+                            <p class="mt-2 mb-0 fw-medium">Избранное</p>
+                            <small class="text-muted">{{ fav_count|default:0 }} товаров</small>
+                        </div>
+                    </a>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 bg-light rounded-3 text-center">
-                        <i class="bi bi-cart3 fs-3 text-primary"></i>
-                        <p class="mt-2 mb-0 fw-medium">Корзина</p>
-                        <small class="text-muted">0 товаров</small>
-                    </div>
+                    <a href="{% url 'cart:cart' %}" class="text-decoration-none">
+                        <div class="p-3 bg-light rounded-3 text-center h-100 hover-shadow transition-all">
+                            <i class="bi bi-cart3 fs-3 text-primary"></i>
+                            <p class="mt-2 mb-0 fw-medium">Корзина</p>
+                            <small class="text-muted">{{ cart_count|default:0 }} товаров</small>
+                        </div>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="p-3 bg-light rounded-3 text-center">
@@ -43,10 +49,16 @@
                     </div>
                 </div>
             </div>
+
             <div class="mt-4">
                 <a href="{% url 'users:logout' %}" class="btn btn-outline-danger btn-sm">Выйти из аккаунта</a>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.hover-shadow:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.transition-all { transition: all 0.2s ease; }
+</style>
 {% endblock %}

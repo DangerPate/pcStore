@@ -1,0 +1,45 @@
+﻿{% extends 'main/layout.html' %}
+{% block title %}Избранное{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="fw-bold mb-4">Избранное</h2>
+    {% if favorites %}
+    <div class="row g-3">
+        {% for fav in favorites %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm position-relative">
+                <button onclick="toggleFav('{{ fav.product.slug }}', this)" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-heart-fill"></i>
+                </button>
+                <a href="{% url 'catalog:product_detail' fav.product.slug %}">
+                    {% if fav.product.image %}<img src="{{ fav.product.image.url }}" class="card-img-top" style="height:180px;object-fit:contain;padding:12px;">
+                    {% else %}<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:180px;"><i class="bi bi-box-seam fs-1 text-muted"></i></div>{% endif %}
+                </a>
+                <div class="card-body">
+                    <h6 class="card-title fw-medium mb-1">{{ fav.product.title }}</h6>
+                    <div class="fw-bold text-primary">{{ fav.product.price }} ₽</div>
+                    <a href="{% url 'cart:add_to_cart' fav.product.slug %}" class="btn btn-dark btn-sm w-100 mt-2">В корзину</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+        <i class="bi bi-heart fs-1 text-muted d-block mb-2"></i>
+        <h5 class="fw-medium">Список пуст</h5>
+        <a href="{% url 'home' %}" class="btn btn-outline-primary mt-2">Смотреть каталог</a>
+    </div>
+    {% endif %}
+</div>
+<script>
+function toggleFav(slug, btn) {
+    fetch(`/cart/favorites/toggle/${slug}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest'}
+    }).then(r => r.json()).then(data => {
+        if (!data.is_favorited) btn.closest('.card').remove();
+    });
+}
+</script>
+{% endblock %}
