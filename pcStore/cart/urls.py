@@ -10,4 +10,6 @@ urlpatterns = [
     path('remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('favorites/', views.favorites_view, name='favorites'),
     path('favorites/toggle/<slug:product_slug>/', views.toggle_favorite, name='toggle_favorite'),
+    path('bulk-action/', views.bulk_cart_action, name='bulk_action'),  # 🔑 Массовые действия
+    path('checkout/', views.checkout_selected, name='checkout'),
 ]

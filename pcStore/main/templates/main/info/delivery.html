@@ -1,0 +1,133 @@
+﻿{% extends 'main/layout.html' %}
+{% block title %}Доставка - pcStore{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="fw-bold mb-4">Доставка и самовывоз</h1>
+    <p class="text-muted mb-4">Закажите комплектующие для ПК с доставкой по Кирову или заберите сами из нашего магазина в Вятка-ЦУМе.</p>
+
+    <!-- Самовывоз (важный пункт для локального магазина) -->
+    <div class="bg-light rounded-4 p-4 mb-5">
+        <h3 class="fw-bold mb-3">📦 Самовывоз (бесплатно)</h3>
+        <p>Вы можете забрать заказ самостоятельно в нашем розничном магазине. Предварительно оформите заказ на сайте или по телефону — мы соберём его за 30 минут.</p>
+        <p class="mb-0"><strong>📍 Адрес:</strong> г. Киров, ул. Воровского, 77, Вятка-ЦУМ, 2-й этаж (отдел pcStore). <br>
+        <strong>🕒 Время работы:</strong> ежедневно с 10:00 до 20:00. <br>
+        <strong>📞</strong> При себе иметь подтверждение заказа (номер или телефон).</p>
+    </div>
+
+    <h3 class="fw-bold mb-3">🚚 Доставка по Кирову</h3>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-bold border-0 pt-4 px-4">Стандартная доставка (на следующий день или в удобное время)</div>
+                <div class="card-body p-4">
+                    <p class="small text-muted">Заказы, оформленные до 18:00, доставляем на следующий день. По согласованию можно выбрать временной интервал.</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Интервал</th>
+                                    <th>До 25 кг</th>
+                                    <th>25–50 кг*</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>10:00–14:00</td><td>490 ₽</td><td>990 ₽</td></tr>
+                                <tr><td>14:00–18:00</td><td>490 ₽</td><td>990 ₽</td></tr>
+                                <tr><td>18:00–22:00</td><td>590 ₽</td><td>1090 ₽</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="small text-muted mt-2">*Для тяжёлых корпусов или серверных шасси. Точную стоимость уточняйте при оформлении.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-bold border-0 pt-4 px-4">Экспресс-доставка (день в день, за 2–4 часа)</div>
+                <div class="card-body p-4">
+                    <p class="small text-muted">Закажите до 16:00 — привезём сегодня. Работаем только по Кирову (в пределах города). Вес заказа — до 25 кг.</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr><th>Интервал</th><th>Стоимость</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>12:00–14:00</td><td>790 ₽</td></tr>
+                                <tr><td>14:00–16:00</td><td>790 ₽</td></tr>
+                                <tr><td>16:00–18:00</td><td>790 ₽</td></tr>
+                                <tr><td>18:00–20:00</td><td>890 ₽</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="small text-muted">*Заявки на экспресс-доставку принимаются до 16:00. Товар должен быть в наличии на складе.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="fw-bold mb-3">🏡 Доставка за пределы Кирова (Кировская область)</h3>
+    <div class="card border-0 shadow-sm mb-4 p-4">
+        <p class="mb-3">Доставляем в населённые пункты в радиусе до 60 км от города. Срок — на следующий день после оформления заказа (при оплате до 17:00). Вес до 25 кг.</p>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr><th>Расстояние от Кирова</th><th>Стоимость (до 25 кг)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>до 10 км (села Гирсово, Кстинино)</td><td>700 ₽</td></tr>
+                    <tr><td>10–20 км (Бахта, Русское)</td><td>950 ₽</td></tr>
+                    <tr><td>20–30 км (Слободской, Мурыгино)</td><td>1250 ₽</td></tr>
+                    <tr><td>30–50 км (Орлов, Вахруши)</td><td>1650 ₽</td></tr>
+                    <tr><td>50–60 км (Зуевка, Фалёнки)</td><td>2100 ₽</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="small text-muted">Для заказов тяжелее 25 кг (несколько корпусов или серверные стойки) — стоимость рассчитывается индивидуально. Позвоните нам: +7 (999) 999-99-99.</p>
+    </div>
+
+    <h3 class="fw-bold mb-3">💰 Способы оплаты</h3>
+    <div class="bg-white rounded-4 p-4 mb-4 shadow-sm">
+        <ul class="list-unstyled row g-3 mb-0">
+            <li class="col-md-4">💳 <strong>Банковской картой</strong> (онлайн при оформлении)</li>
+            <li class="col-md-4">🧾 <strong>Наличными курьеру</strong> (только для стандартной доставки)</li>
+            <li class="col-md-4">📱 <strong>По QR-коду СБП</strong> (по запросу)</li>
+            <li class="col-md-4">🏦 <strong>Безналичный расчёт</strong> (для юрлиц)</li>
+        </ul>
+    </div>
+
+    <h3 class="fw-bold mb-3">📋 Условия доставки (важно знать)</h3>
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light p-3 h-100">
+                <h5 class="fw-bold">Что нужно знать:</h5>
+                <ul class="small">
+                    <li>Товар доставляется только по предоплате <strong>100%</strong> (для физлиц — карта/наличные курьеру возможны).</li>
+                    <li>Курьер позвонит за 30–60 минут до прибытия.</li>
+                    <li>В случае отсутствия клиента по адресу в согласованное время — повторная доставка платная (от 300 ₽).</li>
+                    <li>Подъём на этаж: <strong>бесплатно</strong> при наличии лифта. Без лифта — 50 ₽ за этаж, начиная со 2-го.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light p-3 h-100">
+                <h5 class="fw-bold">Осмотр товара при получении:</h5>
+                <ul class="small">
+                    <li>Вы вправе проверить внешний вид упаковки и комплектацию (наличие всех компонентов по описи).</li>
+                    <li><strong>Запуск и тестирование товара курьером не производятся</strong> — это не сервисный центр.</li>
+                    <li>После подписания акта приёма-передачи претензии по внешним дефектам не принимаются.</li>
+                    <li>Если товар имеет повреждения упаковки — откажитесь от получения или составьте акт.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-secondary rounded-4" role="alert">
+        💡 <strong>Совет от главного Кирилла:</strong> Большинство комплектующих (материнские платы, видеокарты, ОЗУ) чувствительны к статике и перепадам температур. После доставки зимой не включайте компьютер сразу — дайте технике прогреться до комнатной температуры 2–3 часа.
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-3">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">← На главную</a>
+        <p class="mb-0 small text-muted">По вопросам доставки: <strong>+7 (999) 999-99-99</strong> (доб. 222) или <strong>delivery@pcstore.ru</strong></p>
+    </div>
+</div>
+{% endblock %}

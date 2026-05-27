@@ -1,0 +1,419 @@
+﻿{% extends 'main/layout.html' %}
+{% block title %}Вопросы и ответы - pcStore{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="fw-bold mb-4">Часто задаваемые вопросы (FAQ)</h1>
+    <p class="text-muted mb-4">Собрали самые популярные вопросы о нашем магазине, комплектующих для ПК, доставке и сервисе. Если не нашли ответ — напишите нам.</p>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="list-group sticky-top" style="top: 20px;">
+                <a href="#ordering" class="list-group-item list-group-item-action fw-bold">🛒 Заказ и оплата</a>
+                <a href="#delivery" class="list-group-item list-group-item-action fw-bold">🚚 Доставка</a>
+                <a href="#guarantee-return" class="list-group-item list-group-item-action fw-bold">🔧 Гарантия и возврат</a>
+                <a href="#products" class="list-group-item list-group-item-action fw-bold">💻 Комплектующие и совместимость</a>
+                <a href="#bonus-credit" class="list-group-item list-group-item-action fw-bold">🎁 Бонусы и кредит</a>
+                <a href="#shop" class="list-group-item list-group-item-action fw-bold">🏢 Магазин и сервис</a>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <!-- Заказ и оплата -->
+            <div id="ordering" class="mb-5">
+                <h3 class="fw-bold border-bottom pb-2 mb-3">🛒 Заказ и оплата</h3>
+                <div class="accordion" id="accordionOrdering">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#q1" aria-expanded="true">
+                                Как оформить заказ в pcStore?
+                            </button>
+                        </h2>
+                        <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#accordionOrdering">
+                            <div class="accordion-body small">
+                                Добавьте товары в корзину, перейдите к оформлению, заполните контактные данные (ФИО, телефон, адрес доставки или выберите самовывоз). Выберите способ оплаты и доставки. После оформления с вами свяжется менеджер для подтверждения. Также можно позвонить нам по телефону <strong>+7 (999) 999-99-99</strong> и заказать через консультанта.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                                Какие способы оплаты доступны?
+                            </button>
+                        </h2>
+                        <div id="q2" class="accordion-collapse collapse" data-bs-parent="#accordionOrdering">
+                            <div class="accordion-body small">
+                                <ul class="mb-0">
+                                    <li>Онлайн оплата банковской картой (Visa, Mastercard, МИР) на сайте.</li>
+                                    <li>Наличными курьеру при получении (только для стандартной доставки по Кирову).</li>
+                                    <li>По QR-коду СБП (Система быстрых платежей) — запросите у менеджера.</li>
+                                    <li>Безналичный расчёт для юридических лиц (по счёту).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
+                                Нужна ли предоплата?
+                            </button>
+                        </h2>
+                        <div id="q3" class="accordion-collapse collapse" data-bs-parent="#accordionOrdering">
+                            <div class="accordion-body small">
+                                Для физических лиц предоплата не обязательна при стандартной доставке — можно оплатить наличными курьеру. Для экспресс-доставки и заказов в другие города требуется 100% предоплата картой или СБП. Юридические лица работают по 100% предоплате после выставления счёта.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q4">
+                                Можно ли изменить или отменить заказ после оформления?
+                            </button>
+                        </h2>
+                        <div id="q4" class="accordion-collapse collapse" data-bs-parent="#accordionOrdering">
+                            <div class="accordion-body small">
+                                Да, если заказ ещё не передан в сборку (обычно в течение 2 часов после оформления в рабочее время). Позвоните нам по телефону <strong>+7 (999) 999-99-99</strong> или напишите на <strong>info@pcstore.ru</strong>. После сборки заказа отмена возможна, но если доставка уже выехала, придётся оплатить расходы на возврат товара на склад (300 ₽).
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q5">
+                                Нужно ли регистрироваться на сайте для заказа?
+                            </button>
+                        </h2>
+                        <div id="q5" class="accordion-collapse collapse" data-bs-parent="#accordionOrdering">
+                            <div class="accordion-body small">
+                                Нет, можно оформить заказ как гость (указав телефон и адрес). Но регистрация даёт преимущества: история заказов, накопление бонусов («pcStore Бонус»), быстрый повтор заказа, сохранение корзины между устройствами.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Доставка -->
+            <div id="delivery" class="mb-5">
+                <h3 class="fw-bold border-bottom pb-2 mb-3">🚚 Доставка</h3>
+                <div class="accordion" id="accordionDelivery">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#d1">
+                                Сколько стоит доставка по Кирову?
+                            </button>
+                        </h2>
+                        <div id="d1" class="accordion-collapse collapse show" data-bs-parent="#accordionDelivery">
+                            <div class="accordion-body small">
+                                <strong>Стандартная доставка:</strong> 490–590 ₽ в зависимости от интервала и веса (до 25 кг). <strong>Экспресс (день в день, за 2–4 часа):</strong> 790–890 ₽. Подробные тарифы на странице <a href="{% url 'delivery' %}">«Доставка»</a>. Самовывоз из магазина — бесплатно.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#d2">
+                                Доставляете ли вы за пределы Кирова (в область)?
+                            </button>
+                        </h2>
+                        <div id="d2" class="accordion-collapse collapse" data-bs-parent="#accordionDelivery">
+                            <div class="accordion-body small">
+                                Да, доставляем в радиусе до 60 км от Кирова. Стоимость от 700 до 2100 ₽ в зависимости от расстояния (до 25 кг). Срок — на следующий день после подтверждения заказа и предоплаты. Подробности на странице «Доставка».
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#d3">
+                                Как узнать, что заказ приехал? Можно ли отследить?
+                            </button>
+                        </h2>
+                        <div id="d3" class="accordion-collapse collapse" data-bs-parent="#accordionDelivery">
+                            <div class="accordion-body small">
+                                Курьер звонит за 30–60 минут до прибытия. Статус заказа можно отслеживать в личном кабинете (если вы зарегистрированы), также мы присылаем SMS-уведомления о смене статуса (сборка, передан курьеру, доставлен).
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#d4">
+                                Что делать, если курьер опоздал или меня не было дома?
+                            </button>
+                        </h2>
+                        <div id="d4" class="accordion-collapse collapse" data-bs-parent="#accordionDelivery">
+                            <div class="accordion-body small">
+                                Если вас не оказалось дома в согласованное время, курьер оставляет товар на складе. Повторная доставка платная — от 300 ₽. По возможности договаривайтесь с курьером о переносе. За 24 часа до доставки вы можете изменить интервал, позвонив нам.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#d5">
+                                Можно ли проверить комплектующие перед оплатой?
+                            </button>
+                        </h2>
+                        <div id="d5" class="accordion-collapse collapse" data-bs-parent="#accordionDelivery">
+                            <div class="accordion-body small">
+                                Вы имеете право осмотреть внешний вид упаковки и комплектацию (по описи). <strong>Запуск и тестирование курьером не производятся</strong> — для этого есть сервисный центр или самостоятельная проверка дома. Если вы заметили повреждения упаковки — откажитесь от получения и составьте акт.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Гарантия и возврат -->
+            <div id="guarantee-return" class="mb-5">
+                <h3 class="fw-bold border-bottom pb-2 mb-3">🔧 Гарантия и возврат</h3>
+                <div class="accordion" id="accordionGuarantee">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#g1">
+                                Какая гарантия на комплектующие?
+                            </button>
+                        </h2>
+                        <div id="g1" class="accordion-collapse collapse show" data-bs-parent="#accordionGuarantee">
+                            <div class="accordion-body small">
+                                Гарантийный срок устанавливается производителем (обычно 12–36 месяцев). Мы даём дополнительную гарантию магазина 1 месяц на все позиции (бесплатная диагностика и помощь с обменом). Подробнее на странице <a href="{% url 'warranty' %}">«Гарантия»</a>.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#g2">
+                                Могу ли я вернуть комплектующее, если оно не подошло по размеру или не совместимо?
+                            </button>
+                        </h2>
+                        <div id="g2" class="accordion-collapse collapse" data-bs-parent="#accordionGuarantee">
+                            <div class="accordion-body small">
+                                Большинство комплектующих (материнские платы, видеокарты, процессоры, ОЗУ, БП, накопители) являются технически сложными товарами. По Закону «О защите прав потребителей» (ст. 25 и Перечень № 924) их <strong>нельзя вернуть или обменять</strong>, если они исправны. Пожалуйста, внимательно изучайте совместимость перед покупкой. Если вы сомневаетесь — проконсультируйтесь с нашими менеджерами.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#g3">
+                                Что делать, если комплектующее оказалось бракованным?
+                            </button>
+                        </h2>
+                        <div id="g3" class="accordion-collapse collapse" data-bs-parent="#accordionGuarantee">
+                            <div class="accordion-body small">
+                                Обратитесь в наш магазин или сервисный центр (Вятка-ЦУМ, 3-й этаж) с товаром и чеком. Проведём проверку качества: до 20 дней, если с момента покупки прошло менее 15 дней; до 45 дней — если более. При подтверждении брака вернём деньги, заменим товар или отремонтируем (на ваш выбор). Подробнее на страницах <a href="{% url 'warranty' %}">«Гарантия»</a> и <a href="{% url 'returns' %}">«Возврат»</a>.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#g4">
+                                Принимаете ли вы товары по гарантии без чека?
+                            </button>
+                        </h2>
+                        <div id="g4" class="accordion-collapse collapse" data-bs-parent="#accordionGuarantee">
+                            <div class="accordion-body small">
+                                Да. Если вы зарегистрированы на сайте или совершили покупку по номеру телефона, мы найдём заказ в базе. Вам потребуется только назвать телефон и предъявить паспорт. Если заказ был оформлен как гость без указания номера — понадобится чек (можно попросить копию у нас, если покупали онлайн).
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#g5">
+                                Гарантия сгорает после разгона (оверклокинга)?
+                            </button>
+                        </h2>
+                        <div id="g5" class="accordion-collapse collapse" data-bs-parent="#accordionGuarantee">
+                            <div class="accordion-body small">
+                                Да, оверклокинг (повышение тактовой частоты, напряжения) считается нарушением условий эксплуатации, если производитель прямо не заявляет обратное (например, процессоры серии K разгоняемы, но гарантия может не покрывать последствия). Механические повреждения от перегрева или некорректного разгона гарантийным случаем не являются.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Комплектующие и совместимость -->
+            <div id="products" class="mb-5">
+                <h3 class="fw-bold border-bottom pb-2 mb-3">💻 Комплектующие и совместимость</h3>
+                <div class="accordion" id="accordionProducts">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#p1">
+                                Как подобрать совместимые комплектующие?
+                            </button>
+                        </h2>
+                        <div id="p1" class="accordion-collapse collapse show" data-bs-parent="#accordionProducts">
+                            <div class="accordion-body small">
+                                Ориентируйтесь на следующие параметры:
+                                <ul>
+                                    <li>Процессор → сокет материнской платы (LGA 1700, AM5 и т.д.) и чипсет.</li>
+                                    <li>ОЗУ → тип (DDR4/DDR5), частота, максимальный объём на материнской плате.</li>
+                                    <li>Видеокарта → длина в корпусе, мощность блока питания (рекомендуемая производителем).</li>
+                                    <li>Накопитель → интерфейс (SATA или M.2 PCIe).</li>
+                                </ul>
+                                Если не уверены — позвоните нам или напишите в чат, проконсультируем бесплатно.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#p2">
+                                Продаёте ли вы б/у или восстановленные комплектующие?
+                            </button>
+                        </h2>
+                        <div id="p2" class="accordion-collapse collapse" data-bs-parent="#accordionProducts">
+                            <div class="accordion-body small">
+                                Нет. pcStore продаёт только <strong>новые</strong> комплектующие от официальных дистрибьюторов. Все товары в заводской упаковке, с полной гарантией. Б/у и восстановленные не продаём.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#p3">
+                                Есть ли у вас услуга сборки ПК?
+                            </button>
+                        </h2>
+                        <div id="p3" class="accordion-collapse collapse" data-bs-parent="#accordionProducts">
+                            <div class="accordion-body small">
+                                Да. Мы собираем ПК из ваших или наших комплектующих. Стоимость сборки — от 1500 ₽ (включая установку ОС, драйверов и стресс-тестирование). Срок — 1–3 дня. Записывайтесь по телефону <strong>+7 (999) 999-99-99</strong>.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#p4">
+                                Могу ли я принести свой ПК на диагностику?
+                            </button>
+                        </h2>
+                        <div id="p4" class="accordion-collapse collapse" data-bs-parent="#accordionProducts">
+                            <div class="accordion-body small">
+                                Да, у нас есть собственный сервисный центр. Диагностика компьютера — 800 ₽ (при ремонте у нас — бесплатно). Ремонт компонентов (замена чипов на материнской плате, перепайка и т.д.) — по согласованию. Адрес: Киров, ул. Воровского, 77, 3-й этаж.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Бонусы и кредит -->
+            <div id="bonus-credit" class="mb-5">
+                <h3 class="fw-bold border-bottom pb-2 mb-3">🎁 Бонусы и кредит</h3>
+                <div class="accordion" id="accordionBonus">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#b1">
+                                Что такое «pcStore Бонус»?
+                            </button>
+                        </h2>
+                        <div id="b1" class="accordion-collapse collapse show" data-bs-parent="#accordionBonus">
+                            <div class="accordion-body small">
+                                Это накопительная программа лояльности. За каждую покупку вы получаете бонусные баллы (до 5% от стоимости заказа). 1 бонус = 1 рубль. Бонусами можно оплатить до 30% следующего заказа. Баллы начисляются после получения товара, сгорают через 90 дней без покупок.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#b2">
+                                Как участвовать в бонусной программе?
+                            </button>
+                        </h2>
+                        <div id="b2" class="accordion-collapse collapse" data-bs-parent="#accordionBonus">
+                            <div class="accordion-body small">
+                                Зарегистрируйтесь на сайте pcStore. При оформлении заказа будет автоматически предложено списать бонусы. Если вы не зарегистрированы, бонусы не начисляются.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#b3">
+                                Можно ли купить комплектующие в кредит или рассрочку?
+                            </button>
+                        </h2>
+                        <div id="b3" class="accordion-collapse collapse" data-bs-parent="#accordionBonus">
+                            <div class="accordion-body small">
+                                Да, мы сотрудничаем с банками-партнёрами (Тинькофф, Альфа-Банк, Совкомбанк). Оформление кредита или рассрочки (0% на 3–6 месяцев) прямо в магазине при самовывозе. Потребуется паспорт и второй документ (СНИЛС/ИНН). Онлайн-кредит пока в разработке.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Магазин и сервис -->
+            <div id="shop" class="mb-5">
+                <h3 class="fw-bold border-bottom pb-2 mb-3">🏢 Магазин и сервис</h3>
+                <div class="accordion" id="accordionShop">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#s1">
+                                Где находится ваш магазин и как к вам добраться?
+                            </button>
+                        </h2>
+                        <div id="s1" class="accordion-collapse collapse show" data-bs-parent="#accordionShop">
+                            <div class="accordion-body small">
+                                <strong>Адрес:</strong> г. Киров, ул. Воровского, 77, Вятка-ЦУМ, 2-й этаж (отдел pcStore). <br>
+                                <strong>Как добраться:</strong> трамваи №1, №4, №10 до остановки «Филармония»; автобусы №7, №12, №33 до ост. «Вятка-ЦУМ». Вход со стороны главного фасада, затем эскалатор на 2-й этаж.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#s2">
+                                Часы работы магазина и сервисного центра
+                            </button>
+                        </h2>
+                        <div id="s2" class="accordion-collapse collapse" data-bs-parent="#accordionShop">
+                            <div class="accordion-body small">
+                                <strong>Магазин (самовывоз, консультации):</strong> ежедневно с 10:00 до 20:00. <br>
+                                <strong>Сервисный центр (приём/выдача по гарантии, ремонт):</strong> пн–пт с 11:00 до 19:00, сб с 12:00 до 16:00, вс — выходной.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#s3">
+                                Как связаться с поддержкой?
+                            </button>
+                        </h2>
+                        <div id="s3" class="accordion-collapse collapse" data-bs-parent="#accordionShop">
+                            <div class="accordion-body small">
+                                <ul class="mb-0">
+                                    <li>📞 Телефон: <strong>+7 (999) 999-99-99</strong> (пн–вс 10:00–20:00).</li>
+                                    <li>✉️ E-mail: <strong>info@pcstore.ru</strong> (отвечаем в течение 24 часов).</li>
+                                    <li>💬 Онлайн-чат на сайте (иконка в правом нижнем углу).</li>
+                                    <li>📱 Соцсети: ВКонтакте и Telegram (ссылки в футере).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#s4">
+                                Работаете ли вы с юридическими лицами?
+                            </button>
+                        </h2>
+                        <div id="s4" class="accordion-collapse collapse" data-bs-parent="#accordionShop">
+                            <div class="accordion-body small">
+                                Да, у нас есть отдел по работе с юрлицами. Закупки комплектующих для офисов, серверных, госучреждений — оптовые цены, отсрочка платежа, закрывающие документы. Свяжитесь с нашим менеджером: <strong>b2b@pcstore.ru</strong> или телефон +7 (999) 999-99-99 (доб. 456).
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#s5">
+                                Принимаете ли вы заказы из других регионов (не Киров)?
+                            </button>
+                        </h2>
+                        <div id="s5" class="accordion-collapse collapse" data-bs-parent="#accordionShop">
+                            <div class="accordion-body small">
+                                Пока мы доставляем только по Кирову и Кировской области (до 60 км). В будущем планируем отправку через СДЭК по всей России. Следите за новостями.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-light rounded-4 p-4 text-center">
+        <h5 class="fw-bold mb-3">Не нашли ответ на свой вопрос?</h5>
+        <p class="mb-3">Свяжитесь с нами — мы обязательно поможем!</p>
+        <a href="tel:+79999999999" class="btn btn-primary me-2">📞 Позвонить</a>
+        <a href="mailto:info@pcstore.ru" class="btn btn-outline-secondary">✉️ Написать</a>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">← На главную</a>
+    </div>
+</div>
+{% endblock %}

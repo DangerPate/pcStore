@@ -1,78 +1,253 @@
-﻿body {
-  background: white;
-  padding-top: var(--navbar-height);
-  margin: 0;
-}
-
-header {
-  background-color: white;
-}
-
-main {
-  padding-top: 0px;
-}
-
-main.container, main .container {
-    padding-top: 1rem; /* Минимальный внутренний отступ для контента */
-    margin-top: 0 !important;
-}
-
-footer {
-    margin-top: 200px;
-}
-
-.mt-auto {
-    margin-top: 50;
-}
+﻿/* =========================================
+   1. ПЕРЕМЕННЫЕ (обязательно в начале)
+   ========================================= */
 :root {
   --navbar-height: 72px;
 }
-body {
-  
+
+/* =========================================
+   2. БАЗОВЫЕ СТИЛИ & СБРОС
+   ========================================= */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #fff;
 }
 
-/* === OFFCANVA CATALOG === */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* =========================================
+   3. LAYOUT & STICKY FOOTER
+   ========================================= */
+/* Основной контент растягивается, толкая футер вниз */
+main {
+  flex: 1 0 auto;
+  padding-top: calc(var(--navbar-height) + 1rem); /* Отступ под fixed-навбар */
+  padding-bottom: 2rem;
+}
+
+/* Сбрасываем лишние отступы у контейнеров внутри main */
+main .container {
+  padding-top: 0;
+  margin-top: 0 !important;
+}
+
+/* Футер не сжимается и прижимается к низу */
+footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+/* =========================================
+   4. НАВБАР & OFFCANVAS КАТАЛОГ
+   ========================================= */
+header {
+  background-color: #fff;
+  z-index: 1050; /* Поверх всего, кроме модалок */
+}
+
 .offcanvas-top.no-overlap-header {
   top: var(--navbar-height) !important;
   height: calc(100vh - var(--navbar-height)) !important;
-  z-index: 1045; /* Поверх навбара (1030), но под модалками */
+  z-index: 1045;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
-  /* Стартовая позиция: сдвинут вверх ровно на высоту навбара → спрятан за ним */
+  /* Скрыт за навбаром по умолчанию */
   transform: translateY(calc(-1 * var(--navbar-height))) !important;
-  /* Переопределяем стандартную анимацию Bootstrap */
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 
-/* При добавлении класса .show от Bootstrap панель выезжает вниз */
 .offcanvas-top.no-overlap-header.show {
   transform: translateY(0) !important;
 }
 
-/* Стили элементов каталога */
+/* Элементы каталога */
 .catalog-category {
   padding: 0.75rem 1.25rem;
   transition: all 0.2s ease;
   border-radius: 8px;
   margin: 0.25rem 0;
 }
+
 .catalog-category:hover {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  transform: translateX(4px); /* Плавный сдвиг без дёргания верстки */
+  transform: translateX(4px);
   text-decoration: none;
 }
+
 .catalog-category i {
   width: 24px;
   color: #6c757d;
   transition: color 0.2s;
 }
+
 .catalog-category:hover i {
   color: #0d6efd;
 }
+
 .hover-bg-primary:hover {
   background-color: #0d6efd !important;
   color: #fff !important;
   transition: all 0.2s;
+}
+
+/* =========================================
+   5. ФУТЕР (ЧЁРНО-БЕЛЫЙ СТИЛЬ)
+   ========================================= */
+footer {
+  background-color: #000;
+  color: #fff;
+  border-top: 1px solid #333;
+  font-size: 0.9rem;
+}
+
+ooter .text-muted,
+footer .small,
+footer p,
+footer li {
+    color: #b3b3b3 !important;
+}
+
+footer h5, footer h6 {
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+footer a {
+  color: #aaa;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: inline-block;
+}
+
+footer a:hover {
+  color: #fff !important;
+}
+
+footer .list-unstyled li {
+  margin-bottom: 0.5rem;
+}
+
+/* Соцсети */
+footer .social-links a {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid #444;
+  margin-right: 0.5rem;
+  color: #aaa;
+  transition: all 0.2s ease;
+}
+
+footer .social-links a:hover {
+  background: #fff;
+  color: #000 !important;
+  border-color: #fff;
+}
+
+/* Форма подписки */
+footer .newsletter-form .form-control {
+  background: #1a1a1a;
+  border: 1px solid #444;
+  color: #fff;
+  border-radius: 4px;
+}
+
+footer .newsletter-form .form-control::placeholder {
+  color: #666;
+}
+
+footer .newsletter-form .form-control:focus {
+  background: #222;
+  border-color: #fff;
+  box-shadow: none;
+  color: #fff;
+}
+
+footer .newsletter-form .btn {
+  background: #fff;
+  color: #000;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+footer .newsletter-form .btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* Нижняя полоса */
+footer .footer-bottom {
+  border-top: 1px solid #333;
+  padding-top: 1.5rem;
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+footer .footer-bottom a {
+  color: #666;
+}
+
+footer .footer-bottom a:hover {
+  color: #fff !important;
+}
+
+footer .payment-badge {
+  background: #222;
+  color: #fff;
+  padding: 0.25rem 0.6rem;
+  border-radius: 3px;
+  font-weight: 500;
+  font-size: 0.75rem;
+  margin-right: 0.3rem;
+  border: 1px solid #444;
+}
+
+/* =========================================
+   6. АДАПТИВ
+   ========================================= */
+@media (max-width: 768px) {
+  footer .row > [class*="col-"] {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  footer .social-links {
+    justify-content: center;
+  }
+
+  footer .newsletter-form {
+    max-width: 100%;
+  }
+
+  footer .newsletter-form .form-control {
+    margin-bottom: 0.5rem;
+  }
+
+  footer .footer-bottom {
+    text-align: center;
+  }
+
+  footer .footer-bottom .d-flex {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
