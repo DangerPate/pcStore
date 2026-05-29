@@ -540,3 +540,71 @@ footer .payment-badge {
         height: 370px !important;
     }
 }
+/* ==========================================
+   КАРУСЕЛЬ НОВИНОК (полный аналог хитов)
+   ========================================== */
+.new-carousel-section {
+    padding: 0.8rem 0 1.5rem !important;
+    border-radius: 12px;
+    position: relative;
+    margin-top: 10px;
+}
+
+.new-carousel-section h3 {
+    margin-bottom: 0.4rem !important;
+    padding: 0 1rem;
+}
+
+.new-carousel-section .swiper {
+    overflow: hidden !important;
+    max-width: 100%;
+    padding-left: 1rem !important;
+}
+
+.new-carousel-section .swiper-wrapper {
+    padding-bottom: 0px;
+    gap: 30px;
+    height: 450px !important;
+}
+
+.new-carousel-section .swiper-slide {
+    width: 245px !important;
+    flex-shrink: 0 !important;
+}
+
+.new-carousel-section .product-card {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* СТРЕЛКИ */
+.new-carousel-section .swiper-button-prev,
+.new-carousel-section .swiper-button-next {
+    color: #333 !important;
+    opacity: 0.9;
+    width: 40px !important;
+    height: 40px !important;
+    z-index: 9999 !important;
+    cursor: pointer;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.new-carousel-section .swiper-button-prev:hover,
+.new-carousel-section .swiper-button-next:hover {
+    opacity: 1;
+    background: #fff;
+}
+.new-carousel-section .swiper-button-prev:after,
+.new-carousel-section .swiper-button-next:after {
+    font-size: 20px !important;
+    font-weight: bold;
+}
+
+@media (max-width: 767.98px) {
+    .new-carousel-section .swiper-slide div {
+        height: 370px !important;
+    }
+}

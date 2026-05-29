@@ -74,9 +74,13 @@ def index(request):
 
     # === 🔥 ХИТЫ ПРОДАЖ ===
     hit_products = Product.objects.filter(
-        is_active=True,
-        is_hit=True
+        is_active=True
     ).order_by('-created_at')[:15]
+
+    new_products = Product.objects.filter(
+        is_active=True
+    ).order_by('-created_at')[:15]
+
 
     if request.user.is_authenticated:
         hit_products = hit_products.annotate(
@@ -93,8 +97,8 @@ def index(request):
         'banners_with_products': banners_with_products,
         'discounted_products': discounted_products_all,
         'hit_products': hit_products,
+        'new_products': new_products,
         'products': products,
-
     })
 def about(request):
     return render(request, 'main/info/about.html')

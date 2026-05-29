@@ -244,6 +244,20 @@
                 },
             });
         }
+        // 🔥 Карусель новинок
+        if (document.querySelector('.newSwiper')) {
+            new Swiper('.newSwiper', {
+                loop: true,
+                speed: 500,
+                slidesPerView: 'auto',
+                spaceBetween: 0,
+                loopedSlides: 5,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            });
+        }
     });
     </script>
     <!-- === ФУТЕР === -->

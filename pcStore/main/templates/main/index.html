@@ -139,14 +139,35 @@
 </section>
 {% endif %}
 <!-- ==========================================
-     ОСТАЛЬНЫЕ КАРУСЕЛИ (заглушки)
+     НОВИНКИ (аналогично хитам)
      ========================================== -->
-<section class="container py-4">
-    <h3 class="fw-bold mb-4">🔥 Скоро здесь будут:</h3>
-    <ul>
-        <li>Карусель хитов продаж</li>
-        <li>Карусель новинок</li>
-        <li>Популярные отзывы</li>
-    </ul>
+{% if new_products %}
+<section class="new-carousel-section mb-4">
+    <div class="container-fluid px-0">
+        <h3 class="fw-bold px-3 px-md-4 mb-3">
+            ✨ Новинки
+            <a href="#" class="btn btn-link btn-sm text-decoration-none">
+                Все новинки <i class="bi bi-arrow-right"></i>
+            </a>
+        </h3>
+
+        <!-- Swiper контейнер -->
+        <div class="swiper newSwiper" style="padding: 0 1rem;">
+            <div class="swiper-wrapper" style="height: 410px; gap: 30px;">
+                {% for product in new_products %}
+                <div class="swiper-slide" style="width: 245px;">
+                    <div style="height: 405px;">
+                        {% include 'product/mini_product_card.html' with product=product %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Стрелки -->
+            <div class="swiper-button-prev" style="left: 0;"></div>
+            <div class="swiper-button-next" style="right: 0;"></div>
+        </div>
+    </div>
 </section>
+{% endif %}
 {% endblock %}

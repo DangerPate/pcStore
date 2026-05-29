@@ -90,24 +90,19 @@ def category_view(request, category_slug):
     })
 
 
+# catalog/views.py
+
 def product_detail(request, slug):
-    """Детальная страница товара"""
     product = get_object_or_404(Product, slug=slug, is_active=True)
+
+    product.increment_views()
 
     is_in_cart = False
     is_favorited = False
 
     if request.user.is_authenticated:
-        cart_item = CartItem.objects.filter(
-            user=request.user,
-            product=product
-        ).first()
-
-        fav_item = Favorite.objects.filter(
-            user=request.user,
-            product=product
-        ).first()
-
+        cart_item = CartItem.objects.filter(user=request.user, product=product).first()
+        fav_item = Favorite.objects.filter(user=request.user, product=product).first()
         is_in_cart = cart_item is not None
         is_favorited = fav_item is not None
 
