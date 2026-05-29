@@ -251,3 +251,292 @@ footer .payment-badge {
     gap: 0.5rem;
   }
 }
+/* ==========================================
+   SWIPER КАРУСЕЛЬ
+   ========================================== */
+
+.promo-carousel-section {
+    padding-bottom: 20px;
+    position: relative !important;  /* 🔑 ИЗОЛЯЦИЯ */
+    z-index: 1 !important;
+    overflow: hidden !important;
+}
+
+.promo-carousel-section .swiper {
+    height: 450px !important;
+    position: relative !important;
+}
+
+.promo-carousel-section .swiper-wrapper {
+    align-items: stretch;
+}
+
+.promo-carousel-section .swiper-slide {
+    height: 450px !important;
+    width: 100% !important;
+}
+
+.promo-carousel-section .slide-content {
+    height: 100%;
+}
+
+.promo-carousel-section .banner-wrapper {
+    height: 450px !important;
+    transition: transform 0.3s ease;
+}
+.promo-carousel-section .banner-wrapper:hover {
+    transform: scale(1.01);
+}
+.promo-carousel-section .banner-wrapper img {
+    transition: transform 0.5s ease;
+}
+.promo-carousel-section .banner-wrapper:hover img {
+    transform: scale(1.05);
+}
+
+.banner-content {
+    z-index: 2;
+}
+
+.promo-banner-btn {
+    background: #111111 !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transition: all 0.2s;
+}
+.promo-banner-btn:hover {
+    background: #333333 !important;
+    transform: translateY(-2px);
+}
+
+/* 🔑 ТОЧКИ - ОТДЕЛЬНО СНИЗУ */
+.promo-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+.promo-pagination-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d0d0d0;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.promo-pagination-dot.active {
+    background: #111;
+    transform: scale(1.3);
+}
+
+/* СТРЕЛКИ */
+.promo-carousel-section .swiper-button-next,
+.promo-carousel-section .swiper-button-prev {
+    color: #333 !important;
+    opacity: 0.9;
+    width: 40px !important;
+    height: 40px !important;
+    z-index: 9999 !important;
+    cursor: pointer;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.promo-carousel-section .swiper-button-next:hover,
+.promo-carousel-section .swiper-button-prev:hover {
+    opacity: 1;
+    background: #fff;
+}
+.promo-carousel-section .swiper-button-next:after,
+.promo-carousel-section .swiper-button-prev:after {
+    font-size: 20px !important;
+    font-weight: bold;
+}
+
+/* ТОВАРЫ */
+.promo-carousel-section .col-4 {
+    height: 100%;
+}
+.promo-carousel-section .col-4 .p-3 {
+    height: 100%;
+    padding: 1rem !important;
+}
+.promo-carousel-section .product-card {
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 991.98px) {
+    .promo-carousel-section .swiper {
+        height: 350px !important;
+    }
+    .promo-carousel-section .swiper-slide {
+        height: 350px !important;
+    }
+    .promo-carousel-section .banner-wrapper {
+        height: 350px !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .promo-carousel-section .swiper {
+        height: 300px !important;
+    }
+    .promo-carousel-section .swiper-slide {
+        height: 300px !important;
+    }
+    .promo-carousel-section .banner-wrapper {
+        height: 300px !important;
+    }
+}
+
+/* ==========================================
+   КАРУСЕЛЬ ТОВАРОВ СО СКИДКОЙ
+   ========================================== */
+
+.discount-carousel-section {
+    background: #f8f9fa;
+    padding: 0.8rem 0 1.5rem !important;
+    border-radius: 12px;
+    position: relative;
+    margin-top: 10px;
+}
+
+.discount-carousel-section h3 {
+    margin-bottom: 0.4rem !important;
+    padding: 0 1rem;
+}
+
+.discount-carousel-section .swiper {
+    overflow: hidden !important;
+    max-width: 100%;
+    padding-left: 1rem !important;
+}
+
+.discount-carousel-section .swiper-wrapper {
+    padding-bottom: 0px;
+    gap: 30px ;
+    height: 450px !important;  /* Твоё значение - не трогаю */
+
+}
+
+.discount-carousel-section .swiper-slide {
+    width: 245px !important;   /* Фиксированная ширина */
+    flex-shrink: 0 !important;
+}
+
+
+.discount-carousel-section .product-card {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* 🔑 СТРЕЛКИ - ГАРАНТИРОВАННО РАБОЧИЕ */
+.discount-carousel-section .swiper-button-prev,
+.discount-carousel-section .swiper-button-next {
+    color: #333 !important;
+    opacity: 0.9;
+    width: 40px !important;
+    height: 40px !important;
+    z-index: 9999 !important;
+    cursor: pointer;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.discount-carousel-section .swiper-button-prev:hover,
+.discount-carousel-section .swiper-button-next:hover {
+    opacity: 1;
+    background: #fff;
+}
+
+.discount-carousel-section .swiper-button-prev:after,
+.discount-carousel-section .swiper-button-next:after {
+    font-size: 20px !important;
+    font-weight: bold;
+}
+
+/* Адаптив */
+@media (max-width: 767.98px) {
+    .discount-carousel-section .swiper-slide div {
+        height: 370px !important;
+    }
+}
+
+/* ==========================================
+   КАРУСЕЛЬ ХИТОВ ПРОДАЖ (без фона)
+   ========================================== */
+
+.hit-carousel-section {
+    padding: 0.8rem 0 1.5rem !important;
+    border-radius: 12px;
+    position: relative;
+    margin-top: 10px;
+    /* 🔑 НЕТ background: #f8f9fa — белый фон как у сайта */
+}
+
+.hit-carousel-section h3 {
+    margin-bottom: 0.4rem !important;
+    padding: 0 1rem;
+}
+
+.hit-carousel-section .swiper {
+    overflow: hidden !important;
+    max-width: 100%;
+    padding-left: 1rem !important;
+}
+
+.hit-carousel-section .swiper-wrapper {
+    padding-bottom: 0px;
+    gap: 30px;
+    height: 450px !important;
+}
+
+.hit-carousel-section .swiper-slide {
+    width: 245px !important;
+    flex-shrink: 0 !important;
+}
+
+.hit-carousel-section .product-card {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* СТРЕЛКИ */
+.hit-carousel-section .swiper-button-prev,
+.hit-carousel-section .swiper-button-next {
+    color: #333 !important;
+    opacity: 0.9;
+    width: 40px !important;
+    height: 40px !important;
+    z-index: 9999 !important;
+    cursor: pointer;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.hit-carousel-section .swiper-button-prev:hover,
+.hit-carousel-section .swiper-button-next:hover {
+    opacity: 1;
+    background: #fff;
+}
+.hit-carousel-section .swiper-button-prev:after,
+.hit-carousel-section .swiper-button-next:after {
+    font-size: 20px !important;
+    font-weight: bold;
+}
+
+@media (max-width: 767.98px) {
+    .hit-carousel-section .swiper-slide div {
+        height: 370px !important;
+    }
+}

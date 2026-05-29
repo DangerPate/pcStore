@@ -1,26 +1,101 @@
 from django.shortcuts import render
 from catalog.models import Product, Category
-from django.db.models import Exists, OuterRef, Value, BooleanField
+from django.db.models import Exists, OuterRef, Value, BooleanField, Q, F
 from cart.models import CartItem, Favorite
+from .models import Banner
 
+
+# main/views.py
+
+# main/views.py
 
 def index(request):
-    products = Product.objects.filter(is_active=True)[:15]  # Ваши 12 товаров
+    """Главная страница с баннерами и каруселями"""
+
+    # === БАННЕРЫ С ТОВАРАМИ ===
+    banners_with_products = []
+    active_banners = Banner.objects.filter(
+        is_active=True
+    ).select_related('link_category', 'link_product').prefetch_related('products')
+
+    for banner in active_banners:
+        if banner.is_current:
+            discounted_products = banner.get_discounted_products(count=3)
+
+            if request.user.is_authenticated:
+                discounted_products = discounted_products.annotate(
+                    is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+                    is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+                )
+            else:
+                discounted_products = discounted_products.annotate(
+                    is_in_cart=Value(False, output_field=BooleanField()),
+                    is_favorited=Value(False, output_field=BooleanField())
+                )
+
+            banners_with_products.append({
+                'banner': banner,
+                'products': list(discounted_products),
+            })
+
+    # === 🔥 ТОВАРЫ СО СКИДКОЙ ===
+    discounted_products_all = Product.objects.filter(
+        is_active=True,
+        old_price__isnull=False
+    ).exclude(
+        old_price__lte=F('price')
+    ).order_by('-created_at')[:15]
 
     if request.user.is_authenticated:
-        products = products.annotate(
-            is_in_cart=Exists(CartItem.objects.filter(cart__user=request.user, product=OuterRef('pk'))),
+        discounted_products_all = discounted_products_all.annotate(
+            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
             is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
         )
     else:
-        # 🔑 FIX: Используем Value() вместо простого False
-        products = products.annotate(
+        discounted_products_all = discounted_products_all.annotate(
             is_in_cart=Value(False, output_field=BooleanField()),
             is_favorited=Value(False, output_field=BooleanField())
         )
 
-    return render(request, 'main/index.html', {'products': products})
+    # === ОБЫЧНЫЕ ТОВАРЫ ===
+    products = Product.objects.filter(is_active=True)[:15]
 
+    if request.user.is_authenticated:
+        products = products.annotate(
+            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+        )
+    else:
+        products = products.annotate(
+            is_in_cart=Value(False, output_field=BooleanField()),
+            is_favorited=Value(False, output_field=BooleanField())
+        )
+    # main/views.py — внутри функции index(), после discounted_products_all
+
+    # === 🔥 ХИТЫ ПРОДАЖ ===
+    hit_products = Product.objects.filter(
+        is_active=True,
+        is_hit=True
+    ).order_by('-created_at')[:15]
+
+    if request.user.is_authenticated:
+        hit_products = hit_products.annotate(
+            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+        )
+    else:
+        hit_products = hit_products.annotate(
+            is_in_cart=Value(False, output_field=BooleanField()),
+            is_favorited=Value(False, output_field=BooleanField())
+        )
+
+    return render(request, 'main/index.html', {
+        'banners_with_products': banners_with_products,
+        'discounted_products': discounted_products_all,
+        'hit_products': hit_products,
+        'products': products,
+
+    })
 def about(request):
     return render(request, 'main/info/about.html')
 

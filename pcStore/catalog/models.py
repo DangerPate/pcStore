@@ -21,6 +21,11 @@ class Category(models.Model):
             self.slug = slugify(self.title, allow_unicode=False)
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        """Возвращает URL категории"""
+        from django.urls import reverse
+        return reverse('catalog:category', kwargs={'category_slug': self.slug})
+
 
 class Product(models.Model):
     # === ВАШИ СТАРЫЕ ПОЛЯ (сохранены + доработаны) ===
@@ -89,8 +94,9 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        # Будет работать, когда создадите view для детальной страницы товара
-        return reverse('product_detail', kwargs={'slug': self.slug})
+        """Возвращает URL детальной страницы товара"""
+        from django.urls import reverse
+        return reverse('catalog:product_detail', kwargs={'slug': self.slug})  # 🔑 product_detail, а не category!
 
     # === БИЗНЕС-ЛОГИКА (вызываются в шаблонах как product.price_with_discount) ===
     @property

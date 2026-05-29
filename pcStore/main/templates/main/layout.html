@@ -9,9 +9,12 @@
     <link rel="stylesheet" href="{% static 'main/css/main.css' %}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
 <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'main/js/ecommerce.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
 <body>
     <!-- === НАВБАР === -->
     <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
@@ -187,11 +190,64 @@
     <main>
         <div class="container">{% block content %}{% endblock %}</div>
     </main>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 🔥 Карусель акций (не трогаем)
+        if (document.querySelector('.promoSwiper')) {
+            new Swiper('.promoSwiper', {
+                loop: false,
+                speed: 500,
+                slidesPerView: 1,
+                spaceBetween: 0,
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.promo-pagination',
+                    clickable: true,
+                    bulletClass: 'promo-pagination-dot',
+                    bulletActiveClass: 'active',
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            });
+        }
 
+        // 🔥 Карусель товаров со скидкой (НОВАЯ ВЕРСИЯ)
+        if (document.querySelector('.discountSwiper')) {
+            new Swiper('.discountSwiper', {
+                loop: true,              /* 🔑 БЕСКОНЕЧНАЯ ПРОКРУТКА */
+                speed: 500,
+                slidesPerView: 'auto',
+                spaceBetween: 0,
+                loopedSlides: 5,         /* 🔑 Количество дублируемых слайдов */
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            });
+        }
+        // 🔥 Карусель хитов продаж
+        if (document.querySelector('.hitSwiper')) {
+            new Swiper('.hitSwiper', {
+                loop: true,
+                speed: 500,  // Быстрая анимация
+                slidesPerView: 'auto',
+                spaceBetween: 0,
+                loopedSlides: 5,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            });
+        }
+    });
+    </script>
     <!-- === ФУТЕР === -->
     <footer class="mt-auto">
-        <link rel="stylesheet" href="{% static 'main/css/footer.css' %}">
-
         <div class="container py-5">
             <div class="row g-4">
                 <!-- 1. Логотип + Соцсети (3/12) -->
