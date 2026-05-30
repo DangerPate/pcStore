@@ -186,6 +186,11 @@ class Product(models.Model):
         else:
             return 'Под заказ'
 
+    @property
+    def review_count(self):
+        """Заглушка: возвращает случайное число отзывов (10-500)"""
+        # 🔥 В будущем: return self.reviews.count()
+        return (self.id * 7 + 13) % 491 + 10  # Псевдо-рандом на основе ID
     # 🔥 === УВЕЛИЧЕНИЕ ПРОСМОТРОВ ===
     def increment_views(self):
         """Безопасное увеличение счётчика просмотров"""

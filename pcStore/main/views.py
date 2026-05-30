@@ -5,14 +5,10 @@ from cart.models import CartItem, Favorite
 from .models import Banner
 
 
-# main/views.py
-
-# main/views.py
-
 def index(request):
     """Главная страница с баннерами и каруселями"""
 
-    # === БАННЕРЫ С ТОВАРАМИ ===
+    # === 1. БАННЕРЫ С ТОВАРАМИ ===
     banners_with_products = []
     active_banners = Banner.objects.filter(
         is_active=True
@@ -20,25 +16,28 @@ def index(request):
 
     for banner in active_banners:
         if banner.is_current:
-            discounted_products = banner.get_discounted_products(count=3)
+            # 🔑 ИСПРАВЛЕНИЕ: работаем с QuerySet, а не со списком
+            # get_discounted_products возвращал list, у которого нет .annotate()
+            products_qs = banner.products.filter(is_active=True)
 
             if request.user.is_authenticated:
-                discounted_products = discounted_products.annotate(
+                products_qs = products_qs.annotate(
                     is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
                     is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
                 )
             else:
-                discounted_products = discounted_products.annotate(
+                products_qs = products_qs.annotate(
                     is_in_cart=Value(False, output_field=BooleanField()),
                     is_favorited=Value(False, output_field=BooleanField())
                 )
 
+            # 🔑 Преобразуем в список ТОЛЬКО после аннотаций и ограничения выборки
             banners_with_products.append({
                 'banner': banner,
-                'products': list(discounted_products),
+                'products': list(products_qs[:3]),
             })
 
-    # === 🔥 ТОВАРЫ СО СКИДКОЙ ===
+    # === 2. ТОВАРЫ СО СКИДКОЙ ===
     discounted_products_all = Product.objects.filter(
         is_active=True,
         old_price__isnull=False
@@ -57,38 +56,33 @@ def index(request):
             is_favorited=Value(False, output_field=BooleanField())
         )
 
-    # === ОБЫЧНЫЕ ТОВАРЫ ===
-    products = Product.objects.filter(is_active=True)[:15]
+    # === 3. ПОПУЛЯРНОЕ (только товары с максимальным количеством просмотров) ===
+    popular_products = Product.objects.filter(
+        is_active=True,
+        views__gt=0  # 🔑 Исключаем товары с 0 просмотров
+    ).order_by('-views')[:15]  # 🔑 Сортировка строго по убыванию просмотров
 
     if request.user.is_authenticated:
-        products = products.annotate(
+        popular_products = popular_products.annotate(
             is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
             is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
         )
     else:
-        products = products.annotate(
+        popular_products = popular_products.annotate(
             is_in_cart=Value(False, output_field=BooleanField()),
             is_favorited=Value(False, output_field=BooleanField())
         )
-    # main/views.py — внутри функции index(), после discounted_products_all
 
-    # === 🔥 ХИТЫ ПРОДАЖ ===
-    hit_products = Product.objects.filter(
-        is_active=True
-    ).order_by('-created_at')[:15]
-
-    new_products = Product.objects.filter(
-        is_active=True
-    ).order_by('-created_at')[:15]
-
+    # === 4. НОВИНКИ (автоматически по дате создания) ===
+    new_products = Product.objects.filter(is_active=True).order_by('-created_at')[:15]
 
     if request.user.is_authenticated:
-        hit_products = hit_products.annotate(
+        new_products = new_products.annotate(
             is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
             is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
         )
     else:
-        hit_products = hit_products.annotate(
+        new_products = new_products.annotate(
             is_in_cart=Value(False, output_field=BooleanField()),
             is_favorited=Value(False, output_field=BooleanField())
         )
@@ -96,10 +90,11 @@ def index(request):
     return render(request, 'main/index.html', {
         'banners_with_products': banners_with_products,
         'discounted_products': discounted_products_all,
-        'hit_products': hit_products,
+        'popular_products': popular_products,  # 🔑 Новое имя
         'new_products': new_products,
-        'products': products,
     })
+
+
 def about(request):
     return render(request, 'main/info/about.html')
 

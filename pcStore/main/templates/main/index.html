@@ -77,97 +77,99 @@
 <!-- ==========================================
      ТОВАРЫ СО СКИДКОЙ
      ========================================== -->
+<div class="container" style="max-width: 1440px;">
 {% if discounted_products %}
-<section class="discount-carousel-section mb-4">
-    <div class="container-fluid px-0">
-        <h3 class="fw-bold px-3 px-md-4 mb-3">
-            🔥 Товары со скидкой
-            <a href="#" class="btn btn-link btn-sm text-decoration-none">
-                Все акции <i class="bi bi-arrow-right"></i>
-            </a>
-        </h3>
+    <section class="discount-carousel-section mb-4">
+        <div class="container-fluid px-0">
+            <h3 class="fw-bold px-3 px-md-4 mb-3">
+                🔥 Товары со скидкой
+                <a href="#" class="btn btn-link btn-sm text-decoration-none">
+                    Все акции <i class="bi bi-arrow-right"></i>
+                </a>
+            </h3>
 
-        <!-- 🔑 Swiper контейнер -->
-        <div class="swiper discountSwiper" style="padding: 0 1rem;">
-            <div class="swiper-wrapper">
-                {% for product in discounted_products %}
-                <div class="swiper-slide" >
-                    <div style="height: 405px;">
-                        {% include 'product/mini_product_card.html' with product=product %}
+            <!-- 🔑 Swiper контейнер -->
+            <div class="swiper discountSwiper" style="padding: 0 1rem;">
+                <div class="swiper-wrapper">
+                    {% for product in discounted_products %}
+                    <div class="swiper-slide" >
+                        <div style="height: 405px;">
+                            {% include 'product/mini_product_card.html' with product=product %}
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+
+                <!-- Стрелки -->
+                <div class="swiper-button-prev" style="left: 0;"></div>
+                <div class="swiper-button-next" style="right: 0;"></div>
             </div>
-
-            <!-- Стрелки -->
-            <div class="swiper-button-prev" style="left: 0;"></div>
-            <div class="swiper-button-next" style="right: 0;"></div>
         </div>
-    </div>
-</section>
-{% endif %}
-<!-- ==========================================
-     ХИТЫ ПРОДАЖ (без серого фона)
-     ========================================== -->
-{% if hit_products %}
-<section class="hit-carousel-section mb-4">
-    <div class="container-fluid px-0">
-        <h3 class="fw-bold px-3 px-md-4 mb-3">
-            🔥 Хиты продаж
-            <a href="#" class="btn btn-link btn-sm text-decoration-none">
-                Все хиты <i class="bi bi-arrow-right"></i>
-            </a>
-        </h3>
+    </section>
+    {% endif %}
+    <!-- ==========================================
+         ХИТЫ ПРОДАЖ (без серого фона)
+         ========================================== -->
+    {% if popular_products %}
+    <section class="popular-carousel-section mb-4">
+        <div class="container-fluid px-0">
+            <h3 class="fw-bold px-3 px-md-4 mb-3">
+                ⭐ Популярное
+                <a href="#" class="btn btn-link btn-sm text-decoration-none">
+                    Всё популярное <i class="bi bi-arrow-right"></i>
+                </a>
+            </h3>
 
-        <!-- Swiper контейнер (такой же как у скидок, но без фона) -->
-        <div class="swiper hitSwiper" style="padding: 0 1rem;">
-            <div class="swiper-wrapper" style="height: 410px; gap: 30px;">
-                {% for product in hit_products %}
-                <div class="swiper-slide" style="width: 245px;">
-                    <div style="height: 405px;">
-                        {% include 'product/mini_product_card.html' with product=product %}
+            <!-- Swiper контейнер -->
+            <div class="swiper popularSwiper" style="padding: 0 1rem;">
+                <div class="swiper-wrapper" style="height: 410px; gap: 30px;">
+                    {% for product in popular_products %}
+                    <div class="swiper-slide" style="width: 245px;">
+                        <div style="height: 405px;">
+                            {% include 'product/mini_product_card.html' with product=product %}
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+
+                <!-- Стрелки -->
+                <div class="swiper-button-prev" style="left: 0;"></div>
+                <div class="swiper-button-next" style="right: 0;"></div>
             </div>
-
-            <!-- Стрелки -->
-            <div class="swiper-button-prev" style="left: 0;"></div>
-            <div class="swiper-button-next" style="right: 0;"></div>
         </div>
-    </div>
-</section>
-{% endif %}
-<!-- ==========================================
-     НОВИНКИ (аналогично хитам)
-     ========================================== -->
-{% if new_products %}
-<section class="new-carousel-section mb-4">
-    <div class="container-fluid px-0">
-        <h3 class="fw-bold px-3 px-md-4 mb-3">
-            ✨ Новинки
-            <a href="#" class="btn btn-link btn-sm text-decoration-none">
-                Все новинки <i class="bi bi-arrow-right"></i>
-            </a>
-        </h3>
+    </section>
+    {% endif %}
+    <!-- ==========================================
+         НОВИНКИ (аналогично хитам)
+         ========================================== -->
+    {% if new_products %}
+    <section class="new-carousel-section mb-4">
+        <div class="container-fluid px-0">
+            <h3 class="fw-bold px-3 px-md-4 mb-3">
+                ✨ Новинки
+                <a href="#" class="btn btn-link btn-sm text-decoration-none">
+                    Все новинки <i class="bi bi-arrow-right"></i>
+                </a>
+            </h3>
 
-        <!-- Swiper контейнер -->
-        <div class="swiper newSwiper" style="padding: 0 1rem;">
-            <div class="swiper-wrapper" style="height: 410px; gap: 30px;">
-                {% for product in new_products %}
-                <div class="swiper-slide" style="width: 245px;">
-                    <div style="height: 405px;">
-                        {% include 'product/mini_product_card.html' with product=product %}
+            <!-- Swiper контейнер -->
+            <div class="swiper newSwiper" style="padding: 0 1rem;">
+                <div class="swiper-wrapper" style="height: 410px; gap: 30px;">
+                    {% for product in new_products %}
+                    <div class="swiper-slide" style="width: 245px;">
+                        <div style="height: 405px;">
+                            {% include 'product/mini_product_card.html' with product=product %}
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
 
-            <!-- Стрелки -->
-            <div class="swiper-button-prev" style="left: 0;"></div>
-            <div class="swiper-button-next" style="right: 0;"></div>
+                <!-- Стрелки -->
+                <div class="swiper-button-prev" style="left: 0;"></div>
+                <div class="swiper-button-next" style="right: 0;"></div>
+            </div>
         </div>
-    </div>
-</section>
-{% endif %}
+    </section>
+    {% endif %}
+</div>
 {% endblock %}

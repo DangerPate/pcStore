@@ -471,47 +471,46 @@ footer .payment-badge {
 }
 
 /* ==========================================
-   КАРУСЕЛЬ ХИТОВ ПРОДАЖ (без фона)
+   КАРУСЕЛЬ ПОПУЛЯРНОГО (без фона)
    ========================================== */
 
-.hit-carousel-section {
+.popular-carousel-section {
     padding: 0.8rem 0 1.5rem !important;
     border-radius: 12px;
     position: relative;
     margin-top: 10px;
-    /* 🔑 НЕТ background: #f8f9fa — белый фон как у сайта */
 }
 
-.hit-carousel-section h3 {
+.popular-carousel-section h3 {
     margin-bottom: 0.4rem !important;
     padding: 0 1rem;
 }
 
-.hit-carousel-section .swiper {
+.popular-carousel-section .swiper {
     overflow: hidden !important;
     max-width: 100%;
     padding-left: 1rem !important;
 }
 
-.hit-carousel-section .swiper-wrapper {
+.popular-carousel-section .swiper-wrapper {
     padding-bottom: 0px;
     gap: 30px;
     height: 450px !important;
 }
 
-.hit-carousel-section .swiper-slide {
+.popular-carousel-section .swiper-slide {
     width: 245px !important;
     flex-shrink: 0 !important;
 }
 
-.hit-carousel-section .product-card {
+.popular-carousel-section .product-card {
     height: 100% !important;
     width: 100% !important;
 }
 
 /* СТРЕЛКИ */
-.hit-carousel-section .swiper-button-prev,
-.hit-carousel-section .swiper-button-next {
+.popular-carousel-section .swiper-button-prev,
+.popular-carousel-section .swiper-button-next {
     color: #333 !important;
     opacity: 0.9;
     width: 40px !important;
@@ -524,19 +523,19 @@ footer .payment-badge {
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
-.hit-carousel-section .swiper-button-prev:hover,
-.hit-carousel-section .swiper-button-next:hover {
+.popular-carousel-section .swiper-button-prev:hover,
+.popular-carousel-section .swiper-button-next:hover {
     opacity: 1;
     background: #fff;
 }
-.hit-carousel-section .swiper-button-prev:after,
-.hit-carousel-section .swiper-button-next:after {
+.popular-carousel-section .swiper-button-prev:after,
+.popular-carousel-section .swiper-button-next:after {
     font-size: 20px !important;
     font-weight: bold;
 }
 
 @media (max-width: 767.98px) {
-    .hit-carousel-section .swiper-slide div {
+    .popular-carousel-section .swiper-slide div {
         height: 370px !important;
     }
 }
@@ -603,8 +602,72 @@ footer .payment-badge {
     font-weight: bold;
 }
 
+
+
 @media (max-width: 767.98px) {
     .new-carousel-section .swiper-slide div {
         height: 370px !important;
+    }
+}
+
+/* Делаем карусель во всю ширину */
+.discount-carousel-section,
+.popular-carousel-section,
+.new-carousel-section
+{
+    width: 1377px !important;           /* 100% ширины окна */
+    margin-left: calc(-105px / 2) !important;  /* центрируем относительно окна */
+    position: relative !important;
+    left: 0 !important;
+}
+
+.promo-carousel-section
+{
+    width: 1377px !important;
+    margin-left: calc(-85px / 2) !important;  /* центрирование */
+    position: relative !important;
+    left: 0 !important;
+}
+
+.promo-carousel-section .banner-wrapper {
+    width: 546px !important;
+    flex: 0 0 546px !important;  /* 🔑 добавляем это */
+}
+
+.promo-carousel-section .col-lg-8 {
+    width: calc(100% - 546px) !important;  /* оставшееся место */
+    flex: 1 !important;
+    max-width: none !important;
+}
+
+/* ==========================================
+   MINI PRODUCT CARD — ДОПОЛНИТЕЛЬНЫЕ ЭЛЕМЕНТЫ
+   ========================================== */
+
+/* Рейтинг: звёзды */
+.product-card .text-warning i {
+    font-size: 0.85rem;
+    margin-right: 1px;
+}
+
+/* Старая цена: зачёркнутая */
+.product-card .text-decoration-line-through {
+    color: #999 !important;
+    font-weight: 400;
+}
+
+/* Бейдж скидки */
+.product-card .badge.bg-danger {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 767.98px) {
+    .product-card .text-warning i {
+        font-size: 0.75rem;
+    }
+    .product-card .fs-5 {
+        font-size: 1.1rem !important;
     }
 }
