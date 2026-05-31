@@ -197,240 +197,242 @@
             </div>
 
             <div class="tab-pane fade" id="reviews" role="tabpanel">
+                <div class="review-form mb-5 p-4 bg-light rounded-4 border">
+                    <h5 class="fw-bold mb-4">Оставить отзыв</h5>
+                    <form method="post" action="{% url 'catalog:add_review' product.slug %}" enctype="multipart/form-data" id="reviewForm">
+                        {% csrf_token %}
 
-            <!-- 🔥 Форма отзыва -->
-            <div class="review-form mb-5 p-4 bg-light rounded-4 border">
-                <h5 class="fw-bold mb-4">Оставить отзыв</h5>
-                <form method="post" action="{% url 'catalog:add_review' product.slug %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-
-                    <!-- Рейтинг: интерактивные звёзды -->
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Ваша оценка</label>
-                        <div class="rating-stars d-flex gap-1" data-rating="0">
-                            {% for i in "54321"|make_list %}
-                            <i class="bi bi-star rating-star" data-value="{{ i }}" style="font-size: 2rem; cursor: pointer; color: #e0e0e0; transition: color 0.2s;"></i>
-                            {% endfor %}
+                        <!-- 🔥 Исправленные звёзды (1-5 слева направо) -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Ваша оценка</label>
+                            <div class="rating-stars d-flex gap-2" id="starContainer">
+                                {% for i in "12345"|make_list %}
+                                <i class="bi bi-star rating-star" data-value="{{ i }}" style="font-size: 2rem; cursor: pointer; color: #e0e0e0; transition: all 0.2s;"></i>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="rating" id="ratingInput" required>
+                            <small class="text-muted">Нажмите на звезду</small>
                         </div>
-                        <input type="hidden" name="rating" id="ratingInput" required>
-                        <small class="text-muted">Нажмите на звёзды, чтобы выбрать оценку</small>
-                    </div>
 
-                    <!-- Имя автора -->
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">Ваше имя</label>
-                        <input type="text" name="author_name" class="form-control"
-                               placeholder="{% if user.is_authenticated %}{{ user.username }}{% else %}Гость{% endif %}"
-                               value="{{ user.get_full_name|default:user.username }}" maxlength="100">
-                    </div>
-
-                    <!-- Достоинства / Недостатки -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label small text-muted">✅ Достоинства</label>
-                            <textarea name="pros" class="form-control" rows="3" placeholder="Что понравилось?"></textarea>
+                        <div class="mb-3"><input type="text" name="author_name" class="form-control" placeholder="Ваше имя" value="{{ user.get_full_name|default:user.username }}"></div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6"><textarea name="pros" class="form-control" rows="2" placeholder="✅ Достоинства"></textarea></div>
+                            <div class="col-md-6"><textarea name="cons" class="form-control" rows="2" placeholder="❌ Недостатки"></textarea></div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label small text-muted">❌ Недостатки</label>
-                            <textarea name="cons" class="form-control" rows="3" placeholder="Что не понравилось?"></textarea>
-                        </div>
-                    </div>
+                        <div class="mb-3"><textarea name="comment" class="form-control" rows="3" placeholder="💬 Комментарий" required></textarea></div>
 
-                    <!-- Комментарий -->
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">💬 Комментарий</label>
-                        <textarea name="comment" class="form-control" rows="4" placeholder="Расскажите подробнее о вашем опыте..." required></textarea>
-                    </div>
-
-                    <!-- 🔥 Чекбокс проблемы -->
-                    <div class="mb-3">
-                        <div class="form-check">
+                        <div class="mb-3 form-check">
                             <input class="form-check-input" type="checkbox" name="has_issue" id="hasIssue">
-                            <label class="form-check-label" for="hasIssue">
-                                ⚠️ Товар или комплектация не соответствует описанию на сайте
-                            </label>
+                            <label class="form-check-label" for="hasIssue">⚠️ Несоответствие описанию</label>
+                            <div id="issueBlock" class="mt-2 d-none"><textarea name="issue_description" class="form-control form-control-sm" rows="2" placeholder="Опишите проблему..."></textarea></div>
                         </div>
-                        <div id="issueBlock" class="mt-2 d-none">
-                            <textarea name="issue_description" class="form-control form-control-sm" rows="2"
-                                      placeholder="Опишите, что именно не соответствует..."></textarea>
+
+                        <!-- 🔥 Drag & Drop с валидацией -->
+                        <div class="mb-4">
+                            <label class="form-label small text-muted"> Фото/Видео (JPG, PNG, MP4 до 50МБ)</label>
+                            <div class="upload-area p-4 border border-2 border-dashed rounded-3 text-center bg-white" id="dropZone" style="cursor: pointer; transition: all 0.2s;">
+                                <i class="bi bi-cloud-arrow-up fs-2 text-muted mb-2 d-block"></i>
+                                <p class="mb-1 fw-medium">Перетащите файлы сюда или нажмите</p>
+                                <p class="mb-0 small text-muted">Максимум 5 файлов</p>
+                                <input type="file" name="attachments" id="attachmentInput" class="d-none" accept=".jpg,.jpeg,.png,.mp4" multiple onchange="handleFiles(this.files)">
+                            </div>
+                            <div id="fileList" class="d-flex flex-wrap gap-2 mt-2"></div>
+                            <div id="fileError" class="text-danger small mt-1 d-none"></div>
                         </div>
-                    </div>
 
-                    <!-- 🔥 Загрузка фото/видео -->
-                    <div class="mb-4">
-                        <label class="form-label small text-muted">📎 Прикрепить фото или видео</label>
-                        <div class="upload-area p-3 border border-dashed rounded-3 text-center bg-white"
-                             style="cursor: pointer;" onclick="document.getElementById('attachmentInput').click()">
-                            <i class="bi bi-cloud-upload fs-3 text-muted mb-2 d-block"></i>
-                            <p class="mb-1 small text-muted">Нажмите для выбора файлов</p>
-                            <p class="mb-0 small text-muted" style="font-size: 0.75rem;">Поддерживаются: JPG, PNG, MP4 (макс. 50 МБ)</p>
-                            <input type="file" name="attachments" id="attachmentInput" class="d-none"
-                                   accept="image/*,video/*" multiple onchange="previewAttachments(this)">
-                        </div>
-                        <!-- Превью загруженных файлов -->
-                        <div id="attachmentPreview" class="d-flex flex-wrap gap-2 mt-2"></div>
-                    </div>
+                        <button type="submit" class="btn btn-primary px-4">Отправить отзыв</button>
+                    </form>
+                </div>
 
-                    <button type="submit" class="btn btn-primary px-4">Отправить отзыв</button>
-                </form>
-            </div>
-
-            <!-- 🔥 Список отзывов -->
-            {% if reviews %}
+                <!-- Список отзывов -->
+                {% if reviews %}
                 <div class="reviews-list">
                     {% for review in reviews %}
-                    <div class="review-item card border-0 shadow-sm mb-4 rounded-4">
+                    <div class="review-item card border-0 shadow-sm mb-4 rounded-4" id="review-{{ review.id }}">
                         <div class="card-body p-4">
-                            <!-- Шапка отзыва -->
-                            <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div>
                                     <strong class="fs-5">{{ review.author_name|default:review.user.username }}</strong>
-                                    {% if review.is_verified_purchase %}
-                                        <span class="badge bg-success-subtle text-success ms-2">✓ Проверенная покупка</span>
+                                    {% if review.is_verified_purchase %}<span class="badge bg-success-subtle text-success ms-2">✓ Проверенная покупка</span>{% endif %}
+                                    {% if review.user == request.user %}
+                                    <button class="btn btn-sm btn-outline-secondary ms-2 edit-review-btn" data-id="{{ review.id }}">✏️ Изменить</button>
                                     {% endif %}
                                 </div>
                                 <div class="text-muted small">{{ review.created_at|date:"d.m.Y" }}</div>
                             </div>
 
-                            <!-- Рейтинг -->
-                            <div class="d-flex text-warning mb-3">
-                                {% for i in "12345"|make_list %}
-                                    <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>
-                                {% endfor %}
-                                <span class="ms-2 text-muted small">({{ review.rating }}/5)</span>
+                            <div class="d-flex text-warning mb-2">
+                                {% for i in "12345"|make_list %}<i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>{% endfor %}
                             </div>
 
-                            <!-- Достоинства / Недостатки -->
                             {% if review.pros or review.cons %}
-                            <div class="row g-2 mb-3">
-                                {% if review.pros %}
-                                <div class="col-md-6">
-                                    <div class="p-2 bg-success-subtle rounded-2">
-                                        <small class="fw-semibold text-success">✅ Плюсы:</small>
-                                        <p class="mb-0 small">{{ review.pros|linebreaks }}</p>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                {% if review.cons %}
-                                <div class="col-md-6">
-                                    <div class="p-2 bg-danger-subtle rounded-2">
-                                        <small class="fw-semibold text-danger">❌ Минусы:</small>
-                                        <p class="mb-0 small">{{ review.cons|linebreaks }}</p>
-                                    </div>
-                                </div>
-                                {% endif %}
+                            <div class="row g-2 mb-2">
+                                {% if review.pros %}<div class="col-md-6"><div class="p-2 bg-success-subtle rounded-2 small">✅ {{ review.pros|linebreaksbr }}</div></div>{% endif %}
+                                {% if review.cons %}<div class="col-md-6"><div class="p-2 bg-danger-subtle rounded-2 small">❌ {{ review.cons|linebreaksbr }}</div></div>{% endif %}
                             </div>
                             {% endif %}
 
-                            <!-- Комментарий -->
-                            <p class="text-muted mb-3">{{ review.comment|linebreaks }}</p>
+                            <p class="text-muted mb-3">{{ review.comment|linebreaksbr }}</p>
 
-                            <!-- 🔥 Проблема с описанием -->
                             {% if review.has_issue and review.issue_description %}
-                            <div class="alert alert-warning py-2 mb-3">
-                                <small class="fw-semibold">⚠️ Несоответствие описанию:</small>
-                                <p class="mb-0 small">{{ review.issue_description }}</p>
-                            </div>
+                            <div class="alert alert-warning py-2 mb-3 small">⚠️ {{ review.issue_description }}</div>
                             {% endif %}
 
-                            <!-- 🔥 Вложения (фото/видео) -->
                             {% if review.attachments.all %}
-                            <div class="review-attachments d-flex flex-wrap gap-2 mb-3">
+                            <div class="d-flex flex-wrap gap-2 mb-3">
                                 {% for att in review.attachments.all %}
-                                    {% if att.file_type == 'image' %}
-                                    <a href="{{ att.file.url }}" target="_blank" class="d-block">
-                                        <img src="{{ att.file.url }}" alt="Attachment"
-                                             class="rounded-2" style="width: 100px; height: 100px; object-fit: cover;">
-                                    </a>
-                                    {% elif att.file_type == 'video' %}
-                                    <video controls class="rounded-2" style="width: 200px; height: 120px; object-fit: cover;">
-                                        <source src="{{ att.file.url }}" type="{{ att.file.content_type }}">
-                                    </video>
-                                    {% endif %}
+                                    {% if att.file_type == 'image' %}<a href="{{ att.file.url }}" target="_blank"><img src="{{ att.file.url }}" class="rounded-2" style="width: 90px; height: 90px; object-fit: cover;"></a>
+                                    {% elif att.file_type == 'video' %}<video controls class="rounded-2" style="width: 180px; height: 100px; object-fit: cover;"><source src="{{ att.file.url }}"></video>{% endif %}
                                 {% endfor %}
                             </div>
                             {% endif %}
+
+                            <!-- Лайки/Дизлайки -->
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <button class="btn btn-sm btn-outline-success vote-btn" data-id="{{ review.id }}" data-vote="1">👍 <span class="vote-likes-{{ review.id }}">{{ review.votes.filter.vote|default:0 }}</span></button>
+                                <button class="btn btn-sm btn-outline-danger vote-btn" data-id="{{ review.id }}" data-vote="-1">👎 <span class="vote-dislikes-{{ review.id }}">{{ review.votes.filter.vote|default:0 }}</span></button>
+                            </div>
+
+                            <!-- Комментарии -->
+                            <div class="border-top pt-3">
+                                <h6 class="small fw-bold mb-2">Комментарии ({{ review.comments.count }})</h6>
+                                <div class="comments-list mb-2" id="comments-{{ review.id }}">
+                                    {% for c in review.comments.all %}
+                                    <div class="d-flex gap-2 mb-2 small"><strong>{{ c.user.username }}:</strong> <span class="text-muted">{{ c.text }}</span></div>
+                                    {% endfor %}
+                                </div>
+                                {% if user.is_authenticated %}
+                                <form class="d-flex gap-2 comment-form" data-review="{{ review.id }}">
+                                    {% csrf_token %}
+                                    <input type="text" class="form-control form-control-sm" placeholder="Написать комментарий..." required>
+                                    <button type="submit" class="btn btn-sm btn-primary">➤</button>
+                                </form>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
-            {% else %}
-                <div class="text-center py-5 text-muted">
-                    <i class="bi bi-chat-square-text fs-1 mb-3 d-block"></i>
-                    <p class="mb-0">Отзывов пока нет. Будьте первым!</p>
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
 
-        </div>
+            <!-- 🔥 Модалка редактирования -->
+            <div class="modal fade" id="editReviewModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content" id="editModalContent"></div></div></div>
 
-<!-- JS для галереи и отзывов -->
+            <!-- 🔥 JavaScript -->
 <script>
-    // 🔥 Интерактивные звёзды
-    document.querySelectorAll('.rating-star').forEach(star => {
-        star.addEventListener('click', function() {
-            const value = this.dataset.value;
-            document.getElementById('ratingInput').value = value;
-
-            // Подсветка звёзд
-            document.querySelectorAll('.rating-star').forEach(s => {
-                s.classList.toggle('active', s.dataset.value >= value);
-                s.style.color = s.dataset.value >= value ? '#ffc107' : '#e0e0e0';
-            });
-        });
-
-        // Подсветка при наведении
-        star.addEventListener('mouseenter', function() {
-            const value = this.dataset.value;
-            document.querySelectorAll('.rating-star').forEach(s => {
-                s.style.color = s.dataset.value >= value ? '#ffc107' : '#e0e0e0';
-            });
-        });
-
-        // Сброс при уходе
-        star.addEventListener('mouseleave', function() {
-            const current = document.getElementById('ratingInput').value;
-            document.querySelectorAll('.rating-star').forEach(s => {
-                s.style.color = s.dataset.value >= current ? '#ffc107' : '#e0e0e0';
-            });
+// 1. Исправленные звёзды (клик = выбор)
+document.querySelectorAll('.rating-star').forEach(star => {
+    star.addEventListener('click', function() {
+        const val = parseInt(this.dataset.value);
+        document.getElementById('ratingInput').value = val;
+        document.querySelectorAll('.rating-star').forEach(s => {
+            const sVal = parseInt(s.dataset.value);
+            s.className = `bi bi-star${sVal <= val ? '-fill' : ''} rating-star`;
+            s.style.color = sVal <= val ? '#ffc107' : '#e0e0e0';
         });
     });
+});
 
-    // 🔥 Чекбокс проблемы
-    document.getElementById('hasIssue')?.addEventListener('change', function() {
-        const block = document.getElementById('issueBlock');
-        if (this.checked) {
-            block.classList.remove('d-none');
-        } else {
-            block.classList.add('d-none');
-            document.querySelector('[name="issue_description"]').value = '';
+// 2. Drag & Drop + Валидация
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('attachmentInput');
+const fileList = document.getElementById('fileList');
+const fileError = document.getElementById('fileError');
+const allowed = ['image/jpeg', 'image/png', 'video/mp4'];
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#0d6efd'; dropZone.style.background = '#f8f9fa'; });
+dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#dee2e6'; dropZone.style.background = '#fff'; });
+dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.style.borderColor = '#dee2e6';
+    dropZone.style.background = '#fff';
+    handleFiles(e.dataTransfer.files);
+});
+
+function handleFiles(files) {
+    fileList.innerHTML = '';
+    fileError.classList.add('d-none');
+    const dt = new DataTransfer();
+    let count = 0;
+
+    Array.from(files).forEach(f => {
+        if (!allowed.includes(f.type)) {
+            fileError.textContent = ` ${f.name}: недопустимый формат (только JPG, PNG, MP4)`;
+            fileError.classList.remove('d-none');
+            return;
         }
+        if (f.size > 50 * 1024 * 1024) {
+            fileError.textContent = `❌ ${f.name}: файл слишком большой (>50МБ)`;
+            fileError.classList.remove('d-none');
+            return;
+        }
+        if (count >= 5) {
+            fileError.textContent = '❌ Максимум 5 файлов';
+            fileError.classList.remove('d-none');
+            return;
+        }
+        dt.items.add(f);
+        count++;
+
+        // Превью
+        const div = document.createElement('div');
+        if (f.type.startsWith('image/')) {
+            div.innerHTML = `<img src="${URL.createObjectURL(f)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">`;
+        } else {
+            div.innerHTML = `<video src="${URL.createObjectURL(f)}" style="width:80px;height:50px;object-fit:cover;border-radius:8px;" controls></video>`;
+        }
+        fileList.appendChild(div);
     });
+    fileInput.files = dt.files;
+}
 
-    // 🔥 Превью загруженных файлов
-    function previewAttachments(input) {
-        const preview = document.getElementById('attachmentPreview');
-        preview.innerHTML = '';
+// 3. Чекбокс проблемы
+document.getElementById('hasIssue')?.addEventListener('change', function() {
+    document.getElementById('issueBlock').classList.toggle('d-none', !this.checked);
+});
 
-        Array.from(input.files).slice(0, 5).forEach(file => { // Макс. 5 файлов
-            if (file.type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                img.style.width = '80px';
-                img.style.height = '80px';
-                img.style.objectFit = 'cover';
-                img.className = 'rounded-2 border';
-                preview.appendChild(img);
-            } else if (file.type.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.src = URL.createObjectURL(file);
-                video.style.width = '120px';
-                video.style.height = '80px';
-                video.style.objectFit = 'cover';
-                video.className = 'rounded-2 border';
-                video.controls = true;
-                preview.appendChild(video);
-            }
+// 4. AJAX Лайки/Дизлайки
+document.querySelectorAll('.vote-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const id = this.dataset.id;
+        const vote = this.dataset.vote;
+        const res = await fetch('{% url "catalog:toggle_vote" %}', {
+            method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `review_id=${id}&vote=${vote}`
         });
-    }
+        const data = await res.json();
+        document.querySelector(`.vote-likes-${id}`).textContent = data.likes;
+        document.querySelector(`.vote-dislikes-${id}`).textContent = data.dislikes;
+    });
+});
+
+// 5. AJAX Комментарии
+document.querySelectorAll('.comment-form').forEach(form => {
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = this.dataset.review;
+        const text = this.querySelector('input').value;
+        const res = await fetch('{% url "catalog:add_comment" %}', {
+            method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `review_id=${id}&text=${encodeURIComponent(text)}`
+        });
+        const data = await res.json();
+        const list = document.getElementById(`comments-${id}`);
+        list.innerHTML += `<div class="d-flex gap-2 mb-2 small"><strong>${data.user}:</strong> <span class="text-muted">${data.text}</span></div>`;
+        this.querySelector('input').value = '';
+    });
+});
+
+// 6. Редактирование отзыва (модалка)
+document.querySelectorAll('.edit-review-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const id = this.dataset.id;
+        const res = await fetch(`/catalog/review/${id}/edit/`);
+        document.getElementById('editModalContent').innerHTML = await res.text();
+        new bootstrap.Modal(document.getElementById('editReviewModal')).show();
+    });
+});
 </script>
 {% endblock %}

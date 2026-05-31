@@ -245,3 +245,34 @@ class ReviewAttachment(models.Model):
 
     def __str__(self):
         return f"Вложение для отзыва #{self.review.id}"
+
+# catalog/models.py
+
+class ReviewVote(models.Model):
+    """Лайки и дизлайки отзывов"""
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='votes')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    vote = models.SmallIntegerField(choices=[(1, 'Like'), (-1, 'Dislike')])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('review', 'user')
+        verbose_name = 'Голос за отзыв'
+
+    def __str__(self):
+        return f"{'👍' if self.vote == 1 else '👎'} {self.user} для отзыва #{self.review.id}"
+
+
+class ReviewComment(models.Model):
+    """Комментарии под отзывами"""
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    text = models.TextField('Текст комментария')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Комментарий к отзыву'
+
+    def __str__(self):
+        return f"Комментарий от {self.user} к отзыву #{self.review.id}"

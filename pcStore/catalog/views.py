@@ -2,15 +2,18 @@
 import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.db.models import Q, Exists, OuterRef, Value, BooleanField, Avg
-from catalog.models import Product, Category, Review, ReviewAttachment
+from django.http import JsonResponse
+from django.db.models import Q, Exists, OuterRef, Value, BooleanField, Count, Avg
+from catalog.models import Product, Category, Review, ReviewAttachment, ReviewVote, ReviewComment
 from cart.models import CartItem, Favorite
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.storage import default_storage
 from django.conf import settings
 from .filters_config import FILTERS_CONFIG
 
-
+ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'video/mp4']
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 МБ
 def apply_filters(queryset, request, category_slug=None):
     """
     Объединяет общие фильтры (цена, бренд, наличие, сортировка)
@@ -154,17 +157,15 @@ def product_detail(request, slug):
 
 
 def add_review(request, slug):
-    """Обработка формы отзыва с вложениями"""
+    """Создание отзыва с валидацией файлов"""
     if request.method == 'POST':
         product = get_object_or_404(Product, slug=slug, is_active=True)
-
         rating = request.POST.get('rating')
         comment = request.POST.get('comment', '').strip()
 
         if not rating or not comment:
             messages.error(request, 'Заполните оценку и комментарий.')
         else:
-            # Создаём отзыв
             review = Review.objects.create(
                 product=product,
                 user=request.user if request.user.is_authenticated else None,
@@ -180,28 +181,16 @@ def add_review(request, slug):
                 is_verified_purchase=request.user.is_authenticated
             )
 
-            # 🔥 Обработка загруженных файлов
             files = request.FILES.getlist('attachments')
             for f in files:
-                # Проверяем тип файла
-                if f.content_type.startswith('image/'):
-                    file_type = 'image'
-                elif f.content_type.startswith('video/'):
-                    file_type = 'video'
+                if f.content_type in ALLOWED_FILE_TYPES and f.size <= MAX_FILE_SIZE:
+                    file_type = 'image' if f.content_type.startswith('image/') else 'video'
+                    ReviewAttachment.objects.create(review=review, file=f, file_type=file_type)
                 else:
-                    continue  # Пропускаем неподдерживаемые типы
+                    messages.warning(request, f'Файл {f.name} пропущен (неподдерживаемый формат или >50МБ).')
 
-                # Сохраняем вложение
-                ReviewAttachment.objects.create(
-                    review=review,
-                    file=f,
-                    file_type=file_type
-                )
-
-            messages.success(request, 'Спасибо за ваш отзыв!')
-
+            messages.success(request, 'Отзыв опубликован!')
         return redirect('catalog:product_detail', slug=slug)
-
     return redirect('catalog:product_detail', slug=slug)
 
 
@@ -248,3 +237,62 @@ def search_view(request):
         'total_count': paginator.count,
         'filter_params': filter_params.urlencode(),
     })
+
+@login_required
+def edit_review(request, review_id):
+    """Редактирование своего отзыва"""
+    review = get_object_or_404(Review, id=review_id)
+    if review.user != request.user:
+        messages.error(request, 'Вы можете редактировать только свои отзывы.')
+        return redirect('catalog:product_detail', slug=review.product.slug)
+
+    if request.method == 'POST':
+        review.rating = int(request.POST.get('rating', review.rating))
+        review.pros = request.POST.get('pros', '').strip()
+        review.cons = request.POST.get('cons', '').strip()
+        review.comment = request.POST.get('comment', '').strip()
+        review.has_issue = request.POST.get('has_issue') == 'on'
+        review.issue_description = request.POST.get('issue_description', '').strip() if review.has_issue else ''
+        review.save()
+        messages.success(request, 'Отзыв обновлён.')
+        return redirect('catalog:product_detail', slug=review.product.slug)
+
+    return render(request, 'product/edit_review_modal.html', {'review': review})
+
+
+@login_required
+def toggle_vote(request):
+    """AJAX: Лайк/Дизлайк отзыва"""
+    if request.method == 'POST':
+        review_id = request.POST.get('review_id')
+        vote_type = int(request.POST.get('vote'))  # 1 или -1
+        review = get_object_or_404(Review, id=review_id)
+
+        vote, created = ReviewVote.objects.update_or_create(
+            review=review, user=request.user,
+            defaults={'vote': vote_type}
+        )
+        if not created and vote.vote == vote_type:
+            vote.delete()  # Повторный клик = отмена голоса
+
+        total_likes = review.votes.filter(vote=1).count()
+        total_dislikes = review.votes.filter(vote=-1).count()
+        return JsonResponse({'likes': total_likes, 'dislikes': total_dislikes})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required
+def add_comment(request):
+    """AJAX: Добавление комментария к отзыву"""
+    if request.method == 'POST':
+        review_id = request.POST.get('review_id')
+        text = request.POST.get('text', '').strip()
+        if text:
+            review = get_object_or_404(Review, id=review_id)
+            comment = ReviewComment.objects.create(review=review, user=request.user, text=text)
+            return JsonResponse({
+                'id': comment.id,
+                'user': comment.user.username,
+                'text': comment.text,
+                'date': comment.created_at.strftime('%d.%m.%Y')
+            })
+    return JsonResponse({'error': 'Invalid request'}, status=400)
