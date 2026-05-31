@@ -1,10 +1,10 @@
 ﻿{% extends 'main/layout.html' %}
 {% load static %}
+{% load catalog_extras %}
 
 {% block title %}{{ product.title }}{% endblock %}
 
 {% block content %}
-<!-- Подключаем дополнительные стили -->
 <link rel="stylesheet" href="{% static 'main/css/product.css' %}">
 
 <div class="container py-4">
@@ -24,16 +24,32 @@
     </nav>
 
     <div class="row g-4 align-items-start">
-        <!-- 🖼️ Левая колонка: Изображение -->
+        <!-- 🖼️ Левая колонка: Галерея -->
         <div class="col-lg-6">
-            <div class="product-image-wrapper bg-white rounded-4 shadow-sm p-3">
-                {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.title }}" class="img-fluid product-main-image">
-                {% else %}
-                    <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted py-5">
-                        <i class="bi bi-box-seam fs-1 mb-2"></i>
-                        <span>Изображение отсутствует</span>
-                    </div>
+            <div class="product-gallery bg-white rounded-4 shadow-sm p-3">
+                <!-- Основное изображение -->
+                <div class="product-main-image mb-3">
+                    {% if images %}
+                        <img src="{{ images.0 }}" alt="{{ product.title }}"
+                             class="img-fluid rounded-3" id="mainImage">
+                    {% else %}
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted py-5 bg-light rounded-3">
+                            <i class="bi bi-box-seam fs-1 mb-2"></i>
+                            <span>Изображение отсутствует</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Миниатюры -->
+                {% if images|length > 1 %}
+                <div class="product-thumbnails d-flex gap-2 overflow-auto pb-2">
+                    {% for img in images %}
+                    <img src="{{ img }}" alt="Thumb {{ forloop.counter }}"
+                         class="thumbnail {% if forloop.first %}active{% endif %}"
+                         onclick="changeMainImage(this, '{{ img }}')"
+                         style="cursor: pointer; width: 80px; height: 80px; object-fit: cover; border: 2px solid {% if forloop.first %}#0d6efd{% else %}transparent{% endif %}; border-radius: 8px;">
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -44,7 +60,7 @@
                 <!-- Бейджи -->
                 <div class="d-flex flex-wrap gap-2 mb-3">
                     {% if product.is_new %}<span class="badge bg-info-subtle text-info">Новинка</span>{% endif %}
-                    {% if product.is_hit %}<span class="badge bg-warning-subtle text-warning-emphasis">Хит продаж</span>{% endif %}
+                    {% if product.is_hit %}<span class="badge bg-warning-subtle text-warning-emphasis">Популярное</span>{% endif %}
                     {% if product.discount_percent > 0 %}<span class="badge bg-danger">-{{ product.discount_percent }}%</span>{% endif %}
                 </div>
 
@@ -54,10 +70,23 @@
                     {% if product.brand %} | Бренд: <span class="text-dark fw-medium">{{ product.brand }}</span>{% endif %}
                 </p>
 
+                <!-- Рейтинг и отзывы -->
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="d-flex text-warning">
+                        {% for i in "12345"|make_list %}
+                            <i class="bi bi-star{% if forloop.counter <= avg_rating|floatformat:0 %}-fill{% else %}{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                    <span class="text-muted small">({{ reviews.count }} отзывов)</span>
+                    {% if avg_rating %}
+                        <span class="badge bg-light text-dark border">{{ avg_rating }}/5</span>
+                    {% endif %}
+                </div>
+
                 <!-- Цена -->
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <span class="fs-2 fw-bold text-primary">{{ product.price }} ₽</span>
-                    {% if product.old_price %}
+                    {% if product.old_price and product.old_price > product.price %}
                         <del class="text-muted fs-5">{{ product.old_price }} ₽</del>
                     {% endif %}
                 </div>
@@ -98,24 +127,20 @@
                     </button>
                 </div>
 
-                <!-- Быстрые характеристики -->
+                <!-- 🔥 Быстрые характеристики из БД (specifications) -->
+                {% if product.specifications %}
                 <div class="border-top pt-3">
-                    <h6 class="fw-bold mb-3 small text-uppercase text-muted ls-1">Основные параметры</h6>
+                    <h6 class="fw-bold mb-3 small text-uppercase text-muted ls-1">Ключевые параметры</h6>
                     <dl class="row small mb-0 product-specs-quick">
-                        {% if product.brand %}
-                        <dt class="col-sm-4 text-muted">Производитель</dt>
-                        <dd class="col-sm-8">{{ product.brand }}</dd>
-                        {% endif %}
-                        {% if product.warranty %}
-                        <dt class="col-sm-4 text-muted">Гарантия</dt>
-                        <dd class="col-sm-8">{{ product.warranty }}</dd>
-                        {% endif %}
-                        {% if product.weight %}
-                        <dt class="col-sm-4 text-muted">Вес</dt>
-                        <dd class="col-sm-8">{{ product.weight }} кг</dd>
-                        {% endif %}
+                        {% for key, value in product.specifications.items %}
+                            {% if key in 'socket|vram|memory_type|chipset|form_factor|wattage|frequency|tdp_rating|cooling' %}
+                            <dt class="col-sm-5 text-muted">{{ key|humanize_key }}</dt>
+                            <dd class="col-sm-7 fw-medium">{{ value }}</dd>
+                            {% endif %}
+                        {% endfor %}
                     </dl>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -130,10 +155,13 @@
                 <button class="nav-link" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">Характеристики</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Отзывы</button>
+                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Отзывы ({{ reviews.count }})</button>
             </li>
         </ul>
+
         <div class="tab-content p-4 bg-white border border-top-0 rounded-bottom-3 shadow-sm" id="productTabsContent">
+
+            <!-- Описание -->
             <div class="tab-pane fade show active" id="desc" role="tabpanel">
                 {% if product.description %}
                     <div class="product-description">{{ product.description|linebreaks }}</div>
@@ -141,11 +169,21 @@
                     <p class="text-muted">Описание товара пока не добавлено.</p>
                 {% endif %}
             </div>
+
+            <!-- 🔥 Характеристики из JSON -->
             <div class="tab-pane fade" id="specs" role="tabpanel">
+                {% if product.specifications %}
                 <div class="table-responsive">
                     <table class="table table-striped table-hover align-middle mb-0">
                         <tbody>
-                            <tr><td class="w-25 text-muted fw-medium">Название</td><td>{{ product.title }}</td></tr>
+                            {% for key, value in product.specifications.items %}
+                            <tr>
+                                <td class="w-40 text-muted fw-medium">{{ key|humanize_key }}</td>
+                                <td class="fw-medium">{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                            <!-- Стандартные поля -->
+                            <tr><td class="text-muted fw-medium">Название</td><td>{{ product.title }}</td></tr>
                             <tr><td class="text-muted fw-medium">Артикул</td><td>{{ product.sku|default:"—" }}</td></tr>
                             {% if product.brand %}<tr><td class="text-muted fw-medium">Бренд</td><td>{{ product.brand }}</td></tr>{% endif %}
                             {% if product.weight %}<tr><td class="text-muted fw-medium">Вес</td><td>{{ product.weight }} кг</td></tr>{% endif %}
@@ -153,22 +191,246 @@
                         </tbody>
                     </table>
                 </div>
+                {% else %}
+                    <p class="text-muted">Характеристики пока не добавлены.</p>
+                {% endif %}
             </div>
+
             <div class="tab-pane fade" id="reviews" role="tabpanel">
-                <div class="text-center py-4">
-                    <i class="bi bi-chat-square-text fs-1 text-muted mb-2 d-block"></i>
-                    <p class="text-muted mb-3">Отзывов пока нет. Будьте первым!</p>
-                    <button class="btn btn-outline-primary btn-sm">Оставить отзыв</button>
-                </div>
+
+            <!-- 🔥 Форма отзыва -->
+            <div class="review-form mb-5 p-4 bg-light rounded-4 border">
+                <h5 class="fw-bold mb-4">Оставить отзыв</h5>
+                <form method="post" action="{% url 'catalog:add_review' product.slug %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Рейтинг: интерактивные звёзды -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Ваша оценка</label>
+                        <div class="rating-stars d-flex gap-1" data-rating="0">
+                            {% for i in "54321"|make_list %}
+                            <i class="bi bi-star rating-star" data-value="{{ i }}" style="font-size: 2rem; cursor: pointer; color: #e0e0e0; transition: color 0.2s;"></i>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="rating" id="ratingInput" required>
+                        <small class="text-muted">Нажмите на звёзды, чтобы выбрать оценку</small>
+                    </div>
+
+                    <!-- Имя автора -->
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Ваше имя</label>
+                        <input type="text" name="author_name" class="form-control"
+                               placeholder="{% if user.is_authenticated %}{{ user.username }}{% else %}Гость{% endif %}"
+                               value="{{ user.get_full_name|default:user.username }}" maxlength="100">
+                    </div>
+
+                    <!-- Достоинства / Недостатки -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted">✅ Достоинства</label>
+                            <textarea name="pros" class="form-control" rows="3" placeholder="Что понравилось?"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted">❌ Недостатки</label>
+                            <textarea name="cons" class="form-control" rows="3" placeholder="Что не понравилось?"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Комментарий -->
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">💬 Комментарий</label>
+                        <textarea name="comment" class="form-control" rows="4" placeholder="Расскажите подробнее о вашем опыте..." required></textarea>
+                    </div>
+
+                    <!-- 🔥 Чекбокс проблемы -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="has_issue" id="hasIssue">
+                            <label class="form-check-label" for="hasIssue">
+                                ⚠️ Товар или комплектация не соответствует описанию на сайте
+                            </label>
+                        </div>
+                        <div id="issueBlock" class="mt-2 d-none">
+                            <textarea name="issue_description" class="form-control form-control-sm" rows="2"
+                                      placeholder="Опишите, что именно не соответствует..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 🔥 Загрузка фото/видео -->
+                    <div class="mb-4">
+                        <label class="form-label small text-muted">📎 Прикрепить фото или видео</label>
+                        <div class="upload-area p-3 border border-dashed rounded-3 text-center bg-white"
+                             style="cursor: pointer;" onclick="document.getElementById('attachmentInput').click()">
+                            <i class="bi bi-cloud-upload fs-3 text-muted mb-2 d-block"></i>
+                            <p class="mb-1 small text-muted">Нажмите для выбора файлов</p>
+                            <p class="mb-0 small text-muted" style="font-size: 0.75rem;">Поддерживаются: JPG, PNG, MP4 (макс. 50 МБ)</p>
+                            <input type="file" name="attachments" id="attachmentInput" class="d-none"
+                                   accept="image/*,video/*" multiple onchange="previewAttachments(this)">
+                        </div>
+                        <!-- Превью загруженных файлов -->
+                        <div id="attachmentPreview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary px-4">Отправить отзыв</button>
+                </form>
             </div>
+
+            <!-- 🔥 Список отзывов -->
+            {% if reviews %}
+                <div class="reviews-list">
+                    {% for review in reviews %}
+                    <div class="review-item card border-0 shadow-sm mb-4 rounded-4">
+                        <div class="card-body p-4">
+                            <!-- Шапка отзыва -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <strong class="fs-5">{{ review.author_name|default:review.user.username }}</strong>
+                                    {% if review.is_verified_purchase %}
+                                        <span class="badge bg-success-subtle text-success ms-2">✓ Проверенная покупка</span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-muted small">{{ review.created_at|date:"d.m.Y" }}</div>
+                            </div>
+
+                            <!-- Рейтинг -->
+                            <div class="d-flex text-warning mb-3">
+                                {% for i in "12345"|make_list %}
+                                    <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>
+                                {% endfor %}
+                                <span class="ms-2 text-muted small">({{ review.rating }}/5)</span>
+                            </div>
+
+                            <!-- Достоинства / Недостатки -->
+                            {% if review.pros or review.cons %}
+                            <div class="row g-2 mb-3">
+                                {% if review.pros %}
+                                <div class="col-md-6">
+                                    <div class="p-2 bg-success-subtle rounded-2">
+                                        <small class="fw-semibold text-success">✅ Плюсы:</small>
+                                        <p class="mb-0 small">{{ review.pros|linebreaks }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if review.cons %}
+                                <div class="col-md-6">
+                                    <div class="p-2 bg-danger-subtle rounded-2">
+                                        <small class="fw-semibold text-danger">❌ Минусы:</small>
+                                        <p class="mb-0 small">{{ review.cons|linebreaks }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <!-- Комментарий -->
+                            <p class="text-muted mb-3">{{ review.comment|linebreaks }}</p>
+
+                            <!-- 🔥 Проблема с описанием -->
+                            {% if review.has_issue and review.issue_description %}
+                            <div class="alert alert-warning py-2 mb-3">
+                                <small class="fw-semibold">⚠️ Несоответствие описанию:</small>
+                                <p class="mb-0 small">{{ review.issue_description }}</p>
+                            </div>
+                            {% endif %}
+
+                            <!-- 🔥 Вложения (фото/видео) -->
+                            {% if review.attachments.all %}
+                            <div class="review-attachments d-flex flex-wrap gap-2 mb-3">
+                                {% for att in review.attachments.all %}
+                                    {% if att.file_type == 'image' %}
+                                    <a href="{{ att.file.url }}" target="_blank" class="d-block">
+                                        <img src="{{ att.file.url }}" alt="Attachment"
+                                             class="rounded-2" style="width: 100px; height: 100px; object-fit: cover;">
+                                    </a>
+                                    {% elif att.file_type == 'video' %}
+                                    <video controls class="rounded-2" style="width: 200px; height: 120px; object-fit: cover;">
+                                        <source src="{{ att.file.url }}" type="{{ att.file.content_type }}">
+                                    </video>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-chat-square-text fs-1 mb-3 d-block"></i>
+                    <p class="mb-0">Отзывов пока нет. Будьте первым!</p>
+                </div>
+            {% endif %}
+
         </div>
-    </div>
-</div>
+
+<!-- JS для галереи и отзывов -->
 <script>
-    console.log('🔍 Django Context:', {
-        // ✅ Используем yesno для корректного вывода булевых значений в JS
-        is_in_cart: {{ is_in_cart|yesno:"true,false" }},
-        is_favorited: {{ is_favorited|yesno:"true,false" }}
+    // 🔥 Интерактивные звёзды
+    document.querySelectorAll('.rating-star').forEach(star => {
+        star.addEventListener('click', function() {
+            const value = this.dataset.value;
+            document.getElementById('ratingInput').value = value;
+
+            // Подсветка звёзд
+            document.querySelectorAll('.rating-star').forEach(s => {
+                s.classList.toggle('active', s.dataset.value >= value);
+                s.style.color = s.dataset.value >= value ? '#ffc107' : '#e0e0e0';
+            });
+        });
+
+        // Подсветка при наведении
+        star.addEventListener('mouseenter', function() {
+            const value = this.dataset.value;
+            document.querySelectorAll('.rating-star').forEach(s => {
+                s.style.color = s.dataset.value >= value ? '#ffc107' : '#e0e0e0';
+            });
+        });
+
+        // Сброс при уходе
+        star.addEventListener('mouseleave', function() {
+            const current = document.getElementById('ratingInput').value;
+            document.querySelectorAll('.rating-star').forEach(s => {
+                s.style.color = s.dataset.value >= current ? '#ffc107' : '#e0e0e0';
+            });
+        });
     });
+
+    // 🔥 Чекбокс проблемы
+    document.getElementById('hasIssue')?.addEventListener('change', function() {
+        const block = document.getElementById('issueBlock');
+        if (this.checked) {
+            block.classList.remove('d-none');
+        } else {
+            block.classList.add('d-none');
+            document.querySelector('[name="issue_description"]').value = '';
+        }
+    });
+
+    // 🔥 Превью загруженных файлов
+    function previewAttachments(input) {
+        const preview = document.getElementById('attachmentPreview');
+        preview.innerHTML = '';
+
+        Array.from(input.files).slice(0, 5).forEach(file => { // Макс. 5 файлов
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.width = '80px';
+                img.style.height = '80px';
+                img.style.objectFit = 'cover';
+                img.className = 'rounded-2 border';
+                preview.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.style.width = '120px';
+                video.style.height = '80px';
+                video.style.objectFit = 'cover';
+                video.className = 'rounded-2 border';
+                video.controls = true;
+                preview.appendChild(video);
+            }
+        });
+    }
 </script>
 {% endblock %}

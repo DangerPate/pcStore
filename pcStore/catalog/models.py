@@ -200,22 +200,23 @@ class Product(models.Model):
         self.views += 1  # Обновляем локально
 
 
-# catalog/models.py
-
-# catalog/models.py
-
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(
-        'auth.User',  # 🔑 Простая строка вместо settings.AUTH_USER_MODEL
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='catalog_reviews')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     author_name = models.CharField('Имя автора', max_length=100, blank=True)
+
+    # 🔥 Рейтинг
     rating = models.PositiveSmallIntegerField('Оценка', choices=[(i, str(i)) for i in range(1, 6)])
-    title = models.CharField('Заголовок', max_length=200, blank=True)
-    text = models.TextField('Текст отзыва')
+
+    # 🔥 Новые поля
+    pros = models.TextField('Достоинства', blank=True, help_text='Что понравилось?')
+    cons = models.TextField('Недостатки', blank=True, help_text='Что не понравилось?')
+    comment = models.TextField('Комментарий', help_text='Ваш подробный отзыв')
+
+    # 🔥 Чекбокс проблемы
+    has_issue = models.BooleanField('Есть проблема с описанием', default=False)
+    issue_description = models.TextField('Описание проблемы', blank=True, help_text='Опишите, что не соответствует')
+
     is_verified_purchase = models.BooleanField('Проверенная покупка', default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -226,3 +227,21 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Отзыв на {self.product.title} от {self.author_name or self.user}"
+
+
+class ReviewAttachment(models.Model):
+    """Вложения к отзыву (фото/видео)"""
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField('Файл', upload_to='reviews/%Y/%m/%d/')
+    file_type = models.CharField('Тип', max_length=10, choices=[
+        ('image', 'Изображение'),
+        ('video', 'Видео')
+    ])
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Вложение отзыва'
+        verbose_name_plural = 'Вложения отзывов'
+
+    def __str__(self):
+        return f"Вложение для отзыва #{self.review.id}"

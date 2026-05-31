@@ -1,9 +1,13 @@
 # catalog/views.py
-from django.shortcuts import render, get_object_or_404
-from django.db.models import Q, Exists, OuterRef, Value, BooleanField
-from catalog.models import Product, Category
+import os
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.db.models import Q, Exists, OuterRef, Value, BooleanField, Avg
+from catalog.models import Product, Category, Review, ReviewAttachment
 from cart.models import CartItem, Favorite
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.files.storage import default_storage
+from django.conf import settings
 from .filters_config import FILTERS_CONFIG
 
 
@@ -12,7 +16,7 @@ def apply_filters(queryset, request, category_slug=None):
     Объединяет общие фильтры (цена, бренд, наличие, сортировка)
     и динамические JSON-фильтры для конкретной категории.
     """
-    # === 1. ОБЩИЕ ФИЛЬТРЫ (работают везде: категории + поиск) ===
+    # === 1. ОБЩИЕ ФИЛЬТРЫ ===
     price_min = request.GET.get('price_min')
     price_max = request.GET.get('price_max')
     if price_min and price_min.isdigit():
@@ -33,38 +37,33 @@ def apply_filters(queryset, request, category_slug=None):
     elif sort == 'price_desc':
         queryset = queryset.order_by('-price')
     elif not sort:
-        queryset = queryset.order_by('-created_at')  # Дефолтная сортировка
+        queryset = queryset.order_by('-created_at')
 
-    # === 2. ДИНАМИЧЕСКИЕ ФИЛЬТРЫ (только для категорий из CONFIG) ===
+    # === 2. ДИНАМИЧЕСКИЕ ФИЛЬТРЫ ===
     if category_slug and category_slug in FILTERS_CONFIG:
         specs_config = FILTERS_CONFIG[category_slug]
 
         for key, spec in specs_config.items():
-
-            #  Выпадающие списки (select)
             if spec['type'] == 'select':
                 value = request.GET.get(key)
                 if value:
                     queryset = queryset.filter(specifications__contains={key: value})
 
-            # 🔹 Диапазоны (range) для частот, TDP и т.д.
             elif spec['type'] == 'range':
                 min_val = request.GET.get(f'{key}_min')
                 max_val = request.GET.get(f'{key}_max')
 
                 if min_val or max_val:
                     try:
-                        # Преобразуем в float для корректного сравнения
                         min_f = float(min_val) if min_val else None
                         max_f = float(max_val) if max_val else None
 
-                        # Используем нативные фильтры Django для JSONField (работает в PostgreSQL)
                         if min_f is not None:
                             queryset = queryset.filter(**{f'specifications__{key}__gte': min_f})
                         if max_f is not None:
                             queryset = queryset.filter(**{f'specifications__{key}__lte': max_f})
                     except ValueError:
-                        pass  # Игнорируем некорректные числа, чтобы не ломать запрос
+                        pass
 
     return queryset
 
@@ -72,23 +71,16 @@ def apply_filters(queryset, request, category_slug=None):
 def category_view(request, category_slug):
     """Отображение товаров категории с динамическими фильтрами"""
     category = get_object_or_404(Category, slug=category_slug)
-
-    # Базовая выборка
     products = Product.objects.filter(categories=category, is_active=True).distinct()
-
-    # Применяем фильтры (передаём slug для включения динамических правил)
     products = apply_filters(products, request, category_slug)
 
-    # 🔥 ФОРМИРУЕМ КОНФИГУРАЦИЮ ФИЛЬТРОВ ДЛЯ ШАБЛОНА
     config = {**FILTERS_CONFIG.get('_common', {}), **FILTERS_CONFIG.get(category_slug, {})}
-
     if 'brand' in config:
         config['brand']['options'] = list(
             Product.objects.filter(categories=category, is_active=True, brand__isnull=False)
             .exclude(brand='').values_list('brand', flat=True).distinct().order_by('brand')
         )
 
-    # 🔑 ДОБАВЛЕНО: сохраняем текущие значения диапазонов
     filters = {}
     for key, spec in config.items():
         filters[key] = {
@@ -98,7 +90,6 @@ def category_view(request, category_slug):
             'current_max': request.GET.get(f'{key}_max', ''),
         }
 
-    # Аннотации для кнопок корзины/избранного
     if request.user.is_authenticated:
         products = products.annotate(
             is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
@@ -110,7 +101,6 @@ def category_view(request, category_slug):
             is_favorited=Value(False, output_field=BooleanField())
         )
 
-    # Пагинация
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     try:
@@ -120,7 +110,6 @@ def category_view(request, category_slug):
     except EmptyPage:
         products_page = paginator.page(paginator.num_pages)
 
-    # Параметры для пагинации
     filter_params = request.GET.copy()
     if 'page' in filter_params:
         del filter_params['page']
@@ -128,30 +117,92 @@ def category_view(request, category_slug):
     return render(request, 'catalog/catalog.html', {
         'category': category,
         'products': products_page,
-        'filters': filters,  # 🔑 ЗАМЕНЯЕТ 'brands'
+        'filters': filters,
         'filter_params': filter_params.urlencode(),
     })
 
 
 def product_detail(request, slug):
-    """Детальная страница товара"""
+    """Детальная страница товара с отзывами и галереей"""
     product = get_object_or_404(Product, slug=slug, is_active=True)
     product.increment_views()
 
+    # 🔥 Отзывы (используем уникальное related_name='catalog_reviews')
+    reviews = product.catalog_reviews.select_related('user').all()
+    avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
+
+    # 🔥 Галерея изображений
+    images = [product.image.url] if product.image else []
+    if product.specifications and 'gallery' in product.specifications:
+        images.extend(product.specifications['gallery'])
+
+    # Корзина / избранное
     is_in_cart = False
     is_favorited = False
-
     if request.user.is_authenticated:
-        cart_item = CartItem.objects.filter(user=request.user, product=product).first()
-        fav_item = Favorite.objects.filter(user=request.user, product=product).first()
-        is_in_cart = cart_item is not None
-        is_favorited = fav_item is not None
+        is_in_cart = CartItem.objects.filter(user=request.user, product=product).exists()
+        is_favorited = Favorite.objects.filter(user=request.user, product=product).exists()
 
     return render(request, 'product/product_card.html', {
         'product': product,
         'is_in_cart': is_in_cart,
         'is_favorited': is_favorited,
+        'reviews': reviews,
+        'avg_rating': round(avg_rating, 1),
+        'images': images,
     })
+
+
+def add_review(request, slug):
+    """Обработка формы отзыва с вложениями"""
+    if request.method == 'POST':
+        product = get_object_or_404(Product, slug=slug, is_active=True)
+
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment', '').strip()
+
+        if not rating or not comment:
+            messages.error(request, 'Заполните оценку и комментарий.')
+        else:
+            # Создаём отзыв
+            review = Review.objects.create(
+                product=product,
+                user=request.user if request.user.is_authenticated else None,
+                author_name=request.POST.get('author_name', '').strip() or (
+                    request.user.username if request.user.is_authenticated else 'Гость'),
+                rating=int(rating),
+                pros=request.POST.get('pros', '').strip(),
+                cons=request.POST.get('cons', '').strip(),
+                comment=comment,
+                has_issue=request.POST.get('has_issue') == 'on',
+                issue_description=request.POST.get('issue_description', '').strip() if request.POST.get(
+                    'has_issue') == 'on' else '',
+                is_verified_purchase=request.user.is_authenticated
+            )
+
+            # 🔥 Обработка загруженных файлов
+            files = request.FILES.getlist('attachments')
+            for f in files:
+                # Проверяем тип файла
+                if f.content_type.startswith('image/'):
+                    file_type = 'image'
+                elif f.content_type.startswith('video/'):
+                    file_type = 'video'
+                else:
+                    continue  # Пропускаем неподдерживаемые типы
+
+                # Сохраняем вложение
+                ReviewAttachment.objects.create(
+                    review=review,
+                    file=f,
+                    file_type=file_type
+                )
+
+            messages.success(request, 'Спасибо за ваш отзыв!')
+
+        return redirect('catalog:product_detail', slug=slug)
+
+    return redirect('catalog:product_detail', slug=slug)
 
 
 def search_view(request):
@@ -165,7 +216,6 @@ def search_view(request):
             Q(description__icontains=query) | Q(brand__icontains=query)
         )
 
-    # Поиск использует только общие фильтры (category_slug=None)
     products = apply_filters(products, request)
 
     if request.user.is_authenticated:
@@ -197,5 +247,4 @@ def search_view(request):
         'products': products_page,
         'total_count': paginator.count,
         'filter_params': filter_params.urlencode(),
-        # 🔑 Для поиска оставляем упрощённый рендер брендов, если нужно
     })
