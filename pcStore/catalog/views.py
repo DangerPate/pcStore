@@ -140,7 +140,6 @@ def product_detail(request, slug):
         dislikes_count=Count('votes', filter=Q(votes__vote=-1))
     )
 
-    # 🔥 Получаем голоса текущего пользователя для каждого отзыва
     if request.user.is_authenticated:
         user_votes = ReviewVote.objects.filter(
             review__in=reviews,
@@ -151,6 +150,15 @@ def product_detail(request, slug):
         votes_dict = {}
 
     avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
+
+    # 🔥 Расчет распределения оценок (вместо widthratio в шаблоне)
+    rating_dist = []
+    total_reviews = reviews.count()
+    for i in range(5, 0, -1):
+        count = reviews.filter(rating=i).count()
+        # Считаем процент безопасно (если отзывов 0, то 0%)
+        percent = (count * 100) // total_reviews if total_reviews > 0 else 0
+        rating_dist.append({'rating': i, 'count': count, 'percent': percent})
 
     images = [product.image.url] if product.image else []
     if product.specifications and 'gallery' in product.specifications:
@@ -167,9 +175,11 @@ def product_detail(request, slug):
         'is_in_cart': is_in_cart,
         'is_favorited': is_favorited,
         'reviews': reviews,
-        'user_votes': votes_dict,  # 🔥 Передаём голоса
+        'user_votes': votes_dict,
         'avg_rating': round(avg_rating, 1),
         'images': images,
+        'rating_dist': rating_dist,  # 🔥 Передаем готовые данные
+        'total_reviews': total_reviews,
     })
 
 

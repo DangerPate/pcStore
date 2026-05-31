@@ -23,88 +23,86 @@
         </ol>
     </nav>
 
-    <div class="row g-4 align-items-start">
+    <!-- 🔝 ВЕРХНЯЯ ЧАСТЬ (как в DNS) -->
+    <div class="row g-4 mb-5">
         <!-- Галерея -->
-        <div class="col-lg-6">
-            <div class="product-gallery bg-white rounded-4 shadow-sm p-3">
-                <div class="product-main-image mb-3">
+        <div class="col-lg-5">
+            <div class="product-gallery bg-white rounded-3 p-3">
+                <div class="product-main-image mb-3 text-center">
                     {% if images %}
-                        <img src="{{ images.0 }}" alt="{{ product.title }}" class="img-fluid rounded-3" id="mainImage">
+                        <img src="{{ images.0 }}" alt="{{ product.title }}" class="img-fluid" id="mainImage" style="max-height: 450px; object-fit: contain;">
                     {% else %}
-                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted py-5 bg-light rounded-3">
+                        <div class="d-flex flex-column align-items-center justify-content-center py-5 text-muted">
                             <i class="bi bi-box-seam fs-1 mb-2"></i>
                             <span>Изображение отсутствует</span>
                         </div>
                     {% endif %}
                 </div>
                 {% if images|length > 1 %}
-                <div class="product-thumbnails d-flex gap-2 overflow-auto pb-2">
+                <div class="product-thumbnails d-flex gap-2 overflow-auto">
                     {% for img in images %}
-                    <img src="{{ img }}" alt="Thumb {{ forloop.counter }}" class="thumbnail {% if forloop.first %}active{% endif %}"
+                    <img src="{{ img }}" class="thumbnail {% if forloop.first %}active{% endif %} rounded-2"
                          onclick="changeMainImage(this, '{{ img }}')"
-                         style="cursor: pointer; width: 80px; height: 80px; object-fit: cover; border: 2px solid {% if forloop.first %}#0d6efd{% else %}transparent{% endif %}; border-radius: 8px;">
+                         style="cursor: pointer; width: 70px; height: 70px; object-fit: cover; border: 2px solid {% if forloop.first %}#0d6efd{% else %}transparent{% endif %};">
                     {% endfor %}
                 </div>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Информация -->
-        <div class="col-lg-6">
+        <!-- Информация о товаре -->
+        <div class="col-lg-7">
             <div class="product-info">
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    {% if product.is_new %}<span class="badge bg-info-subtle text-info">Новинка</span>{% endif %}
-                    {% if product.is_hit %}<span class="badge bg-warning-subtle text-warning-emphasis">Популярное</span>{% endif %}
-                    {% if product.discount_percent > 0 %}<span class="badge bg-danger">-{{ product.discount_percent }}%</span>{% endif %}
-                </div>
-
-                <h1 class="h2 fw-bold mb-2">{{ product.title }}</h1>
-                <p class="text-muted mb-3 small">
-                    Артикул: <span class="text-dark">{{ product.sku|default:"—" }}</span>
-                    {% if product.brand %} | Бренд: <span class="text-dark fw-medium">{{ product.brand }}</span>{% endif %}
-                </p>
-
-                <div class="d-flex align-items-center gap-2 mb-3">
-                    <div class="d-flex text-warning">
-                        {% for i in "12345"|make_list %}
-                            <i class="bi bi-star{% if forloop.counter <= avg_rating|floatformat:0 %}-fill{% endif %}"></i>
-                        {% endfor %}
-                    </div>
-                    <span class="text-muted small">({{ reviews.count }} отзывов)</span>
-                    {% if avg_rating %}<span class="badge bg-light text-dark border">{{ avg_rating }}/5</span>{% endif %}
-                </div>
+                <h1 class="h3 fw-bold mb-3">{{ product.title }}</h1>
 
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <span class="fs-2 fw-bold text-primary">{{ product.price }} ₽</span>
-                    {% if product.old_price and product.old_price > product.price %}
-                        <del class="text-muted fs-5">{{ product.old_price }} ₽</del>
+                    <div class="d-flex text-warning">
+                        {% for i in "12345"|make_list %}
+                            <i class="bi bi-star{% if forloop.counter <= avg_rating %}-fill{% else %}{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                    <a href="#reviews-section" class="text-decoration-none text-primary small">
+                        {{ reviews.count }} отзывов
+                    </a>
+                    {% if avg_rating %}
+                        <span class="badge bg-light text-dark border">{{ avg_rating }}/5</span>
                     {% endif %}
                 </div>
 
-                <div class="d-flex flex-wrap gap-4 mb-4">
+                <div class="mb-3">
+                    <span class="fs-2 fw-bold text-primary">{{ product.price }} ₽</span>
+                    {% if product.old_price and product.old_price > product.price %}
+                        <del class="text-muted ms-2">{{ product.old_price }} ₽</del>
+                        <span class="badge bg-danger ms-2">-{{ product.discount_percent }}%</span>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex gap-3 mb-4">
                     <div class="d-flex align-items-center gap-2">
-                        <i class="bi {% if product.is_in_stock %}bi-check-circle-fill text-success{% else %}bi-x-circle-fill text-danger{% endif %} fs-5"></i>
-                        <span class="fw-medium {{ product.is_in_stock|yesno:'text-success,text-danger' }}">{{ product.stock_status_label }}</span>
+                        {% if product.is_in_stock %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span class="text-success">{{ product.stock_status_label }}</span>
+                        {% else %}
+                            <i class="bi bi-x-circle-fill text-danger"></i>
+                            <span class="text-danger">Нет в наличии</span>
+                        {% endif %}
                     </div>
                     {% if product.warranty %}
                     <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-shield-check text-primary fs-5"></i>
-                        <span class="fw-medium">Гарантия: {{ product.warranty }}</span>
+                        <i class="bi bi-shield-check text-primary"></i>
+                        <span>Гарантия: {{ product.warranty }}</span>
                     </div>
                     {% endif %}
                 </div>
 
-                {% if product.info %}
-                    <p class="text-muted mb-4 small lh-lg">{{ product.info|linebreaks }}</p>
-                {% endif %}
-
-                <div class="d-flex gap-3 mb-4" id="product-actions">
+                <!-- Кнопки -->
+                <div class="d-flex gap-3 mb-4">
                     {% if is_in_cart %}
                     <button type="button" class="btn btn-success btn-lg px-4 btn-add-cart" data-slug="{{ product.slug }}">
-                        <i class="bi bi-check-lg me-2"></i> Уже в корзине
+                        <i class="bi bi-check-lg me-2"></i> В корзине
                     </button>
                     {% else %}
-                    <button type="button" class="btn btn-dark btn-lg px-4 btn-add-cart" data-slug="{{ product.slug }}">
+                    <button type="button" class="btn btn-primary btn-lg px-4 btn-add-cart" data-slug="{{ product.slug }}">
                         <i class="bi bi-cart-plus me-2"></i> В корзину
                     </button>
                     {% endif %}
@@ -113,15 +111,14 @@
                     </button>
                 </div>
 
+                <!-- Краткие характеристики -->
                 {% if product.specifications %}
                 <div class="border-top pt-3">
-                    <h6 class="fw-bold mb-3 small text-uppercase text-muted ls-1">Ключевые параметры</h6>
-                    <dl class="row small mb-0 product-specs-quick">
-                        {% for key, value in product.specifications.items %}
-                            {% if key in 'socket|vram|memory_type|chipset|form_factor|wattage|frequency|tdp_rating|cooling' %}
-                            <dt class="col-sm-5 text-muted">{{ key|humanize_key }}</dt>
-                            <dd class="col-sm-7 fw-medium">{{ value }}</dd>
-                            {% endif %}
+                    <h6 class="fw-bold mb-3">Основные характеристики</h6>
+                    <dl class="row mb-0 small">
+                        {% for key, value in product.specifications.items|slice:":5" %}
+                        <dt class="col-sm-5 text-muted">{{ key|humanize_key }}</dt>
+                        <dd class="col-sm-7">{{ value }}</dd>
                         {% endfor %}
                     </dl>
                 </div>
@@ -130,46 +127,121 @@
         </div>
     </div>
 
-    <!-- Табы -->
-    <div class="mt-5 pt-3">
-        <ul class="nav nav-tabs product-tabs" id="productTabs" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#desc">Описание</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#specs">Характеристики</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#reviews">Отзывы ({{ reviews.count }})</button></li>
-        </ul>
-
-        <div class="tab-content p-4 bg-white border border-top-0 rounded-bottom-3 shadow-sm">
-            <!-- Описание -->
-            <div class="tab-pane fade show active" id="desc">
-                {% if product.description %}<div class="product-description">{{ product.description|linebreaks }}</div>
-                {% else %}<p class="text-muted">Описание товара пока не добавлено.</p>{% endif %}
+    <!-- 📝 ОПИСАНИЕ ТОВАРА -->
+    <section class="mb-5">
+        <h2 class="h4 fw-bold mb-3">Описание товара</h2>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                {% if product.description %}
+                    <div class="product-description">{{ product.description|linebreaks }}</div>
+                {% elif product.info %}
+                    <p class="text-muted">{{ product.info|linebreaks }}</p>
+                {% else %}
+                    <p class="text-muted">Описание товара пока не добавлено.</p>
+                {% endif %}
             </div>
+        </div>
+    </section>
 
-            <!-- Характеристики -->
-            <div class="tab-pane fade" id="specs">
-                {% if product.specifications %}
-                <table class="table table-striped mb-0">
-                    <tbody>
-                        {% for key, value in product.specifications.items %}
-                        <tr><td class="text-muted fw-medium">{{ key|humanize_key }}</td><td>{{ value }}</td></tr>
+    <!-- ⚙️ ХАРАКТЕРИСТИКИ (с кнопкой "Развернуть") -->
+    {% if product.specifications %}
+    <section class="mb-5">
+        <h2 class="h4 fw-bold mb-3">Характеристики</h2>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div id="specs-short">
+                    <dl class="row mb-0 small">
+                        {% for key, value in product.specifications.items|slice:":8" %}
+                        <dt class="col-sm-4 col-md-3 text-muted mb-2">{{ key|humanize_key }}</dt>
+                        <dd class="col-sm-8 col-md-9 mb-2">{{ value }}</dd>
                         {% endfor %}
-                        <tr><td class="text-muted fw-medium">Название</td><td>{{ product.title }}</td></tr>
-                        <tr><td class="text-muted fw-medium">Артикул</td><td>{{ product.sku|default:"—" }}</td></tr>
-                        {% if product.brand %}<tr><td class="text-muted fw-medium">Бренд</td><td>{{ product.brand }}</td></tr>{% endif %}
-                        {% if product.weight %}<tr><td class="text-muted fw-medium">Вес</td><td>{{ product.weight }} кг</td></tr>{% endif %}
-                    </tbody>
-                </table>
-                {% else %}<p class="text-muted">Характеристики пока не добавлены.</p>{% endif %}
-            </div>
+                    </dl>
+                </div>
 
-            <!-- 🔥 ОТЗЫВЫ (ИСПРАВЛЕНО) -->
-            <div class="tab-pane fade" id="reviews">
-                <div class="review-form mb-5 p-4 bg-light rounded-4 border">
+                <div id="specs-full" class="d-none">
+                    <dl class="row mb-0 small">
+                        {% for key, value in product.specifications.items %}
+                        <dt class="col-sm-4 col-md-3 text-muted mb-2">{{ key|humanize_key }}</dt>
+                        <dd class="col-sm-8 col-md-9 mb-2">{{ value }}</dd>
+                        {% endfor %}
+                        <!-- Стандартные поля -->
+                        <dt class="col-sm-4 col-md-3 text-muted mb-2">Название</dt>
+                        <dd class="col-sm-8 col-md-9 mb-2">{{ product.title }}</dd>
+                        <dt class="col-sm-4 col-md-3 text-muted mb-2">Артикул</dt>
+                        <dd class="col-sm-8 col-md-9 mb-2">{{ product.sku|default:"—" }}</dd>
+                        {% if product.brand %}
+                        <dt class="col-sm-4 col-md-3 text-muted mb-2">Бренд</dt>
+                        <dd class="col-sm-8 col-md-9 mb-2">{{ product.brand }}</dd>
+                        {% endif %}
+                        {% if product.weight %}
+                        <dt class="col-sm-4 col-md-3 text-muted mb-2">Вес</dt>
+                        <dd class="col-sm-8 col-md-9 mb-2">{{ product.weight }} кг</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+
+                {% if product.specifications.items|length > 8 %}
+                <button class="btn btn-link text-primary mt-3 p-0" id="toggle-specs" onclick="toggleSpecs()">
+                    Развернуть все характеристики
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 💬 ОТЗЫВЫ (в стиле DNS) -->
+    <section id="reviews-section" class="mb-5">
+        <h2 class="h4 fw-bold mb-4">Отзывы ({{ reviews.count }})</h2>
+
+        <!-- Общая статистика -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 bg-light">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 fw-bold mb-2">{{ avg_rating|default:"0" }}</div>
+                        <div class="d-flex justify-content-center text-warning mb-2">
+                            {% for i in "12345"|make_list %}
+                                <i class="bi bi-star{% if forloop.counter <= avg_rating %}-fill{% else %}{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                        <div class="text-muted small">{{ reviews.count }} отзывов</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card border-0 bg-light h-100">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">Распределение оценок</h6>
+                        {% for item in rating_dist %}
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2 small">{{ item.rating }}</span>
+                            <div class="flex-grow-1 bg-white rounded-2" style="height: 8px;">
+                                <div class="bg-warning rounded-2" style="width: {{ item.percent }}%; height: 100%;"></div>
+                            </div>
+                            <span class="ms-2 text-muted small">{{ item.count }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопка добавления отзыва -->
+        <div class="mb-4">
+            <button class="btn btn-primary btn-lg" data-bs-toggle="collapse" data-bs-target="#reviewFormCollapse">
+                Добавить отзыв
+            </button>
+        </div>
+
+        <!-- Форма отзыва (сворачиваемая) -->
+        <div class="collapse mb-4" id="reviewFormCollapse">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
                     <h5 class="fw-bold mb-4">Оставить отзыв</h5>
                     <form method="post" action="{% url 'catalog:add_review' product.slug %}" enctype="multipart/form-data" id="reviewForm">
                         {% csrf_token %}
 
-                        <!-- Звёзды -->
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Ваша оценка</label>
                             <div class="rating-stars d-flex gap-2" id="starContainer">
@@ -178,168 +250,304 @@
                                 {% endfor %}
                             </div>
                             <input type="hidden" name="rating" id="ratingInput" required>
-                            <!-- 🔥 Сообщение об ошибке -->
-                            <div id="rating-error" class="text-danger small mt-1 d-none fw-medium">⚠️ Пожалуйста, выберите оценку</div>
-                            <small class="text-muted">Нажмите на звезду</small>
+                            <div id="rating-error" class="text-danger small mt-1 d-none">⚠️ Выберите оценку</div>
                         </div>
-
-                        <!-- 🔥 УБРАНО поле имени (автоподстановка) -->
 
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6"><textarea name="pros" class="form-control" rows="2" placeholder="Достоинства"></textarea></div>
-                            <div class="col-md-6"><textarea name="cons" class="form-control" rows="2" placeholder="Недостатки"></textarea></div>
+                            <div class="col-md-6">
+                                <textarea name="pros" class="form-control" rows="2" placeholder="Достоинства"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <textarea name="cons" class="form-control" rows="2" placeholder="Недостатки"></textarea>
+                            </div>
                         </div>
-                        <div class="mb-3"><textarea name="comment" class="form-control" rows="3" placeholder="Комментарий" required></textarea></div>
+                        <div class="mb-3">
+                            <textarea name="comment" class="form-control" rows="3" placeholder="Комментарий" required></textarea>
+                            <div id="comment-error" class="text-danger small mt-1 d-none">⚠️ Напишите комментарий</div>
+                        </div>
 
                         <div class="mb-3 form-check">
                             <input class="form-check-input" type="checkbox" name="has_issue" id="hasIssue">
-                            <label class="form-check-label" for="hasIssue">Товар или комплектация не соответствует описанию на сайте</label>
+                            <label class="form-check-label" for="hasIssue">Товар не соответствует описанию</label>
                             <div id="issueBlock" class="mt-2 d-none">
                                 <textarea name="issue_description" class="form-control form-control-sm" rows="2" placeholder="Опишите проблему..."></textarea>
                             </div>
                         </div>
 
-                        <!-- Загрузка файлов -->
                         <div class="mb-4">
-                            <label class="form-label small text-muted">Прикрепить фото или видео (JPG, PNG, MP4 до 50МБ)</label>
-                            <div class="upload-area p-4 border border-2 border-dashed rounded-3 text-center bg-white" id="dropZone" style="cursor: pointer;">
-                                <i class="bi bi-cloud-arrow-up fs-2 text-muted mb-2 d-block"></i>
-                                <p class="mb-1 fw-medium">Перетащите файлы сюда или нажмите</p>
-                                <p class="mb-0 small text-muted">Максимум 5 файлов</p>
+                            <label class="form-label small text-muted">Прикрепить фото/видео</label>
+                            <div class="upload-area p-3 border border-dashed rounded-3 text-center" id="dropZone" style="cursor: pointer;">
+                                <i class="bi bi-cloud-upload fs-3 text-muted mb-2 d-block"></i>
+                                <p class="mb-0 small text-muted">Нажмите или перетащите файлы (JPG, PNG, MP4)</p>
                                 <input type="file" name="attachments" id="attachmentInput" class="d-none" accept=".jpg,.jpeg,.png,.mp4" multiple onchange="handleFiles(this.files)">
                             </div>
                             <div id="fileList" class="d-flex flex-wrap gap-2 mt-2"></div>
-                            <div id="fileError" class="text-danger small mt-1 d-none"></div>
                         </div>
 
                         <button type="submit" class="btn btn-primary px-4">Отправить отзыв</button>
                     </form>
                 </div>
-
-                <!-- Список отзывов -->
-                {% if reviews %}
-                <div class="reviews-list">
-                    {% for review in reviews %}
-                    <div class="review-item card border-0 shadow-sm mb-4 rounded-4" id="review-{{ review.id }}">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div>
-                                    <!-- Имя пользователя -->
-                                    <strong class="fs-5">{{ review.user.get_display_name }}</strong>
-                                    {% if review.is_verified_purchase %}
-                                        <span class="badge bg-success-subtle text-success ms-2" style="font-size: 0.75rem;">Реальный покупатель</span>
-                                    {% endif %}
-                                </div>
-                                <div class="text-muted small">{{ review.created_at|date:"d.m.Y" }}</div>
-                            </div>
-
-                            <!-- Рейтинг -->
-                            <div class="d-flex text-warning mb-3">
-                                {% for i in "12345"|make_list %}<i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>{% endfor %}
-                            </div>
-
-                            <!-- Достоинства/Недостатки -->
-                            {% if review.pros or review.cons %}
-                            <div class="row g-2 mb-3">
-                                {% if review.pros %}
-                                <div class="col-md-6">
-                                    <div class="p-3 bg-light rounded-3">
-                                        <small class="fw-semibold text-muted d-block mb-1">Достоинства</small>
-                                        <p class="mb-0 small">{{ review.pros|linebreaksbr }}</p>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                {% if review.cons %}
-                                <div class="col-md-6">
-                                    <div class="p-3 bg-light rounded-3">
-                                        <small class="fw-semibold text-muted d-block mb-1">Недостатки</small>
-                                        <p class="mb-0 small">{{ review.cons|linebreaksbr }}</p>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-
-                            <!-- Комментарий -->
-                            <p class="text-muted mb-3">{{ review.comment|linebreaksbr }}</p>
-
-                            <!-- Проблема -->
-                            {% if review.has_issue and review.issue_description %}
-                            <div class="alert alert-warning py-2 mb-3 small">
-                                <strong>Несоответствие описанию:</strong> {{ review.issue_description }}
-                            </div>
-                            {% endif %}
-
-                            <!-- Вложения -->
-                            {% if review.attachments.all %}
-                            <div class="d-flex flex-wrap gap-2 mb-3">
-                                {% for att in review.attachments.all %}
-                                    {% if att.file_type == 'image' %}
-                                        <a href="{{ att.file.url }}" target="_blank">
-                                            <img src="{{ att.file.url }}" class="rounded-2" style="width: 90px; height: 90px; object-fit: cover;">
-                                        </a>
-                                    {% elif att.file_type == 'video' %}
-                                        <video controls class="rounded-2" style="width: 180px; height: 100px; object-fit: cover;">
-                                            <source src="{{ att.file.url }}">
-                                        </video>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-
-                            <!-- Лайки/Дизлайки -->
-                            <div class="d-flex align-items-center gap-3 mb-3">
-                                <button class="btn btn-sm vote-btn {% if user_votes|get_item:review.id == 1 %}btn-success active{% else %}btn-outline-success{% endif %}"
-                                        data-id="{{ review.id }}" data-vote="1">
-                                    <i class="bi bi-hand-thumbs-up me-1"></i>
-                                    <span class="vote-likes-{{ review.id }}">{{ review.likes_count }}</span>
-                                </button>
-                                <button class="btn btn-sm vote-btn {% if user_votes|get_item:review.id == -1 %}btn-danger active{% else %}btn-outline-danger{% endif %}"
-                                        data-id="{{ review.id }}" data-vote="-1">
-                                    <i class="bi bi-hand-thumbs-down me-1"></i>
-                                    <span class="vote-dislikes-{{ review.id }}">{{ review.dislikes_count }}</span>
-                                </button>
-                            </div>
-
-                            <!-- Комментарии -->
-                            <div class="border-top pt-3">
-                                <h6 class="small fw-bold mb-2">Комментарии ({{ review.comments.count }})</h6>
-                                <div class="comments-list mb-2" id="comments-{{ review.id }}">
-                                    {% for c in review.comments.all %}
-                                    <div class="d-flex gap-2 mb-2 small">
-                                        <strong>{{ c.user.get_display_name }}:</strong>
-                                        <span class="text-muted">{{ c.text }}</span>  {# 🔥 Просто text, без фильтров #}
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                                {% if user.is_authenticated %}
-                                <form class="d-flex gap-2 comment-form" data-review="{{ review.id }}">
-                                    {% csrf_token %}
-                                    <input type="text" class="form-control form-control-sm" placeholder="Написать комментарий..." required>
-                                    <button type="submit" class="btn btn-sm btn-primary">Отправить</button>
-                                </form>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-5 text-muted">
-                    <i class="bi bi-chat-square-text fs-1 mb-3 d-block"></i>
-                    <p class="mb-0">Отзывов пока нет. Будьте первым!</p>
-                </div>
-                {% endif %}
             </div>
         </div>
-    </div>
+
+        <!-- 🔥 Список отзывов (с пагинацией) -->
+        {% if reviews %}
+        <div class="reviews-list" id="reviews-container">
+            {% for review in reviews|slice:":3" %}
+            <div class="review-item card border-0 shadow-sm mb-3" data-review-index="{{ forloop.counter0 }}">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <strong class="fs-5">{{ review.user.get_display_name }}</strong>
+                            {% if review.is_verified_purchase %}
+                                <span class="badge bg-success-subtle text-success ms-2 small">Проверенный покупатель</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small">{{ review.created_at|date:"d.m.Y" }}</div>
+                    </div>
+
+                    <div class="d-flex text-warning mb-3">
+                        {% for i in "12345"|make_list %}
+                            <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% else %}{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+
+                    {% if review.pros or review.cons %}
+                    <div class="row g-2 mb-3">
+                        {% if review.pros %}
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="fw-semibold text-success d-block mb-1">✓ Достоинства</small>
+                                <p class="mb-0 small">{{ review.pros|linebreaksbr }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if review.cons %}
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="fw-semibold text-danger d-block mb-1">✗ Недостатки</small>
+                                <p class="mb-0 small">{{ review.cons|linebreaksbr }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <p class="text-muted mb-3">{{ review.comment|linebreaksbr }}</p>
+
+                    {% if review.attachments.all %}
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% for att in review.attachments.all %}
+                            {% if att.file_type == 'image' %}
+                                <a href="{{ att.file.url }}" target="_blank">
+                                    <img src="{{ att.file.url }}" class="rounded-2" style="width: 80px; height: 80px; object-fit: cover;">
+                                </a>
+                            {% elif att.file_type == 'video' %}
+                                <video controls class="rounded-2" style="width: 160px; height: 90px; object-fit: cover;">
+                                    <source src="{{ att.file.url }}">
+                                </video>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Лайки/Дизлайки -->
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <button class="btn btn-sm btn-outline-success vote-btn" data-id="{{ review.id }}" data-vote="1">
+                            <i class="bi bi-hand-thumbs-up me-1"></i>
+                            <span class="vote-likes-{{ review.id }}">{{ review.likes_count }}</span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger vote-btn" data-id="{{ review.id }}" data-vote="-1">
+                            <i class="bi bi-hand-thumbs-down me-1"></i>
+                            <span class="vote-dislikes-{{ review.id }}">{{ review.dislikes_count }}</span>
+                        </button>
+                    </div>
+
+                    <!-- 🔥 Комментарии (свёрнуты по умолчанию) -->
+                    <div class="border-top mt-3 pt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="small fw-bold mb-0">Комментарии ({{ review.comments.count }})</h6>
+                            {% if review.comments.count > 0 %}
+                            <button class="btn btn-link btn-sm text-primary p-0" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#comments-{{ review.id }}"
+                                    aria-expanded="false">
+                                Показать комментарии
+                            </button>
+                            {% endif %}
+                        </div>
+
+                        <div class="collapse comments-list mb-2" id="comments-{{ review.id }}">
+                            {% for c in review.comments.all %}
+                            <div class="d-flex gap-2 mb-2 small">
+                                <strong>{{ c.user.get_display_name }}:</strong>
+                                <span class="text-muted">{{ c.text }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if user.is_authenticated %}
+                        <form class="d-flex gap-2 comment-form" data-review="{{ review.id }}">
+                            {% csrf_token %}
+                            <input type="text" class="form-control form-control-sm" placeholder="Написать комментарий..." required>
+                            <button type="submit" class="btn btn-sm btn-primary">Отправить</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- 🔥 Кнопка "Показать ещё" -->
+        {% if reviews.count > 3 %}
+        <div class="text-center mt-4">
+            <button class="btn btn-outline-primary btn-lg" id="load-more-reviews" onclick="loadMoreReviews()">
+                Показать ещё отзывы ({{ reviews.count|add:"-3" }})
+            </button>
+        </div>
+
+        <!-- Скрытые отзывы -->
+        <div id="hidden-reviews" class="d-none">
+            {% for review in reviews|slice:"3:" %}
+            <div class="review-item card border-0 shadow-sm mb-3" data-review-index="{{ forloop.counter0|add:3 }}">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <strong class="fs-5">{{ review.user.get_display_name }}</strong>
+                            {% if review.is_verified_purchase %}
+                                <span class="badge bg-success-subtle text-success ms-2 small">Проверенный покупатель</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small">{{ review.created_at|date:"d.m.Y" }}</div>
+                    </div>
+
+                    <div class="d-flex text-warning mb-3">
+                        {% for i in "12345"|make_list %}
+                            <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% else %}{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+
+                    {% if review.pros or review.cons %}
+                    <div class="row g-2 mb-3">
+                        {% if review.pros %}
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="fw-semibold text-success d-block mb-1">✓ Достоинства</small>
+                                <p class="mb-0 small">{{ review.pros|linebreaksbr }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if review.cons %}
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="fw-semibold text-danger d-block mb-1">✗ Недостатки</small>
+                                <p class="mb-0 small">{{ review.cons|linebreaksbr }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <p class="text-muted mb-3">{{ review.comment|linebreaksbr }}</p>
+
+                    {% if review.attachments.all %}
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% for att in review.attachments.all %}
+                            {% if att.file_type == 'image' %}
+                                <a href="{{ att.file.url }}" target="_blank">
+                                    <img src="{{ att.file.url }}" class="rounded-2" style="width: 80px; height: 80px; object-fit: cover;">
+                                </a>
+                            {% elif att.file_type == 'video' %}
+                                <video controls class="rounded-2" style="width: 160px; height: 90px; object-fit: cover;">
+                                    <source src="{{ att.file.url }}">
+                                </video>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <button class="btn btn-sm btn-outline-success vote-btn" data-id="{{ review.id }}" data-vote="1">
+                            <i class="bi bi-hand-thumbs-up me-1"></i>
+                            <span class="vote-likes-{{ review.id }}">{{ review.likes_count }}</span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger vote-btn" data-id="{{ review.id }}" data-vote="-1">
+                            <i class="bi bi-hand-thumbs-down me-1"></i>
+                            <span class="vote-dislikes-{{ review.id }}">{{ review.dislikes_count }}</span>
+                        </button>
+                    </div>
+
+                    <div class="border-top mt-3 pt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="small fw-bold mb-0">Комментарии ({{ review.comments.count }})</h6>
+                            {% if review.comments.count > 0 %}
+                            <button class="btn btn-link btn-sm text-primary p-0" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#comments-{{ review.id }}"
+                                    aria-expanded="false">
+                                Показать комментарии
+                            </button>
+                            {% endif %}
+                        </div>
+
+                        <div class="collapse comments-list mb-2" id="comments-{{ review.id }}">
+                            {% for c in review.comments.all %}
+                            <div class="d-flex gap-2 mb-2 small">
+                                <strong>{{ c.user.get_display_name }}:</strong>
+                                <span class="text-muted">{{ c.text }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if user.is_authenticated %}
+                        <form class="d-flex gap-2 comment-form" data-review="{{ review.id }}">
+                            {% csrf_token %}
+                            <input type="text" class="form-control form-control-sm" placeholder="Написать комментарий..." required>
+                            <button type="submit" class="btn btn-sm btn-primary">Отправить</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-chat-square-text fs-1 mb-3 d-block"></i>
+            <p>Отзывов пока нет. Будьте первым!</p>
+        </div>
+        {% endif %}
+    </section>
 </div>
 
-<!-- JavaScript -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// Развернуть характеристики
+function toggleSpecs() {
+    const short = document.getElementById('specs-short');
+    const full = document.getElementById('specs-full');
+    const btn = document.getElementById('toggle-specs');
 
-    // === 1. ЗВЁЗДЫ РЕЙТИНГА ===
+    if (full.classList.contains('d-none')) {
+        full.classList.remove('d-none');
+        short.classList.add('d-none');
+        btn.textContent = 'Свернуть';
+    } else {
+        full.classList.add('d-none');
+        short.classList.remove('d-none');
+        btn.textContent = 'Развернуть все характеристики';
+    }
+}
+
+// Смена изображения
+function changeMainImage(thumb, src) {
+    document.getElementById('mainImage').src = src;
+    document.querySelectorAll('.thumbnail').forEach(t => t.style.borderColor = 'transparent');
+    thumb.style.borderColor = '#0d6efd';
+}
+
+// Звёзды рейтинга
+document.addEventListener('DOMContentLoaded', function() {
     const stars = document.querySelectorAll('.rating-star');
     const ratingInput = document.getElementById('ratingInput');
 
@@ -356,7 +564,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // === 2. ВАЛИДАЦИЯ ФОРМЫ ОТЗЫВА ===
+    // Валидация формы отзыва
     const reviewForm = document.getElementById('reviewForm');
     if (reviewForm) {
         reviewForm.addEventListener('submit', function(e) {
@@ -369,32 +577,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 error = true;
             }
             if (!comment) {
-                let errEl = document.getElementById('comment-error');
-                if (!errEl) {
-                    errEl = document.createElement('div');
-                    errEl.id = 'comment-error';
-                    errEl.className = 'text-danger small mt-1 fw-medium';
-                    errEl.textContent = '⚠️ Пожалуйста, напишите комментарий';
-                    document.querySelector('textarea[name="comment"]').parentNode.appendChild(errEl);
-                }
-                errEl.classList.remove('d-none');
+                const err = document.getElementById('comment-error');
+                err.classList.remove('d-none');
                 error = true;
             }
             if (error) {
                 e.preventDefault();
-                document.querySelector('.text-danger:not(.d-none)')?.scrollIntoView({behavior: 'smooth', block: 'center'});
                 return false;
             }
         });
     }
 
-    // === 3. DRAG & DROP ФАЙЛОВ ===
+    // Чекбокс проблемы
+    document.getElementById('hasIssue')?.addEventListener('change', function() {
+        document.getElementById('issueBlock')?.classList.toggle('d-none', !this.checked);
+    });
+
+    // Drag & Drop
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('attachmentInput');
     const fileList = document.getElementById('fileList');
-    const fileError = document.getElementById('fileError');
-    const allowed = ['image/jpeg', 'image/png', 'video/mp4'];
-    const MAX_SIZE = 50 * 1024 * 1024;
 
     if (dropZone) {
         dropZone.addEventListener('click', () => fileInput?.click());
@@ -410,81 +612,21 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleFiles(files) {
         if (!fileList) return;
         fileList.innerHTML = '';
-        fileError?.classList.add('d-none');
         const dt = new DataTransfer();
-        let count = 0;
-        Array.from(files).forEach(f => {
-            if (!allowed.includes(f.type)) { if(fileError){fileError.textContent=`❌ ${f.name}: только JPG/PNG/MP4`; fileError.classList.remove('d-none');} return; }
-            if (f.size > MAX_SIZE) { if(fileError){fileError.textContent=`❌ ${f.name}: >50МБ`; fileError.classList.remove('d-none');} return; }
-            if (count >= 5) { if(fileError){fileError.textContent='❌ Макс. 5 файлов'; fileError.classList.remove('d-none');} return; }
-            dt.items.add(f); count++;
-            const div = document.createElement('div');
-            div.innerHTML = f.type.startsWith('image/')
-                ? `<img src="${URL.createObjectURL(f)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">`
-                : `<video src="${URL.createObjectURL(f)}" style="width:80px;height:50px;object-fit:cover;border-radius:8px;" controls></video>`;
-            fileList.appendChild(div);
+        Array.from(files).slice(0, 5).forEach(f => {
+            if (['image/jpeg', 'image/png', 'video/mp4'].includes(f.type)) {
+                dt.items.add(f);
+                const div = document.createElement('div');
+                div.innerHTML = f.type.startsWith('image/')
+                    ? `<img src="${URL.createObjectURL(f)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">`
+                    : `<video src="${URL.createObjectURL(f)}" style="width:80px;height:50px;object-fit:cover;border-radius:8px;" controls></video>`;
+                fileList.appendChild(div);
+            }
         });
         if (fileInput) fileInput.files = dt.files;
     }
 
-    // === 4. ЧЕКБОКС ПРОБЛЕМЫ ===
-    document.getElementById('hasIssue')?.addEventListener('change', function() {
-        document.getElementById('issueBlock')?.classList.toggle('d-none', !this.checked);
-    });
-
-    // === 5. КОММЕНТАРИИ (ИСПРАВЛЕНО) ===
-    document.querySelectorAll('.comment-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const input = this.querySelector('input[type="text"]'); // 🔥 Только текстовый инпут!
-            if (!input) return;
-            const text = input.value.trim();
-            if (text.length < 2) { input.focus(); return; }
-
-            const reviewId = this.dataset.review;
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-            const btn = this.querySelector('button');
-            const oldText = btn.innerHTML;
-
-            btn.disabled = true; btn.innerHTML = '...';
-
-            try {
-                const res = await fetch('{% url "catalog:add_comment" %}', { // 🔥 Прямой URL через Django tag
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ review_id: reviewId, text: text })
-                });
-                const data = await res.json();
-
-                if (res.ok && data.status === 'ok') {
-                    const list = document.getElementById(`comments-${reviewId}`);
-                    if (list) {
-                        const el = document.createElement('div');
-                        el.className = 'd-flex gap-2 mb-2 small';
-                        el.innerHTML = `<strong>${data.user}:</strong> <span class="text-muted">${data.text}</span>`;
-                        list.appendChild(el);
-                        input.value = ''; // 🔥 Очистка
-                        input.blur();
-                    }
-                    // Обновление счётчика
-                    const counter = this.closest('.border-top')?.querySelector('h6');
-                    if (counter) {
-                        const m = counter.textContent.match(/\d+/);
-                        counter.textContent = counter.textContent.replace(/\d+/, m ? +m[0]+1 : 1);
-                    }
-                } else {
-                    alert(data.error || 'Ошибка');
-                }
-            } catch(err) {
-                console.error(err);
-                alert('Ошибка сети');
-            } finally {
-                btn.disabled = false; btn.innerHTML = oldText;
-            }
-        });
-    });
-
-    // === 6. ЛАЙКИ/ДИЗЛАЙКИ (ИСПРАВЛЕНО) ===
+    // Лайки
     document.querySelectorAll('.vote-btn').forEach(btn => {
         btn.addEventListener('click', async function() {
             const id = this.dataset.id;
@@ -492,36 +634,47 @@ document.addEventListener('DOMContentLoaded', function() {
             const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
             try {
-                const res = await fetch('{% url "catalog:toggle_vote" %}', { // 🔥 Прямой URL
+                const res = await fetch('/catalog/review/vote/', {
                     method: 'POST',
                     headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `review_id=${id}&vote=${vote}`
                 });
                 const data = await res.json();
-
                 if (res.ok) {
-                    // Обновляем счётчики
                     document.querySelector(`.vote-likes-${id}`).textContent = data.likes;
                     document.querySelector(`.vote-dislikes-${id}`).textContent = data.dislikes;
+                }
+            } catch(err) { console.error(err); }
+        });
+    });
 
-                    // 🔥 Мгновенное переключение кнопок
-                    const likeBtn = document.querySelector(`.vote-btn[data-id="${id}"][data-vote="1"]`);
-                    const dislikeBtn = document.querySelector(`.vote-btn[data-id="${id}"][data-vote="-1"]`);
+    // Комментарии
+    document.querySelectorAll('.comment-form').forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const input = this.querySelector('input[type="text"]');
+            if (!input) return;
+            const text = input.value.trim();
+            if (text.length < 2) return;
 
-                    if (vote == 1) {
-                        if (likeBtn.classList.contains('btn-success')) {
-                            likeBtn.classList.replace('btn-success', 'btn-outline-success');
-                        } else {
-                            likeBtn.classList.replace('btn-outline-success', 'btn-success');
-                            dislikeBtn?.classList.replace('btn-danger', 'btn-outline-danger');
-                        }
-                    } else {
-                        if (dislikeBtn.classList.contains('btn-danger')) {
-                            dislikeBtn.classList.replace('btn-danger', 'btn-outline-danger');
-                        } else {
-                            dislikeBtn.classList.replace('btn-outline-danger', 'btn-danger');
-                            likeBtn?.classList.replace('btn-success', 'btn-outline-success');
-                        }
+            const reviewId = this.dataset.review;
+            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+            try {
+                const res = await fetch('/catalog/review/comment/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ review_id: reviewId, text: text })
+                });
+                const data = await res.json();
+                if (res.ok && data.status === 'ok') {
+                    const list = document.getElementById(`comments-${reviewId}`);
+                    if (list) {
+                        const el = document.createElement('div');
+                        el.className = 'd-flex gap-2 mb-2 small';
+                        el.innerHTML = `<strong>${data.user}:</strong> <span class="text-muted">${data.text}</span>`;
+                        list.appendChild(el);
+                        input.value = '';
                     }
                 }
             } catch(err) { console.error(err); }
@@ -529,11 +682,100 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Смена главного изображения
-function changeMainImage(thumb, src) {
-    document.getElementById('mainImage').src = src;
-    document.querySelectorAll('.thumbnail').forEach(t => t.style.borderColor = 'transparent');
-    thumb.style.borderColor = '#0d6efd';
+// Пагинация отзывов
+let visibleReviews = 3;
+const reviewsPerPage = 3;
+
+function loadMoreReviews() {
+    const container = document.getElementById('reviews-container');
+    const hiddenContainer = document.getElementById('hidden-reviews');
+    const loadMoreBtn = document.getElementById('load-more-reviews');
+
+    if (!hiddenContainer) return;
+
+    const hiddenReviews = Array.from(hiddenContainer.querySelectorAll('.review-item'));
+    const toShow = hiddenReviews.slice(0, reviewsPerPage);
+
+    toShow.forEach(review => {
+        const clone = review.cloneNode(true);
+        container.appendChild(clone);
+        review.remove();
+    });
+
+    // Обновляем счётчик на кнопке
+    const remaining = hiddenContainer.querySelectorAll('.review-item').length;
+    if (remaining > 0) {
+        loadMoreBtn.textContent = `Показать ещё отзывы (${remaining})`;
+    } else {
+        loadMoreBtn.remove();
+    }
+
+    // Перепривязываем события для новых элементов
+    rebindEvents();
+}
+
+function rebindEvents() {
+    // Лайки
+    document.querySelectorAll('.vote-btn').forEach(btn => {
+        // Удаляем старые обработчики (клонированием)
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', async function() {
+            const id = this.dataset.id;
+            const vote = this.dataset.vote;
+            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+            try {
+                const res = await fetch('/catalog/review/vote/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `review_id=${id}&vote=${vote}`
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    document.querySelector(`.vote-likes-${id}`).textContent = data.likes;
+                    document.querySelector(`.vote-dislikes-${id}`).textContent = data.dislikes;
+                }
+            } catch(err) { console.error(err); }
+        });
+    });
+
+    // Комментарии
+    document.querySelectorAll('.comment-form').forEach(form => {
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+
+        newForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const input = this.querySelector('input[type="text"]');
+            if (!input) return;
+            const text = input.value.trim();
+            if (text.length < 2) return;
+
+            const reviewId = this.dataset.review;
+            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+            try {
+                const res = await fetch('/catalog/review/comment/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ review_id: reviewId, text: text })
+                });
+                const data = await res.json();
+                if (res.ok && data.status === 'ok') {
+                    const list = document.getElementById(`comments-${reviewId}`);
+                    if (list) {
+                        const el = document.createElement('div');
+                        el.className = 'd-flex gap-2 mb-2 small';
+                        el.innerHTML = `<strong>${data.user}:</strong> <span class="text-muted">${data.text}</span>`;
+                        list.appendChild(el);
+                        input.value = '';
+                    }
+                }
+            } catch(err) { console.error(err); }
+        });
+    });
 }
 </script>
 {% endblock %}
