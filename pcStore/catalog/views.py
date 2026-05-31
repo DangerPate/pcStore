@@ -4,12 +4,15 @@ from django.db.models import Q, Exists, OuterRef, Value, BooleanField
 from catalog.models import Product, Category
 from cart.models import CartItem, Favorite
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .filters_config import FILTERS_CONFIG
 
 
-def apply_filters(queryset, request):
-    """Применяет фильтры из GET-параметров к queryset товаров"""
-
-    # Цена
+def apply_filters(queryset, request, category_slug=None):
+    """
+    Объединяет общие фильтры (цена, бренд, наличие, сортировка)
+    и динамические JSON-фильтры для конкретной категории.
+    """
+    # === 1. ОБЩИЕ ФИЛЬТРЫ (работают везде: категории + поиск) ===
     price_min = request.GET.get('price_min')
     price_max = request.GET.get('price_max')
     if price_min and price_min.isdigit():
@@ -17,42 +20,83 @@ def apply_filters(queryset, request):
     if price_max and price_max.isdigit():
         queryset = queryset.filter(price__lte=int(price_max))
 
-    # Бренд
     brand = request.GET.get('brand')
     if brand:
-        queryset = queryset.filter(brand=brand)
+        queryset = queryset.filter(brand__icontains=brand)
 
-    # Наличие
-    in_stock = request.GET.get('in_stock')
-    if in_stock == '1':
+    if request.GET.get('in_stock') == '1':
         queryset = queryset.filter(in_stock__gt=0)
 
-    # Сортировка
     sort = request.GET.get('sort')
     if sort == 'price_asc':
         queryset = queryset.order_by('price')
     elif sort == 'price_desc':
         queryset = queryset.order_by('-price')
+    elif not sort:
+        queryset = queryset.order_by('-created_at')  # Дефолтная сортировка
+
+    # === 2. ДИНАМИЧЕСКИЕ ФИЛЬТРЫ (только для категорий из CONFIG) ===
+    if category_slug and category_slug in FILTERS_CONFIG:
+        specs_config = FILTERS_CONFIG[category_slug]
+
+        for key, spec in specs_config.items():
+
+            #  Выпадающие списки (select)
+            if spec['type'] == 'select':
+                value = request.GET.get(key)
+                if value:
+                    queryset = queryset.filter(specifications__contains={key: value})
+
+            # 🔹 Диапазоны (range) для частот, TDP и т.д.
+            elif spec['type'] == 'range':
+                min_val = request.GET.get(f'{key}_min')
+                max_val = request.GET.get(f'{key}_max')
+
+                if min_val or max_val:
+                    try:
+                        # Преобразуем в float для корректного сравнения
+                        min_f = float(min_val) if min_val else None
+                        max_f = float(max_val) if max_val else None
+
+                        # Используем нативные фильтры Django для JSONField (работает в PostgreSQL)
+                        if min_f is not None:
+                            queryset = queryset.filter(**{f'specifications__{key}__gte': min_f})
+                        if max_f is not None:
+                            queryset = queryset.filter(**{f'specifications__{key}__lte': max_f})
+                    except ValueError:
+                        pass  # Игнорируем некорректные числа, чтобы не ломать запрос
 
     return queryset
 
 
 def category_view(request, category_slug):
-    """Отображение товаров категории с фильтрами"""
+    """Отображение товаров категории с динамическими фильтрами"""
     category = get_object_or_404(Category, slug=category_slug)
 
     # Базовая выборка
     products = Product.objects.filter(categories=category, is_active=True).distinct()
 
-    # Применяем фильтры
-    products = apply_filters(products, request)
+    # Применяем фильтры (передаём slug для включения динамических правил)
+    products = apply_filters(products, request, category_slug)
 
-    # Бренды для фильтра
-    brands = Product.objects.filter(
-        categories=category,
-        is_active=True,
-        brand__isnull=False
-    ).exclude(brand='').values_list('brand', flat=True).distinct().order_by('brand')
+    # 🔥 ФОРМИРУЕМ КОНФИГУРАЦИЮ ФИЛЬТРОВ ДЛЯ ШАБЛОНА
+    config = {**FILTERS_CONFIG.get('_common', {}), **FILTERS_CONFIG.get(category_slug, {})}
+
+    if 'brand' in config:
+        config['brand']['options'] = list(
+            Product.objects.filter(categories=category, is_active=True, brand__isnull=False)
+            .exclude(brand='').values_list('brand', flat=True).distinct().order_by('brand')
+        )
+
+    # 🔑 ДОБАВЛЕНО: сохраняем текущие значения диапазонов
+    filters = {}
+    for key, spec in config.items():
+        filters[key] = {
+            **spec,
+            'value': request.GET.get(key),
+            'current_min': request.GET.get(f'{key}_min', ''),
+            'current_max': request.GET.get(f'{key}_max', ''),
+        }
 
     # Аннотации для кнопок корзины/избранного
     if request.user.is_authenticated:
@@ -76,25 +120,22 @@ def category_view(request, category_slug):
     except EmptyPage:
         products_page = paginator.page(paginator.num_pages)
 
-    # 🔑 Формируем строку фильтров БЕЗ 'page' для пагинации
+    # Параметры для пагинации
     filter_params = request.GET.copy()
     if 'page' in filter_params:
         del filter_params['page']
-    filter_params_str = filter_params.urlencode()
 
     return render(request, 'catalog/catalog.html', {
         'category': category,
         'products': products_page,
-        'brands': brands,
-        'filter_params': filter_params_str,  # 🔑 Передаём в шаблон!
+        'filters': filters,  # 🔑 ЗАМЕНЯЕТ 'brands'
+        'filter_params': filter_params.urlencode(),
     })
 
 
-# catalog/views.py
-
 def product_detail(request, slug):
+    """Детальная страница товара"""
     product = get_object_or_404(Product, slug=slug, is_active=True)
-
     product.increment_views()
 
     is_in_cart = False
@@ -114,25 +155,19 @@ def product_detail(request, slug):
 
 
 def search_view(request):
-    """Поиск товаров с фильтрами"""
+    """Поиск товаров с общими фильтрами"""
     query = request.GET.get('q', '').strip()
-
-    # Базовая выборка
     products = Product.objects.filter(is_active=True).distinct()
 
-    # Поиск
     if query:
         products = products.filter(
-            Q(title__icontains=query) |
-            Q(info__icontains=query) |
-            Q(description__icontains=query) |
-            Q(brand__icontains=query)
+            Q(title__icontains=query) | Q(info__icontains=query) |
+            Q(description__icontains=query) | Q(brand__icontains=query)
         )
 
-    # Применяем фильтры
+    # Поиск использует только общие фильтры (category_slug=None)
     products = apply_filters(products, request)
 
-    # Аннотации
     if request.user.is_authenticated:
         products = products.annotate(
             is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
@@ -144,7 +179,6 @@ def search_view(request):
             is_favorited=Value(False, output_field=BooleanField())
         )
 
-    # Пагинация
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     try:
@@ -154,22 +188,14 @@ def search_view(request):
     except EmptyPage:
         products_page = paginator.page(paginator.num_pages)
 
-    # 🔑 Формируем строку фильтров БЕЗ 'page' для пагинации
     filter_params = request.GET.copy()
     if 'page' in filter_params:
         del filter_params['page']
-    filter_params_str = filter_params.urlencode()
-
-    # 🔑 Получаем бренды для фильтра (все активные товары в поиске)
-    brands = Product.objects.filter(
-        is_active=True,
-        brand__isnull=False
-    ).exclude(brand='').values_list('brand', flat=True).distinct().order_by('brand')[:20]
 
     return render(request, 'catalog/search_results.html', {
         'query': query,
         'products': products_page,
         'total_count': paginator.count,
-        'brands': brands,  # 🔑 Передаём бренды!
-        'filter_params': filter_params_str,  # 🔑 Передаём filter_params!
+        'filter_params': filter_params.urlencode(),
+        # 🔑 Для поиска оставляем упрощённый рендер брендов, если нужно
     })
