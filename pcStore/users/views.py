@@ -38,9 +38,36 @@ def user_login(request):
 
     return render(request, 'users/login.html')
 
+
 @login_required
 def profile(request):
-    return render(request, 'users/profile.html', {'user': request.user})
+    if request.method == 'POST':
+        nickname = request.POST.get('nickname', '').strip()
+        phone = request.POST.get('phone', '').strip()
+
+        if not nickname:
+            messages.error(request, 'Никнейм не может быть пустым.')
+        else:
+            request.user.nickname = nickname
+            request.user.phone = phone
+
+            if 'avatar' in request.FILES:
+                request.user.avatar = request.FILES['avatar']
+
+            request.user.save()
+            messages.success(request, 'Профиль успешно обновлён!')
+            return redirect('users:profile')
+
+    # 🔥 Передаём счётчики для меню (если используются)
+    from cart.models import CartItem, Favorite
+    fav_count = Favorite.objects.filter(user=request.user).count() if request.user.is_authenticated else 0
+    cart_count = CartItem.objects.filter(user=request.user).count() if request.user.is_authenticated else 0
+
+    return render(request, 'users/profile.html', {
+        'user': request.user,
+        'fav_count': fav_count,
+        'cart_count': cart_count,
+    })
 
 def user_logout(request):
     logout(request)

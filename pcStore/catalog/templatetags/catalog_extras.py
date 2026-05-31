@@ -90,3 +90,7 @@ def humanize_key(key):
         'noise_level': 'Уровень шума',
     }
     return mapping.get(key, key.replace('_', ' ').title())
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

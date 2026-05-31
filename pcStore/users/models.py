@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-
+import random
+import string
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -20,11 +21,10 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractUser):
     username = None
-    # 🔑 Email обязателен и уникален
-    email = models.EmailField('Email адрес', unique=True, blank=False)
-    # 🔑 Телефон обязателен и уникален
-    phone = models.CharField('Телефон', max_length=15, unique=True, blank=False)
+    email = models.EmailField('Email адрес', unique=True)
+    phone = models.CharField('Телефон', max_length=15, unique=True)
     avatar = models.ImageField('Аватар', upload_to='users/avatars/', blank=True, null=True)
+    nickname = models.CharField('Никнейм', max_length=50, blank=True)
 
     objects = CustomUserManager()
     USERNAME_FIELD = 'email'
@@ -35,8 +35,29 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Пользователи'
         db_table = 'users_user'
 
+    def clean_nickname(self):
+        import re
+        if self.nickname and not re.match(r'^[\w\s\-\.]{3,50}$', self.nickname):
+            raise ValidationError('Никнейм может содержать только буквы, цифры, пробелы, дефис и точку')
+        return self.nickname
+
     def __str__(self):
-        return self.email
+        return self.get_display_name()
+
+    def get_display_name(self):
+        """Возвращает никнейм или авто-сгенерированный"""
+        if self.nickname:
+            return self.nickname
+        # 🔥 Генерируем автоматический никнейм
+        return f"Пользователь-{self.id:07d}"
+
+    def save(self, *args, **kwargs):
+        # 🔥 Автогенерация никнейма при создании
+        if not self.nickname and self.pk is None:
+            # Генерируем случайный никнейм
+            random_suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
+            self.nickname = f"Пользователь-{random_suffix}"
+        super().save(*args, **kwargs)
 
 
 # === ЗАГОТОВКИ ПОД БУДУЩИЕ ФУНКЦИИ ===
