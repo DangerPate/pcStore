@@ -55,6 +55,15 @@ class Product(models.Model):
     is_active = models.BooleanField('Опубликован', default=True, db_index=True)
     brand = models.CharField('Бренд / Производитель', max_length=100, blank=True, db_index=True)
 
+    variant_group = models.CharField(
+        'Группа вариантов',
+        max_length=100,
+        blank=True,
+        null=True,
+        db_index=True,
+        help_text="Одинаковое значение связывает товары. Например: 'kingston-a400'"
+    )
+
     # === 🔥 АВТО-МАРКЕРЫ (ручное переопределение возможно) ===
     # Для принудительного включения/выключения (опционально)
     force_hit = models.BooleanField('🔥 Принудительно хит', default=False, help_text='Игнорировать авто-расчёт')

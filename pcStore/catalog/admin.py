@@ -30,7 +30,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Основная информация', {
-            'fields': ('title', 'slug', 'sku', 'brand', 'categories')
+            'fields': ('title', 'slug', 'sku', 'brand', 'categories', 'variant_group')
         }),
         ('Цены и наличие', {
             'fields': ('price', 'old_price', 'in_stock', 'is_active')

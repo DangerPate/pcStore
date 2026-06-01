@@ -117,6 +117,25 @@
                     </button>
                 </div>
 
+                <!-- 🔥 ВЫБОР ВАРИАНТОВ (Конфигурации) -->
+                {% if variants %}
+                <div class="mb-4">
+                    <span class="small text-muted d-block mb-2">Доступные конфигурации:</span>
+                    <div class="d-flex flex-wrap gap-2">
+                        <!-- Сначала выводим текущий товар как активную кнопку (без ссылки) -->
+                        <span class="btn btn-sm btn-primary disabled" style="pointer-events: none; opacity: 1;">
+                            {{ product.title }}
+                        </span>
+
+                        <!-- Затем выводим остальные варианты как ссылки -->
+                        {% for v in variants %}
+                        <a href="{{ v.get_absolute_url }}" class="btn btn-sm btn-outline-primary">
+                            {{ v.title }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
                 <!-- Краткие характеристики -->
                 {% if product.specifications %}
                 <div class="border-top pt-3">

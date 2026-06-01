@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
 from django.db.models import Exists, OuterRef, Sum, F
-from .models import CartItem, Favorite
+from .models import CartItem, Favorite, Order, OrderItem
+from .forms import CheckoutForm
 from catalog.models import Product
 
 
@@ -53,33 +54,69 @@ def bulk_cart_action(request):
         return redirect('cart:cart')
 
 
-@login_required
 def checkout_selected(request):
-    """Оформление заказа ТОЛЬКО выбранных товаров"""
-    if request.method == 'POST':
-        item_ids = request.POST.getlist('item_ids')
-        if not item_ids:
-            messages.warning(request, 'Выберите товары для оформления')
-            return redirect('cart:cart')
-
-        # 🔑 Только свои товары
-        selected_items = CartItem.objects.filter(
-            user=request.user,
-            id__in=item_ids
-        ).select_related('product')
-
-        if not selected_items.exists():
-            messages.warning(request, 'Выбранные товары не найдены')
-            return redirect('cart:cart')
-
-        # 🔑 Заглушка для теста:
-        total = sum(item.product.price * item.quantity for item in selected_items)
-        messages.success(request, f'✅ Заказ оформлен! Сумма: {total} ₽ (товаров: {selected_items.count()})')
-
-        # Раскомментируй, когда будешь готов удалять товары после заказа:
-        # selected_items.delete()
-
+    """Оформление заказа"""
+    # Если корзина пуста, редиректим обратно
+    if not CartItem.objects.filter(user=request.user).exists():
         return redirect('cart:cart')
+
+    if request.method == 'POST':
+        form = CheckoutForm(request.POST)
+        if form.is_valid():
+            # Получаем ID выбранных товаров (их добавляет JS из cart.html)
+            item_ids = request.POST.getlist('item_ids')
+
+            cart_items = CartItem.objects.filter(user=request.user)
+            if item_ids:
+                cart_items = cart_items.filter(id__in=item_ids)
+
+            if not cart_items.exists():
+                messages.error(request, 'Выберите товары для оформления.')
+                return redirect('cart:cart')
+
+            # Считаем общую сумму
+            total_price = sum(item.get_total_price() for item in cart_items)
+
+            # Создаем заказ
+            order = form.save(commit=False)
+            if request.user.is_authenticated:
+                order.user = request.user
+            order.total_price = total_price
+            order.save()
+
+            # Создаем элементы заказа и удаляем их из корзины
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    price=item.product.price,
+                    quantity=item.quantity
+                )
+
+            # Очищаем корзину от оформленных товаров
+            cart_items.delete()
+
+            messages.success(request, f'Заказ #{order.id} успешно оформлен! Мы свяжемся с вами в ближайшее время.')
+            return redirect('home')  # Или на специальную страницу успеха
+    else:
+        # Предзаполняем форму, если пользователь авторизован
+        initial_data = {}
+        if request.user.is_authenticated:
+            initial_data['first_name'] = request.user.get_full_name() or request.user.username
+            initial_data['email'] = request.user.email
+        form = CheckoutForm(initial=initial_data)
+
+    # Получаем товары для отображения в чеке на странице оформления
+    item_ids = request.POST.getlist('item_ids')  # Если пришли с POST
+    if not item_ids:
+        cart_items = CartItem.objects.filter(user=request.user)
+    else:
+        cart_items = CartItem.objects.filter(user=request.user, id__in=item_ids)
+
+    return render(request, 'cart/checkout.html', {
+        'form': form,
+        'cart_items': cart_items,
+    })
 
 
 @login_required

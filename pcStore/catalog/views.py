@@ -250,6 +250,13 @@ def product_detail(request, slug):
         percent = (count * 100) // total_reviews if total_reviews > 0 else 0
         rating_dist.append({'rating': i, 'count': count, 'percent': percent})
 
+    variants = []
+    if product.variant_group:
+        variants = Product.objects.filter(
+            variant_group=product.variant_group,
+            is_active=True
+        ).exclude(id=product.id).order_by('price')
+
     # Изображения
     images = []
     if product.image:
@@ -281,7 +288,8 @@ def product_detail(request, slug):
         'current_sort': sort,
         'current_filter_photos': filter_photos,
         'current_filter_videos': filter_videos,
-        'current_filter_ratings': filter_ratings,  # ✅ Теперь ошибки не будет
+        'current_filter_ratings': filter_ratings,
+        'variants': variants,
     })
 
 
