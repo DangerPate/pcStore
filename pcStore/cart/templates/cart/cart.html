@@ -59,6 +59,8 @@
                                         <div class="d-flex align-items-center gap-3">
                                             {% if item.product.image %}
                                                 <img src="{{ item.product.image.url }}" width="70" height="70" class="rounded" style="object-fit:cover;">
+                                            {% elif item.product.images.exists %}
+                                                <img src="{{ item.product.images.first.image.url }}" width="70" height="70" class="rounded" style="object-fit:cover;">
                                             {% else %}
                                                 <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:70px;height:70px;">
                                                     <i class="bi bi-box-seam text-muted"></i>
@@ -67,7 +69,14 @@
                                             <a href="{% url 'catalog:product_detail' item.product.slug %}" class="text-decoration-none text-dark fw-medium">{{ item.product.title }}</a>
                                         </div>
                                     </td>
-                                    <td>{{ item.product.price }} ₽</td>
+                                    <td>
+                                        {% if item.product.old_price and item.product.old_price > item.product.price %}
+                                            <span class="text-muted text-decoration-line-through small d-block">{{ item.product.old_price }} ₽</span>
+                                            <span class="fw-bold text-danger">{{ item.product.price }} ₽</span>
+                                        {% else %}
+                                            <span class="fw-bold">{{ item.product.price }} ₽</span>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2" style="display:flex !important; align-items:center !important; gap:0.5rem !important; flex-wrap:nowrap !important;">
                                             <button type="button" class="btn btn-sm btn-outline-secondary" style="width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;" onclick="changeQuantity({{ item.id }}, -1)">−</button>

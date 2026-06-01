@@ -1,24 +1,22 @@
 # catalog/views.py
-import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Q, Exists, OuterRef, Value, BooleanField, Count, Avg
-from catalog.models import Product, Category, Review, ReviewAttachment, ReviewVote, ReviewComment
+from django.db.models import Q, Exists, OuterRef, Value, BooleanField, Count, Avg, Prefetch
+from catalog.models import Product, Category, Review, ReviewAttachment, ReviewVote, ReviewComment, ProductImage
 from cart.models import CartItem, Favorite
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.storage import default_storage
 from django.conf import settings
 from .filters_config import FILTERS_CONFIG
-from django.shortcuts import redirect, get_object_or_404
-from django.http import JsonResponse
-from django.contrib import messages
 
 import json
 
 ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'video/mp4']
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 МБ
+
+
 def apply_filters(queryset, request, category_slug=None):
     """
     Объединяет общие фильтры (цена, бренд, наличие, сортировка)
@@ -79,9 +77,22 @@ def apply_filters(queryset, request, category_slug=None):
 def category_view(request, category_slug):
     """Отображение товаров категории с динамическими фильтрами"""
     category = get_object_or_404(Category, slug=category_slug)
+
+    # 🔥 Базовый запрос
     products = Product.objects.filter(categories=category, is_active=True).distinct()
+
+    # 🔥 Применяем фильтры
     products = apply_filters(products, request, category_slug)
 
+    # 🔥 Добавляем аннотации ДЛЯ КАРТОЧЕК (после фильтров, до пагинации)
+    products = products.annotate(
+        reviews_count=Count('catalog_reviews'),
+        avg_rating=Avg('catalog_reviews__rating'),
+        is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+        is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+    ).prefetch_related('images')  # 🔥 Подгружаем доп. изображения за 1 запрос
+
+    # 🔥 Формируем конфигурацию фильтров для шаблона
     config = {**FILTERS_CONFIG.get('_common', {}), **FILTERS_CONFIG.get(category_slug, {})}
     if 'brand' in config:
         config['brand']['options'] = list(
@@ -98,17 +109,7 @@ def category_view(request, category_slug):
             'current_max': request.GET.get(f'{key}_max', ''),
         }
 
-    if request.user.is_authenticated:
-        products = products.annotate(
-            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
-            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-        )
-    else:
-        products = products.annotate(
-            is_in_cart=Value(False, output_field=BooleanField()),
-            is_favorited=Value(False, output_field=BooleanField())
-        )
-
+    # 🔥 Пагинация
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     try:
@@ -124,7 +125,7 @@ def category_view(request, category_slug):
 
     return render(request, 'catalog/catalog.html', {
         'category': category,
-        'products': products_page,
+        'products': products_page,  # 🔥 Это Page объект, используй products_page.paginator.count в шаблоне
         'filters': filters,
         'filter_params': filter_params.urlencode(),
     })
@@ -151,17 +152,24 @@ def product_detail(request, slug):
 
     avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
-    # 🔥 Расчет распределения оценок (вместо widthratio в шаблоне)
+    # 🔥 Расчет распределения оценок
     rating_dist = []
     total_reviews = reviews.count()
     for i in range(5, 0, -1):
         count = reviews.filter(rating=i).count()
-        # Считаем процент безопасно (если отзывов 0, то 0%)
         percent = (count * 100) // total_reviews if total_reviews > 0 else 0
         rating_dist.append({'rating': i, 'count': count, 'percent': percent})
 
-    images = [product.image.url] if product.image else []
-    if product.specifications and 'gallery' in product.specifications:
+    # 🔥 Сбор изображений
+    images = []
+    if product.image:
+        images.append(product.image.url)
+
+    additional_images = ProductImage.objects.filter(product=product).order_by('order', 'created_at')
+    for img in additional_images:
+        images.append(img.image.url)
+
+    if not images and product.specifications and 'gallery' in product.specifications:
         images.extend(product.specifications['gallery'])
 
     is_in_cart = False
@@ -178,7 +186,7 @@ def product_detail(request, slug):
         'user_votes': votes_dict,
         'avg_rating': round(avg_rating, 1),
         'images': images,
-        'rating_dist': rating_dist,  # 🔥 Передаем готовые данные
+        'rating_dist': rating_dist,
         'total_reviews': total_reviews,
     })
 
@@ -258,16 +266,13 @@ def search_view(request):
 
     products = apply_filters(products, request)
 
-    if request.user.is_authenticated:
-        products = products.annotate(
-            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
-            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-        )
-    else:
-        products = products.annotate(
-            is_in_cart=Value(False, output_field=BooleanField()),
-            is_favorited=Value(False, output_field=BooleanField())
-        )
+    # 🔥 Добавляем аннотации для поиска
+    products = products.annotate(
+        reviews_count=Count('catalog_reviews'),
+        avg_rating=Avg('catalog_reviews__rating'),
+        is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+        is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+    ).prefetch_related('images')
 
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
@@ -289,12 +294,13 @@ def search_view(request):
         'filter_params': filter_params.urlencode(),
     })
 
+
 @login_required
 def toggle_vote(request):
     """AJAX: Лайк/Дизлайк отзыва"""
     if request.method == 'POST':
         review_id = request.POST.get('review_id')
-        vote_type = int(request.POST.get('vote'))  # 1 или -1
+        vote_type = int(request.POST.get('vote'))
         review = get_object_or_404(Review, id=review_id)
 
         vote, created = ReviewVote.objects.update_or_create(
@@ -302,7 +308,7 @@ def toggle_vote(request):
             defaults={'vote': vote_type}
         )
         if not created and vote.vote == vote_type:
-            vote.delete()  # Повторный клик = отмена голоса
+            vote.delete()
 
         total_likes = review.votes.filter(vote=1).count()
         total_dislikes = review.votes.filter(vote=-1).count()
@@ -319,7 +325,6 @@ def add_comment(request):
             review_id = data.get('review_id')
             raw_text = data.get('text', '')
 
-            # 🔥 Жёсткая очистка от любых кодировок/пробелов
             text = str(raw_text).strip()
 
             if not text or len(text) < 2:
@@ -329,13 +334,13 @@ def add_comment(request):
             comment = ReviewComment.objects.create(
                 review=review,
                 user=request.user,
-                text=text  # Сохраняем чистый текст
+                text=text
             )
 
             return JsonResponse({
                 'status': 'ok',
                 'user': request.user.get_display_name(),
-                'text': comment.text,  # Возвращаем гарантированно чистое значение из БД
+                'text': comment.text,
                 'date': comment.created_at.strftime('%d.%m.%Y')
             })
         except json.JSONDecodeError:

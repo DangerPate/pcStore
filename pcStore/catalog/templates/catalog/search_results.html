@@ -76,54 +76,17 @@
             </div>
 
             <!-- Товары -->
+            <!-- search_results.html -->
             {% for product in products %}
-            <div class="card catalog-card mb-3 border-0 shadow-sm">
-                <div class="row g-0 align-items-center">
-                    <div class="col-3 col-md-2 p-3">
-                        <a href="{% url 'catalog:product_detail' product.slug %}" class="d-block catalog-img-link">
-                            {% if product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.title }}" class="img-fluid">
-                            {% else %}
-                                <div class="d-flex align-items-center justify-content-center h-100 bg-light rounded">
-                                    <i class="bi bi-box-seam text-muted fs-3"></i>
-                                </div>
-                            {% endif %}
-                        </a>
-                    </div>
-                    <div class="col-9 col-md-6 p-3">
-                        <a href="{% url 'catalog:product_detail' product.slug %}" class="text-decoration-none text-dark">
-                            <h6 class="fw-medium mb-1 catalog-title">{{ product.title }}</h6>
-                        </a>
-                        <p class="text-muted small mb-2 catalog-specs">{{ product.info|truncatechars:140 }}</p>
-                        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                            <span class="badge bg-light text-dark border-0"><i class="bi bi-star-fill text-warning"></i> 4.5</span>
-                            <span class="text-muted small">62 отзыва</span>
-                            {% if product.categories.first %}
-                            <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle"></i> {{ product.categories.first.title }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="text-muted small"><i class="bi bi-truck"></i> Доставка завтра</div>
-                    </div>
-                    <div class="col-12 col-md-4 p-3 d-flex flex-column justify-content-center border-top border-md-top-0">
-                        <div class="fs-5 fw-bold text-primary mb-1">{{ product.price }} ₽</div>
-                        {% if product.old_price %}<div class="text-muted small text-decoration-line-through mb-1">{{ product.old_price }} ₽</div>{% endif %}
-                        <div class="d-flex gap-2 mt-2">
-                            {% if product.is_in_cart %}
-                            <button type="button" class="btn btn-success btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}"><i class="bi bi-check-lg me-1"></i> В корзине</button>
-                            {% else %}
-                            <button type="button" class="btn btn-dark btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}"><i class="bi bi-cart-plus me-1"></i> Купить</button>
-                            {% endif %}
-                            <button type="button" class="btn btn-outline-danger btn-sm btn-toggle-fav {% if product.is_favorited %}active{% endif %}" data-slug="{{ product.slug }}"><i class="bi {% if product.is_favorited %}bi-heart-fill{% else %}bi-heart{% endif %}"></i></button>
-                        </div>
+                {% include 'catalog/_product_card_list.html' with product=product %}
+            {% empty %}
+                <div class="col-12">
+                    <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+                        <i class="bi bi-search fs-1 text-muted d-block mb-2"></i>
+                        <h5 class="fw-medium">Товары не найдены</h5>
+                        <p class="text-muted small">Попробуйте изменить запрос или фильтры</p>
                     </div>
                 </div>
-            </div>
-            {% empty %}
-            <div class="text-center py-5 bg-white rounded-3 shadow-sm">
-                <i class="bi bi-search fs-1 text-muted d-block mb-2"></i>
-                <h5 class="fw-medium">Товары не найдены</h5>
-                <p class="text-muted small">Попробуйте изменить запрос или фильтры</p>
-            </div>
             {% endfor %}
 
             <!-- 🔑 Пагинация (используем filter_params из view, БЕЗ |replace) -->

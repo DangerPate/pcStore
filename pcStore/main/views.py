@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from catalog.models import Product, Category
-from django.db.models import Exists, OuterRef, Value, BooleanField, Q, F
+from django.db.models import Exists, OuterRef, Value, BooleanField, Q, F, Count, Avg
 from cart.models import CartItem, Favorite
 from .models import Banner
 
 
 def index(request):
     """Главная страница с баннерами и каруселями"""
+
+    base_products = Product.objects.filter(is_active=True)
 
     # === 1. БАННЕРЫ С ТОВАРАМИ ===
     banners_with_products = []
@@ -16,81 +18,54 @@ def index(request):
 
     for banner in active_banners:
         if banner.is_current:
-            # 🔑 ИСПРАВЛЕНИЕ: работаем с QuerySet, а не со списком
-            # get_discounted_products возвращал list, у которого нет .annotate()
             products_qs = banner.products.filter(is_active=True)
 
-            if request.user.is_authenticated:
-                products_qs = products_qs.annotate(
-                    is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
-                    is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-                )
-            else:
-                products_qs = products_qs.annotate(
-                    is_in_cart=Value(False, output_field=BooleanField()),
-                    is_favorited=Value(False, output_field=BooleanField())
-                )
+            # 🔥 Аннотации с УНИКАЛЬНЫМ именем reviews_count
+            products_qs = products_qs.annotate(
+                reviews_count=Count('catalog_reviews'),  # 🔥 Было review_count
+                avg_rating=Avg('catalog_reviews__rating'),
+                is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+                is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+            ).prefetch_related('images')
 
-            # 🔑 Преобразуем в список ТОЛЬКО после аннотаций и ограничения выборки
             banners_with_products.append({
                 'banner': banner,
                 'products': list(products_qs[:3]),
             })
 
     # === 2. ТОВАРЫ СО СКИДКОЙ ===
-    discounted_products_all = Product.objects.filter(
-        is_active=True,
+    discounted_products_all = base_products.filter(
         old_price__isnull=False
-    ).exclude(
-        old_price__lte=F('price')
-    ).order_by('-created_at')[:15]
+    ).exclude(old_price__lte=F('price')
+              ).annotate(
+        reviews_count=Count('catalog_reviews'),  # 🔥 Было review_count
+        avg_rating=Avg('catalog_reviews__rating'),
+        is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+        is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+    ).prefetch_related('images').order_by('-created_at')[:15]
 
-    if request.user.is_authenticated:
-        discounted_products_all = discounted_products_all.annotate(
-            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
-            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-        )
-    else:
-        discounted_products_all = discounted_products_all.annotate(
-            is_in_cart=Value(False, output_field=BooleanField()),
-            is_favorited=Value(False, output_field=BooleanField())
-        )
+    # === 3. ПОПУЛЯРНОЕ ===
+    popular_products = base_products.filter(
+        views__gt=0
+    ).annotate(
+        reviews_count=Count('catalog_reviews'),  # 🔥 Было review_count
+        avg_rating=Avg('catalog_reviews__rating'),
+        is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+        is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+    ).prefetch_related('images').order_by('-views')[:15]
 
-    # === 3. ПОПУЛЯРНОЕ (только товары с максимальным количеством просмотров) ===
-    popular_products = Product.objects.filter(
-        is_active=True,
-        views__gt=0  # 🔑 Исключаем товары с 0 просмотров
-    ).order_by('-views')[:15]  # 🔑 Сортировка строго по убыванию просмотров
-
-    if request.user.is_authenticated:
-        popular_products = popular_products.annotate(
-            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
-            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-        )
-    else:
-        popular_products = popular_products.annotate(
-            is_in_cart=Value(False, output_field=BooleanField()),
-            is_favorited=Value(False, output_field=BooleanField())
-        )
-
-    # === 4. НОВИНКИ (автоматически по дате создания) ===
-    new_products = Product.objects.filter(is_active=True).order_by('-created_at')[:15]
-
-    if request.user.is_authenticated:
-        new_products = new_products.annotate(
-            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
-            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-        )
-    else:
-        new_products = new_products.annotate(
-            is_in_cart=Value(False, output_field=BooleanField()),
-            is_favorited=Value(False, output_field=BooleanField())
-        )
+    # === 4. НОВИНКИ ===
+    new_products = base_products.annotate(
+        reviews_count=Count('catalog_reviews'),  # 🔥 Было review_count
+        avg_rating=Avg('catalog_reviews__rating'),
+        is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+        is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+    ).prefetch_related('images').order_by('-created_at')[:15]
 
     return render(request, 'main/index.html', {
         'banners_with_products': banners_with_products,
         'discounted_products': discounted_products_all,
-        'popular_products': popular_products,  # 🔑 Новое имя
+        'popular_products': popular_products,
         'new_products': new_products,
     })
 

@@ -2,22 +2,22 @@
 <div class="col">
   <div class="card h-100 shadow border-0 position-relative product-card">
 
-    <!-- 🔥 Бейдж скидки (если есть) -->
+    <!-- 🔥 Бейдж скидки -->
     {% if product.old_price and product.old_price > product.price %}
     <span class="position-absolute top-0 start-0 badge bg-danger rounded-0 m-3 px-2 py-1" style="z-index: 3; font-size: 0.75rem;">
       -{{ product.discount_percent }}%
     </span>
     {% endif %}
 
-    <!-- Изображение -->
+    <!-- 🔥 Изображение (Главное -> Первое доп. -> Заглушка) -->
     <div class="position-relative bg-light" style="height: 180px;">
       {% if product.image %}
         <a href="{% url 'catalog:product_detail' product.slug %}" class="d-block h-100 w-100">
-          <img src="{{ product.image.url }}"
-               alt="{{ product.title }}"
-               class="w-100 h-100"
-               style="object-fit: contain; padding: 12px;"
-               loading="lazy">
+          <img src="{{ product.image.url }}" alt="{{ product.title }}" class="w-100 h-100" style="object-fit: contain; padding: 12px;" loading="lazy">
+        </a>
+      {% elif product.images.exists %}
+        <a href="{% url 'catalog:product_detail' product.slug %}" class="d-block h-100 w-100">
+          <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}" class="w-100 h-100" style="object-fit: contain; padding: 12px;" loading="lazy">
         </a>
       {% else %}
         <div class="d-flex align-items-center justify-content-center h-100 text-muted">
@@ -36,26 +36,40 @@
         </a>
       </h6>
 
-      <!-- 🔥 Рейтинг и отзывы (заглушки) -->
-      <div class="d-flex align-items-center gap-1 mb-2">
-        <div class="d-flex text-warning small">
-          <!-- 5 звёзд -->
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-half"></i>
+      <!-- 🔥 Реальный рейтинг и кол-во отзывов -->
+      <!-- 🔥 Реальный рейтинг и кол-во отзывов -->
+      {% with review_count=product.reviews_count|default:0 %}
+      {% if review_count > 0 %}
+        {% with avg_rating=product.avg_rating|default:0 %}
+        <div class="d-flex align-items-center gap-1 mb-2">
+          <div class="d-flex text-warning small">
+            {% for i in "12345"|make_list %}
+              {# 🔥 Полная звезда: если номер звезды <= рейтинга #}
+              {% if forloop.counter <= avg_rating %}
+                <i class="bi bi-star-fill"></i>
+              {# 🔥 Половинка: если номер звезды == округлённому рейтингу + 0.5 #}
+              {% elif forloop.counter == avg_rating|add:"0.5" %}
+                <i class="bi bi-star-half"></i>
+              {# 🔥 Пустая звезда #}
+              {% else %}
+                <i class="bi bi-star"></i>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <span class="text-muted small" style="font-size: 0.75rem;">
+            ({{ review_count }})
+          </span>
         </div>
-        <span class="text-muted small" style="font-size: 0.75rem;">
-          ({{ product.review_count|default:127 }})
-        </span>
-      </div>
+        {% endwith %}
+      {% else %}
+        <!-- Отступ, если отзывов нет -->
+        <div class="mb-2" style="height: 20px;"></div>
+      {% endif %}
+      {% endwith %}
 
-      <!-- 🔥 Цены: старая и новая -->
+      <!-- Цены -->
       <div class="d-flex align-items-center gap-2 mb-3">
-        <span class="fw-bold text-dark fs-5">
-          {{ product.price }} ₽
-        </span>
+        <span class="fw-bold text-dark fs-5">{{ product.price }} ₽</span>
         {% if product.old_price and product.old_price > product.price %}
         <span class="text-muted text-decoration-line-through small" style="font-size: 0.9rem;">
           {{ product.old_price }} ₽
@@ -63,7 +77,7 @@
         {% endif %}
       </div>
 
-      <!-- Кнопки (внизу, прижаты) -->
+      <!-- Кнопки -->
       <div class="mt-auto d-flex gap-2 position-relative" style="z-index: 2;">
           {% if product.is_in_cart %}
           <button type="button" class="btn btn-success btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}">

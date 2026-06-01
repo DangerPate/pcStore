@@ -276,3 +276,25 @@ class ReviewComment(models.Model):
 
     def __str__(self):
         return f"Комментарий от {self.user} к отзыву #{self.review.id}"
+
+class ProductImage(models.Model):
+    """Дополнительные изображения товара"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField('Изображение', upload_to='products/%Y/%m/%d/')
+    is_main = models.BooleanField('Главное изображение', default=False)
+    order = models.PositiveIntegerField('Порядок', default=0, help_text='Меньшее число = выше в списке')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = 'Изображение товара'
+        verbose_name_plural = 'Изображения товаров'
+
+    def __str__(self):
+        return f"Изображение для {self.product.title}"
+
+    def save(self, *args, **kwargs):
+        # Если это главное изображение, снимаем флаг с остальных
+        if self.is_main:
+            ProductImage.objects.filter(product=self.product).update(is_main=False)
+        super().save(*args, **kwargs)
