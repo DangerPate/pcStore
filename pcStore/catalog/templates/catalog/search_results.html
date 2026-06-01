@@ -15,7 +15,6 @@
     </nav>
 
     <!-- 🔥 УМНЫЙ БАННЕР РЕЗУЛЬТАТОВ -->
-    <!-- 🔥 ЗАГОЛОВОК С КАТЕГОРИЯМИ (как в DNS) -->
     {% if primary_category %}
     <div class="mb-4">
         <h2 class="h4 fw-bold mb-3">
@@ -26,17 +25,20 @@
         <!-- Плитки категорий -->
         <div class="d-flex flex-wrap gap-2">
             {% for cat in found_categories %}
-            <a href="{% url 'catalog:category' cat.slug %}?q={{ query|urlencode }}"
-               class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-light rounded-3 text-decoration-none text-dark hover-shadow transition-all"
+            <a href="?q={{ query|urlencode }}&category={{ cat.slug }}"
+               class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 text-decoration-none transition-all
+                      {% if cat.slug == primary_category.slug %}bg-primary text-white shadow-sm{% else %}bg-light text-dark hover-shadow{% endif %}"
                style="min-width: 150px;">
                 {% if cat.icon %}
-                <i class="bi {{ cat.icon }} fs-4 text-muted"></i>
+                <i class="bi {{ cat.icon }} fs-4 {% if cat.slug == primary_category.slug %}text-white{% else %}text-muted{% endif %}"></i>
                 {% else %}
-                <i class="bi bi-box-seam fs-4 text-muted"></i>
+                <i class="bi bi-box-seam fs-4 {% if cat.slug == primary_category.slug %}text-white{% else %}text-muted{% endif %}"></i>
                 {% endif %}
                 <div>
                     <div class="small fw-medium">{{ cat.title }}</div>
-                    <div class="text-muted" style="font-size: 0.75rem;">{{ cat.count }} товаров</div>
+                    <div class="{% if cat.slug == primary_category.slug %}text-white-50{% else %}text-muted{% endif %}" style="font-size: 0.75rem;">
+                        {{ cat.count }} товаров
+                    </div>
                 </div>
             </a>
             {% endfor %}

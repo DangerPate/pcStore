@@ -198,48 +198,76 @@ def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     product.increment_views()
 
-    reviews = product.catalog_reviews.select_related('user').annotate(
+    reviews_qs = product.catalog_reviews.select_related('user')
+
+    # 🔥 1. ОПРЕДЕЛЯЕМ ПЕРЕМЕННЫЕ ФИЛЬТРОВ (Именно этого не хватало!)
+    filter_photos = request.GET.get('filter_photos') == 'on'
+    filter_videos = request.GET.get('filter_videos') == 'on'
+    filter_ratings = request.GET.getlist('filter_rating')  # <-- ВОТ ЭТА СТРОКА
+
+    # Применяем фильтры к queryset
+    if filter_photos:
+        reviews_qs = reviews_qs.filter(attachments__file_type='image').distinct()
+    if filter_videos:
+        reviews_qs = reviews_qs.filter(attachments__file_type='video').distinct()
+    if filter_ratings:
+        reviews_qs = reviews_qs.filter(rating__in=[int(r) for r in filter_ratings])
+
+    # 🔥 2. СОРТИРОВКА
+    sort = request.GET.get('sort', 'new')
+    if sort == 'old':
+        reviews_qs = reviews_qs.order_by('created_at')
+    elif sort == 'bad_rating':
+        reviews_qs = reviews_qs.order_by('rating', '-created_at')
+    elif sort == 'good_rating':
+        reviews_qs = reviews_qs.order_by('-rating', '-created_at')
+    else:  # 'new' по умолчанию
+        reviews_qs = reviews_qs.order_by('-created_at')
+
+    # Аннотации для лайков
+    reviews = reviews_qs.annotate(
         likes_count=Count('votes', filter=Q(votes__vote=1)),
         dislikes_count=Count('votes', filter=Q(votes__vote=-1))
     )
 
+    # Голоса пользователя
     if request.user.is_authenticated:
         user_votes = ReviewVote.objects.filter(
-            review__in=reviews,
-            user=request.user
+            review__in=reviews, user=request.user
         ).values('review_id', 'vote')
         votes_dict = {v['review_id']: v['vote'] for v in user_votes}
     else:
         votes_dict = {}
 
-    avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
+    # Средний рейтинг (всегда по ВСЕМ отзывам)
+    avg_rating = product.catalog_reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
-    # 🔥 Расчет распределения оценок
+    # Распределение оценок
     rating_dist = []
-    total_reviews = reviews.count()
+    total_reviews = product.catalog_reviews.count()
     for i in range(5, 0, -1):
-        count = reviews.filter(rating=i).count()
+        count = product.catalog_reviews.filter(rating=i).count()
         percent = (count * 100) // total_reviews if total_reviews > 0 else 0
         rating_dist.append({'rating': i, 'count': count, 'percent': percent})
 
-    # 🔥 Сбор изображений
+    # Изображения
     images = []
     if product.image:
         images.append(product.image.url)
-
     additional_images = ProductImage.objects.filter(product=product).order_by('order', 'created_at')
     for img in additional_images:
         images.append(img.image.url)
-
     if not images and product.specifications and 'gallery' in product.specifications:
         images.extend(product.specifications['gallery'])
 
+    # Корзина и избранное
     is_in_cart = False
     is_favorited = False
     if request.user.is_authenticated:
         is_in_cart = CartItem.objects.filter(user=request.user, product=product).exists()
         is_favorited = Favorite.objects.filter(user=request.user, product=product).exists()
 
+    # 🔥 3. ПЕРЕДАЧА В ШАБЛОН (теперь filter_ratings точно существует)
     return render(request, 'product/product_card.html', {
         'product': product,
         'is_in_cart': is_in_cart,
@@ -250,6 +278,10 @@ def product_detail(request, slug):
         'images': images,
         'rating_dist': rating_dist,
         'total_reviews': total_reviews,
+        'current_sort': sort,
+        'current_filter_photos': filter_photos,
+        'current_filter_videos': filter_videos,
+        'current_filter_ratings': filter_ratings,  # ✅ Теперь ошибки не будет
     })
 
 
@@ -316,8 +348,10 @@ def add_review(request, slug):
 
 
 def search_view(request):
-    """Умный поиск товаров с категориями"""
+    """Поиск с выбором категории"""
     query = request.GET.get('q', '').strip()
+    category_slug = request.GET.get('category', '').strip()  # 🔥 Выбранная категория
+
     products = Product.objects.filter(is_active=True).distinct()
 
     if query:
@@ -343,18 +377,7 @@ def search_view(request):
         count=Count('id')
     ).order_by('-count')
 
-    # Основная категория (с наибольшим количеством)
-    primary_category = None
-    if categories_with_counts:
-        top_cat = categories_with_counts[0]
-        primary_category = {
-            'slug': top_cat['categories__slug'],
-            'title': top_cat['categories__title'],
-            'icon': top_cat['categories__icon'],
-            'count': top_cat['count'],
-        }
-
-    # Преобразуем queryset в список словарей для шаблона
+    # Преобразуем в список
     found_categories = [
         {
             'slug': cat['categories__slug'],
@@ -364,6 +387,22 @@ def search_view(request):
         }
         for cat in categories_with_counts if cat['categories__slug']
     ]
+
+    # 🔥 Определяем выбранную категорию (или первую по количеству)
+    primary_category = None
+    if category_slug:
+        # Пользователь выбрал конкретную категорию
+        for cat in found_categories:
+            if cat['slug'] == category_slug:
+                primary_category = cat
+                break
+        # 🔥 ФИЛЬТРУЕМ товары по выбранной категории
+        products = products.filter(categories__slug=category_slug)
+    elif found_categories:
+        # Категория не выбрана — берем первую (с наибольшим количеством)
+        primary_category = found_categories[0]
+        # 🔥 ФИЛЬТРУЕМ товары по первой категории
+        products = products.filter(categories__slug=primary_category['slug'])
 
     # Применяем фильтры
     target_slug = primary_category['slug'] if primary_category else None
@@ -441,7 +480,7 @@ def search_view(request):
         'query': query,
         'products': products_page,
         'primary_category': primary_category,
-        'found_categories': found_categories,  # 🔥 Все найденные категории
+        'found_categories': found_categories,
         'filters': filters,
         'filter_params': filter_params.urlencode(),
     })

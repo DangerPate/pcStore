@@ -62,7 +62,7 @@
                         {% endfor %}
                     </div>
                     <a href="#reviews-section" class="text-decoration-none text-primary small">
-                        {{ reviews.count }} отзывов
+                        {{ total_reviews }} отзывов
                     </a>
                     {% if avg_rating %}
                         <span class="badge bg-light text-dark border">{{ avg_rating }}/5</span>
@@ -190,11 +190,11 @@
     </section>
     {% endif %}
 
-    <!-- 💬 ОТЗЫВЫ (в стиле DNS) -->
+    <!-- 💬 ОТЗЫВЫ -->
     <section id="reviews-section" class="mb-5">
-        <h2 class="h4 fw-bold mb-4">Отзывы ({{ reviews.count }})</h2>
+        <h2 class="h4 fw-bold mb-4">Отзывы ({{ total_reviews }})</h2>
 
-        <!-- Общая статистика -->
+        <!-- Статистика -->
         <div class="row g-4 mb-4">
             <div class="col-md-4">
                 <div class="card border-0 bg-light">
@@ -205,7 +205,7 @@
                                 <i class="bi bi-star{% if forloop.counter <= avg_rating %}-fill{% else %}{% endif %}"></i>
                             {% endfor %}
                         </div>
-                        <div class="text-muted small">{{ reviews.count }} отзывов</div>
+                        <div class="text-muted small">{{ total_reviews }} отзывов</div>
                     </div>
                 </div>
             </div>
@@ -234,14 +234,13 @@
             </button>
         </div>
 
-        <!-- Форма отзыва (сворачиваемая) -->
+        <!-- Форма отзыва -->
         <div class="collapse mb-4" id="reviewFormCollapse">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-4">Оставить отзыв</h5>
                     <form method="post" action="{% url 'catalog:add_review' product.slug %}" enctype="multipart/form-data" id="reviewForm">
                         {% csrf_token %}
-
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Ваша оценка</label>
                             <div class="rating-stars d-flex gap-2" id="starContainer">
@@ -252,20 +251,14 @@
                             <input type="hidden" name="rating" id="ratingInput" required>
                             <div id="rating-error" class="text-danger small mt-1 d-none">⚠️ Выберите оценку</div>
                         </div>
-
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <textarea name="pros" class="form-control" rows="2" placeholder="Достоинства"></textarea>
-                            </div>
-                            <div class="col-md-6">
-                                <textarea name="cons" class="form-control" rows="2" placeholder="Недостатки"></textarea>
-                            </div>
+                            <div class="col-md-6"><textarea name="pros" class="form-control" rows="2" placeholder="Достоинства"></textarea></div>
+                            <div class="col-md-6"><textarea name="cons" class="form-control" rows="2" placeholder="Недостатки"></textarea></div>
                         </div>
                         <div class="mb-3">
                             <textarea name="comment" class="form-control" rows="3" placeholder="Комментарий" required></textarea>
                             <div id="comment-error" class="text-danger small mt-1 d-none">⚠️ Напишите комментарий</div>
                         </div>
-
                         <div class="mb-3 form-check">
                             <input class="form-check-input" type="checkbox" name="has_issue" id="hasIssue">
                             <label class="form-check-label" for="hasIssue">Товар не соответствует описанию</label>
@@ -273,7 +266,6 @@
                                 <textarea name="issue_description" class="form-control form-control-sm" rows="2" placeholder="Опишите проблему..."></textarea>
                             </div>
                         </div>
-
                         <div class="mb-4">
                             <label class="form-label small text-muted">Прикрепить фото/видео</label>
                             <div class="upload-area p-3 border border-dashed rounded-3 text-center" id="dropZone" style="cursor: pointer;">
@@ -283,16 +275,78 @@
                             </div>
                             <div id="fileList" class="d-flex flex-wrap gap-2 mt-2"></div>
                         </div>
-
                         <button type="submit" class="btn btn-primary px-4">Отправить отзыв</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- 🔥 Список отзывов (с пагинацией) -->
+        <!-- 🔥 СОРТИРОВКА И ФИЛЬТРЫ ОТЗЫВОВ (ИСПРАВЛЕНО: Чекбоксы + Кнопка) -->
+        <form method="get" action="" id="review-filter-form" class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 p-3 bg-light rounded-3">
+
+            <!-- Левая часть: Фильтры -->
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <!-- Тип отзыва -->
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small fw-semibold text-muted">Тип:</span>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="filter_photos" value="on" id="filter_photos" {% if current_filter_photos %}checked{% endif %}>
+                        <label class="form-check-label small" for="filter_photos"><i class="bi bi-image me-1"></i>С фото</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="filter_videos" value="on" id="filter_videos" {% if current_filter_videos %}checked{% endif %}>
+                        <label class="form-check-label small" for="filter_videos"><i class="bi bi-camera-video me-1"></i>С видео</label>
+                    </div>
+                </div>
+
+                <div class="vr mx-2" style="height: 24px;"></div>
+
+                <!-- Оценка (с исправленными звездами) -->
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small fw-semibold text-muted">Оценка:</span>
+                    {% for i in "54321"|make_list %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="filter_rating" value="{{ i }}" id="filter_rating_{{ i }}" {% if i in current_filter_ratings %}checked{% endif %}>
+                        <label class="form-check-label small d-flex align-items-center gap-1" for="filter_rating_{{ i }}">
+                            {% for s in "12345"|make_list %}
+                                {# 🔥 i|add:0 преобразует строку '5' в число 5 для корректного сравнения #}
+                                {% if forloop.counter <= i|add:0 %}
+                                    <i class="bi bi-star-fill text-warning" style="font-size: 0.85rem;"></i>
+                                {% else %}
+                                    <i class="bi bi-star text-warning" style="font-size: 0.85rem;"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Правая часть: Сортировка и Кнопки -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <select class="form-select form-select-sm w-auto" name="sort">
+                    <option value="new" {% if current_sort == 'new' or not current_sort %}selected{% endif %}>Сначала новые</option>
+                    <option value="old" {% if current_sort == 'old' %}selected{% endif %}>Сначала старые</option>
+                    <option value="good_rating" {% if current_sort == 'good_rating' %}selected{% endif %}>С лучшей оценкой</option>
+                    <option value="bad_rating" {% if current_sort == 'bad_rating' %}selected{% endif %}>С худшей оценкой</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-funnel me-1"></i> Применить
+                </button>
+
+                {% if current_filter_photos or current_filter_videos or current_filter_ratings or current_sort != 'new' %}
+                <a href="?" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-circle me-1"></i> Сбросить
+                </a>
+                {% endif %}
+            </div>
+        </form>
+
+        <!-- Список отзывов (с пагинацией) -->
         {% if reviews %}
         <div class="reviews-list" id="reviews-container">
+            <!-- 🔥 Первые 3 отзыва -->
             {% for review in reviews|slice:":3" %}
             <div class="review-item card border-0 shadow-sm mb-3" data-review-index="{{ forloop.counter0 }}">
                 <div class="card-body p-4">
@@ -308,7 +362,7 @@
 
                     <div class="d-flex text-warning mb-3">
                         {% for i in "12345"|make_list %}
-                            <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% else %}{% endif %}"></i>
+                            <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>
                         {% endfor %}
                     </div>
 
@@ -351,7 +405,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- Лайки/Дизлайки -->
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <button class="btn btn-sm btn-outline-success vote-btn" data-id="{{ review.id }}" data-vote="1">
                             <i class="bi bi-hand-thumbs-up me-1"></i>
@@ -363,7 +416,6 @@
                         </button>
                     </div>
 
-                    <!-- 🔥 Комментарии (свёрнуты по умолчанию) -->
                     <div class="border-top mt-3 pt-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h6 class="small fw-bold mb-0">Комментарии ({{ review.comments.count }})</h6>
@@ -398,15 +450,8 @@
             {% endfor %}
         </div>
 
-        <!-- 🔥 Кнопка "Показать ещё" -->
-        {% if reviews.count > 3 %}
-        <div class="text-center mt-4">
-            <button class="btn btn-outline-primary btn-lg" id="load-more-reviews" onclick="loadMoreReviews()">
-                Показать ещё отзывы ({{ reviews.count|add:"-3" }})
-            </button>
-        </div>
-
-        <!-- Скрытые отзывы -->
+        <!-- 🔥 Скрытые отзывы (после 3-го) -->
+        {% if reviews|length > 3 %}
         <div id="hidden-reviews" class="d-none">
             {% for review in reviews|slice:"3:" %}
             <div class="review-item card border-0 shadow-sm mb-3" data-review-index="{{ forloop.counter0|add:3 }}">
@@ -423,7 +468,7 @@
 
                     <div class="d-flex text-warning mb-3">
                         {% for i in "12345"|make_list %}
-                            <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% else %}{% endif %}"></i>
+                            <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>
                         {% endfor %}
                     </div>
 
@@ -510,6 +555,13 @@
             </div>
             {% endfor %}
         </div>
+
+        <!-- Кнопка "Показать ещё" -->
+        <div class="text-center mt-4">
+            <button class="btn btn-outline-primary btn-lg" id="load-more-reviews" onclick="loadMoreReviews()">
+                Показать ещё отзывы ({{ reviews|length|add:"-3" }})
+            </button>
+        </div>
         {% endif %}
 
         {% else %}
@@ -521,261 +573,5 @@
     </section>
 </div>
 
-<script>
-// Развернуть характеристики
-function toggleSpecs() {
-    const short = document.getElementById('specs-short');
-    const full = document.getElementById('specs-full');
-    const btn = document.getElementById('toggle-specs');
-
-    if (full.classList.contains('d-none')) {
-        full.classList.remove('d-none');
-        short.classList.add('d-none');
-        btn.textContent = 'Свернуть';
-    } else {
-        full.classList.add('d-none');
-        short.classList.remove('d-none');
-        btn.textContent = 'Развернуть все характеристики';
-    }
-}
-
-// Смена изображения
-function changeMainImage(thumb, src) {
-    document.getElementById('mainImage').src = src;
-    document.querySelectorAll('.thumbnail').forEach(t => t.style.borderColor = 'transparent');
-    thumb.style.borderColor = '#0d6efd';
-}
-
-// Звёзды рейтинга
-document.addEventListener('DOMContentLoaded', function() {
-    const stars = document.querySelectorAll('.rating-star');
-    const ratingInput = document.getElementById('ratingInput');
-
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            const val = parseInt(this.dataset.value);
-            ratingInput.value = val;
-            stars.forEach(s => {
-                const sVal = parseInt(s.dataset.value);
-                s.className = `bi bi-star${sVal <= val ? '-fill' : ''} rating-star`;
-                s.style.color = sVal <= val ? '#ffc107' : '#e0e0e0';
-            });
-            document.getElementById('rating-error')?.classList.add('d-none');
-        });
-    });
-
-    // Валидация формы отзыва
-    const reviewForm = document.getElementById('reviewForm');
-    if (reviewForm) {
-        reviewForm.addEventListener('submit', function(e) {
-            const rating = ratingInput.value;
-            const comment = document.querySelector('textarea[name="comment"]')?.value.trim();
-            let error = false;
-
-            if (!rating) {
-                document.getElementById('rating-error').classList.remove('d-none');
-                error = true;
-            }
-            if (!comment) {
-                const err = document.getElementById('comment-error');
-                err.classList.remove('d-none');
-                error = true;
-            }
-            if (error) {
-                e.preventDefault();
-                return false;
-            }
-        });
-    }
-
-    // Чекбокс проблемы
-    document.getElementById('hasIssue')?.addEventListener('change', function() {
-        document.getElementById('issueBlock')?.classList.toggle('d-none', !this.checked);
-    });
-
-    // Drag & Drop
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('attachmentInput');
-    const fileList = document.getElementById('fileList');
-
-    if (dropZone) {
-        dropZone.addEventListener('click', () => fileInput?.click());
-        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#0d6efd'; });
-        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#dee2e6'; });
-        dropZone.addEventListener('drop', e => {
-            e.preventDefault();
-            dropZone.style.borderColor = '#dee2e6';
-            handleFiles(e.dataTransfer.files);
-        });
-    }
-
-    function handleFiles(files) {
-        if (!fileList) return;
-        fileList.innerHTML = '';
-        const dt = new DataTransfer();
-        Array.from(files).slice(0, 5).forEach(f => {
-            if (['image/jpeg', 'image/png', 'video/mp4'].includes(f.type)) {
-                dt.items.add(f);
-                const div = document.createElement('div');
-                div.innerHTML = f.type.startsWith('image/')
-                    ? `<img src="${URL.createObjectURL(f)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">`
-                    : `<video src="${URL.createObjectURL(f)}" style="width:80px;height:50px;object-fit:cover;border-radius:8px;" controls></video>`;
-                fileList.appendChild(div);
-            }
-        });
-        if (fileInput) fileInput.files = dt.files;
-    }
-
-    // Лайки
-    document.querySelectorAll('.vote-btn').forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const id = this.dataset.id;
-            const vote = this.dataset.vote;
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-            try {
-                const res = await fetch('/catalog/review/vote/', {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `review_id=${id}&vote=${vote}`
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    document.querySelector(`.vote-likes-${id}`).textContent = data.likes;
-                    document.querySelector(`.vote-dislikes-${id}`).textContent = data.dislikes;
-                }
-            } catch(err) { console.error(err); }
-        });
-    });
-
-    // Комментарии
-    document.querySelectorAll('.comment-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const input = this.querySelector('input[type="text"]');
-            if (!input) return;
-            const text = input.value.trim();
-            if (text.length < 2) return;
-
-            const reviewId = this.dataset.review;
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-            try {
-                const res = await fetch('/catalog/review/comment/', {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ review_id: reviewId, text: text })
-                });
-                const data = await res.json();
-                if (res.ok && data.status === 'ok') {
-                    const list = document.getElementById(`comments-${reviewId}`);
-                    if (list) {
-                        const el = document.createElement('div');
-                        el.className = 'd-flex gap-2 mb-2 small';
-                        el.innerHTML = `<strong>${data.user}:</strong> <span class="text-muted">${data.text}</span>`;
-                        list.appendChild(el);
-                        input.value = '';
-                    }
-                }
-            } catch(err) { console.error(err); }
-        });
-    });
-});
-
-// Пагинация отзывов
-let visibleReviews = 3;
-const reviewsPerPage = 3;
-
-function loadMoreReviews() {
-    const container = document.getElementById('reviews-container');
-    const hiddenContainer = document.getElementById('hidden-reviews');
-    const loadMoreBtn = document.getElementById('load-more-reviews');
-
-    if (!hiddenContainer) return;
-
-    const hiddenReviews = Array.from(hiddenContainer.querySelectorAll('.review-item'));
-    const toShow = hiddenReviews.slice(0, reviewsPerPage);
-
-    toShow.forEach(review => {
-        const clone = review.cloneNode(true);
-        container.appendChild(clone);
-        review.remove();
-    });
-
-    // Обновляем счётчик на кнопке
-    const remaining = hiddenContainer.querySelectorAll('.review-item').length;
-    if (remaining > 0) {
-        loadMoreBtn.textContent = `Показать ещё отзывы (${remaining})`;
-    } else {
-        loadMoreBtn.remove();
-    }
-
-    // Перепривязываем события для новых элементов
-    rebindEvents();
-}
-
-function rebindEvents() {
-    // Лайки
-    document.querySelectorAll('.vote-btn').forEach(btn => {
-        // Удаляем старые обработчики (клонированием)
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-
-        newBtn.addEventListener('click', async function() {
-            const id = this.dataset.id;
-            const vote = this.dataset.vote;
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-            try {
-                const res = await fetch('/catalog/review/vote/', {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `review_id=${id}&vote=${vote}`
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    document.querySelector(`.vote-likes-${id}`).textContent = data.likes;
-                    document.querySelector(`.vote-dislikes-${id}`).textContent = data.dislikes;
-                }
-            } catch(err) { console.error(err); }
-        });
-    });
-
-    // Комментарии
-    document.querySelectorAll('.comment-form').forEach(form => {
-        const newForm = form.cloneNode(true);
-        form.parentNode.replaceChild(newForm, form);
-
-        newForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const input = this.querySelector('input[type="text"]');
-            if (!input) return;
-            const text = input.value.trim();
-            if (text.length < 2) return;
-
-            const reviewId = this.dataset.review;
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-            try {
-                const res = await fetch('/catalog/review/comment/', {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ review_id: reviewId, text: text })
-                });
-                const data = await res.json();
-                if (res.ok && data.status === 'ok') {
-                    const list = document.getElementById(`comments-${reviewId}`);
-                    if (list) {
-                        const el = document.createElement('div');
-                        el.className = 'd-flex gap-2 mb-2 small';
-                        el.innerHTML = `<strong>${data.user}:</strong> <span class="text-muted">${data.text}</span>`;
-                        list.appendChild(el);
-                        input.value = '';
-                    }
-                }
-            } catch(err) { console.error(err); }
-        });
-    });
-}
-</script>
+<script src="{% static 'product/js/product.js' %}"></script>
 {% endblock %}
