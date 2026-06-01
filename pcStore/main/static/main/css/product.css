@@ -315,3 +315,121 @@
         height: 80px !important;
     }
 }
+
+/* Активные кнопки лайков/дизлайков */
+.vote-btn.active.btn-success {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    color: #fff !important;
+}
+
+.vote-btn.active.btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: #fff !important;
+}
+
+/* Анимация при наведении */
+.vote-btn {
+    transition: all 0.2s ease;
+}
+
+.vote-btn:hover {
+    transform: translateY(-1px);
+}
+
+.vote-btn:active {
+    transform: translateY(0);
+}
+/* Превью загружаемых файлов */
+.file-preview {
+    position: relative;
+    display: inline-block;
+    margin: 4px;
+}
+
+.file-preview img,
+.file-preview video {
+    border: 2px solid #dee2e6;
+    transition: border-color 0.2s;
+}
+
+.file-preview:hover img,
+.file-preview:hover video {
+    border-color: #0d6efd;
+}
+
+/* Зона загрузки */
+.upload-area {
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    background-color: #e9ecef !important;
+    border-color: #0d6efd !important;
+}
+
+.upload-area.dragover {
+    background-color: #cfe2ff !important;
+    border-color: #0d6efd !important;
+    transform: scale(1.02);
+}
+
+/* Модальное окно */
+.modal-content.bg-dark {
+    background-color: rgba(0, 0, 0, 0.95) !important;
+}
+
+.modal-body {
+    min-height: 400px;
+}
+
+/* Кнопка удаления файла */
+.btn-close-file {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    z-index: 10;
+    transition: transform 0.2s;
+}
+
+.btn-close-file:hover {
+    transform: scale(1.1);
+    background-color: #bb2d3b;
+}
+
+/* Стили для фильтров отзывов */
+#review-filter-form .form-check-label {
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+#review-filter-form .form-check-label:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+#review-filter-form .form-check-input:checked + .form-check-label {
+    font-weight: 600;
+}
+
+/* Для звёздочек */
+#review-filter-form .form-check-label i {
+    transition: transform 0.2s;
+}
+
+#review-filter-form .form-check-label:hover i {
+    transform: scale(1.1);
+}

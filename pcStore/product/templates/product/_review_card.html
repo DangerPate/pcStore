@@ -1,0 +1,124 @@
+﻿{% load catalog_extras %}
+
+<div class="review-item card border-0 shadow-sm mb-3" data-review-index="{{ review_index }}">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <strong class="fs-5">{{ review.user.get_display_name }}</strong>
+                {% if review.is_verified_purchase %}
+                    <span class="badge bg-success-subtle text-success ms-2 small">Проверенный покупатель</span>
+                {% endif %}
+            </div>
+            <div class="text-muted small">{{ review.created_at|date:"d.m.Y" }}</div>
+        </div>
+
+        <div class="d-flex text-warning mb-3">
+            {% for i in "12345"|make_list %}
+                <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>
+            {% endfor %}
+        </div>
+
+        {% if review.pros or review.cons %}
+        <div class="row g-2 mb-3">
+            {% if review.pros %}
+            <div class="col-md-6">
+                <div class="p-3 bg-light rounded-3">
+                    <small class="fw-semibold text-success d-block mb-1">✓ Достоинства</small>
+                    <p class="mb-0 small">{{ review.pros|linebreaksbr }}</p>
+                </div>
+            </div>
+            {% endif %}
+            {% if review.cons %}
+            <div class="col-md-6">
+                <div class="p-3 bg-light rounded-3">
+                    <small class="fw-semibold text-danger d-block mb-1">✗ Недостатки</small>
+                    <p class="mb-0 small">{{ review.cons|linebreaksbr }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <p class="text-muted mb-3">{{ review.comment|linebreaksbr }}</p>
+
+        <!-- 🔥 ОТОБРАЖЕНИЕ ПРОБЛЕМЫ (Товар не соответствует описанию) -->
+        {% if review.has_issue and review.issue_description %}
+        <div class="alert alert-warning py-2 mb-3 small border-warning bg-warning-subtle">
+            <strong><i class="bi bi-exclamation-triangle me-1"></i> Несоответствие описанию:</strong>
+            {{ review.issue_description|linebreaksbr }}
+        </div>
+        {% endif %}
+
+        {% if review.attachments.all %}
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            {% for att in review.attachments.all %}
+                {% if att.file_type == 'image' %}
+                    <div class="position-relative">
+                        <img src="{{ att.file.url }}"
+                             class="rounded-2"
+                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
+                             onclick="openExistingMedia('{{ att.file.url }}', 'image')">
+                    </div>
+                {% elif att.file_type == 'video' %}
+                    <div class="position-relative">
+                        <video class="rounded-2"
+                               style="width: 120px; height: 80px; object-fit: cover; cursor: pointer;"
+                               onclick="openExistingMedia('{{ att.file.url }}', 'video')">
+                            <source src="{{ att.file.url }}">
+                        </video>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Лайки/Дизлайки (справа) -->
+        <div class="d-flex align-items-center justify-content-end gap-3 mt-3 pt-3 border-top">
+            <button class="btn btn-sm {% if user_votes|get_item:review.id == 1 %}btn-success active{% else %}btn-outline-success{% endif %} vote-btn"
+                    data-id="{{ review.id }}"
+                    data-vote="1"
+                    title="Полезный отзыв">
+                <i class="bi bi-hand-thumbs-up me-1"></i>
+                <span class="vote-likes-{{ review.id }}">{{ review.likes_count }}</span>
+            </button>
+            <button class="btn btn-sm {% if user_votes|get_item:review.id == -1 %}btn-danger active{% else %}btn-outline-danger{% endif %} vote-btn"
+                    data-id="{{ review.id }}"
+                    data-vote="-1"
+                    title="Бесполезный отзыв">
+                <i class="bi bi-hand-thumbs-down me-1"></i>
+                <span class="vote-dislikes-{{ review.id }}">{{ review.dislikes_count }}</span>
+            </button>
+        </div>
+
+        <!-- Комментарии -->
+        <div class="border-top mt-3 pt-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="small fw-bold mb-0">Комментарии ({{ review.comments.count }})</h6>
+                {% if review.comments.count > 0 %}
+                <button class="btn btn-link btn-sm text-primary p-0" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#comments-{{ review.id }}"
+                        aria-expanded="false">
+                    Показать комментарии
+                </button>
+                {% endif %}
+            </div>
+
+            <div class="collapse comments-list mb-2" id="comments-{{ review.id }}">
+                {% for c in review.comments.all %}
+                <div class="d-flex gap-2 mb-2 small">
+                    <strong>{{ c.user.get_display_name }}:</strong>
+                    <span class="text-muted">{{ c.text }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if user.is_authenticated %}
+            <form class="d-flex gap-2 comment-form" data-review="{{ review.id }}">
+                {% csrf_token %}
+                <input type="text" class="form-control form-control-sm" placeholder="Написать комментарий..." required>
+                <button type="submit" class="btn btn-sm btn-primary">Отправить</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>

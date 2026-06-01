@@ -1,6 +1,11 @@
-﻿// product/static/product/js/product.js
+﻿// product/static/product.js
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 🔥 Читаем данные, переданные из Django
+    const productDataScript = document.getElementById('product-data');
+    const productData = productDataScript ? JSON.parse(productDataScript.textContent) : { images: [], title: 'Товар' };
+    const images = productData.images || [];
+    const productTitle = productData.title || 'Товар';
 
     // ==========================================
     // 1. ГАЛЕРЕЯ И ХАРАКТЕРИСТИКИ
@@ -36,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const stars = document.querySelectorAll('.rating-star');
     const ratingInput = document.getElementById('ratingInput');
+    const ratingError = document.getElementById('rating-error');
 
     stars.forEach(star => {
         star.addEventListener('click', function() {
@@ -46,7 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 s.className = `bi bi-star${sVal <= val ? '-fill' : ''} rating-star`;
                 s.style.color = sVal <= val ? '#ffc107' : '#e0e0e0';
             });
-            document.getElementById('rating-error')?.classList.add('d-none');
+            if (ratingError) {
+                ratingError.style.display = 'none';
+            }
+            ratingInput.removeAttribute('required');
         });
     });
 
@@ -58,14 +67,26 @@ document.addEventListener('DOMContentLoaded', () => {
             let error = false;
 
             if (!rating) {
-                document.getElementById('rating-error').classList.remove('d-none');
+                if (ratingError) {
+                    ratingError.style.display = 'block';
+                    ratingInput.setCustomValidity('Пожалуйста, поставьте оценку');
+                    ratingInput.reportValidity();
+                }
                 error = true;
+            } else {
+                ratingInput.setCustomValidity('');
             }
+
+            const commentError = document.getElementById('comment-error');
             if (!comment) {
-                const err = document.getElementById('comment-error');
-                err.classList.remove('d-none');
+                if (commentError) {
+                    commentError.style.display = 'block';
+                }
                 error = true;
+            } else if (commentError) {
+                commentError.style.display = 'none';
             }
+
             if (error) {
                 e.preventDefault();
                 return false;
@@ -83,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('attachmentInput');
     const fileList = document.getElementById('fileList');
+    let uploadedFiles = [];
 
     if (dropZone) {
         dropZone.addEventListener('click', () => fileInput?.click());
@@ -103,90 +125,221 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+    }
+
     function handleFiles(files) {
         if (!fileList) return;
-        fileList.innerHTML = '';
+
         const dt = new DataTransfer();
-        Array.from(files).slice(0, 5).forEach(f => {
-            if (['image/jpeg', 'image/png', 'video/mp4'].includes(f.type)) {
-                dt.items.add(f);
-                const div = document.createElement('div');
-                div.innerHTML = f.type.startsWith('image/')
-                    ? `<img src="${URL.createObjectURL(f)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">`
-                    : `<video src="${URL.createObjectURL(f)}" style="width:80px;height:50px;object-fit:cover;border-radius:8px;" controls></video>`;
-                fileList.appendChild(div);
+        const allowedTypes = ['image/jpeg', 'image/png', 'video/mp4'];
+        const maxSize = 50 * 1024 * 1024;
+
+        Array.from(files).forEach(f => {
+            if (!allowedTypes.includes(f.type)) {
+                alert(`Файл ${f.name} имеет неподдерживаемый формат. Разрешены: JPG, PNG, MP4`);
+                return;
             }
+            if (f.size > maxSize) {
+                alert(`Файл ${f.name} слишком большой. Максимум 50MB`);
+                return;
+            }
+            if (uploadedFiles.length >= 5) {
+                alert('Можно загрузить максимум 5 файлов');
+                return;
+            }
+
+            uploadedFiles.push(f);
+            dt.items.add(f);
         });
+
         if (fileInput) fileInput.files = dt.files;
+        renderFilePreviews();
+    }
+
+    function renderFilePreviews() {
+        if (!fileList) return;
+        fileList.innerHTML = '';
+
+        uploadedFiles.forEach((file, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'position-relative d-inline-block';
+
+            const preview = document.createElement('div');
+            preview.className = 'file-preview';
+
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'rounded-2';
+                img.style.cssText = 'width: 80px; height: 80px; object-fit: cover; cursor: pointer;';
+                img.onclick = () => openModal(file, index);
+                preview.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.className = 'rounded-2';
+                video.style.cssText = 'width: 120px; height: 80px; object-fit: cover; cursor: pointer;';
+                video.onclick = () => openModal(file, index);
+                preview.appendChild(video);
+            }
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger btn-sm position-absolute top-0 start-100 translate-middle rounded-circle';
+            removeBtn.style.cssText = 'width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center;';
+            removeBtn.innerHTML = '<i class="bi bi-x-lg" style="font-size: 12px;"></i>';
+            removeBtn.onclick = () => removeFile(index);
+
+            wrapper.appendChild(preview);
+            wrapper.appendChild(removeBtn);
+            fileList.appendChild(wrapper);
+        });
+    }
+
+    function removeFile(index) {
+        uploadedFiles.splice(index, 1);
+        const dt = new DataTransfer();
+        uploadedFiles.forEach(f => dt.items.add(f));
+        if (fileInput) fileInput.files = dt.files;
+        renderFilePreviews();
     }
 
     // ==========================================
-    // 4. ДЕЛЕГИРОВАНИЕ СОБЫТИЙ (Лайки и Комментарии)
+    // 4. ЛАЙКИ/ДИЗЛАЙКИ
     // ==========================================
     document.addEventListener('click', async function(e) {
         const voteBtn = e.target.closest('.vote-btn');
-        if (voteBtn) {
-            e.preventDefault();
-            const id = voteBtn.dataset.id;
-            const vote = voteBtn.dataset.vote;
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        if (!voteBtn) return;
 
-            try {
-                const res = await fetch('/catalog/review/vote/', {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `review_id=${id}&vote=${vote}`
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    document.querySelector(`.vote-likes-${id}`).textContent = data.likes;
-                    document.querySelector(`.vote-dislikes-${id}`).textContent = data.dislikes;
+        e.preventDefault();
+        const id = voteBtn.dataset.id;
+        const vote = parseInt(voteBtn.dataset.vote);
+        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+        const likeBtn = document.querySelector(`.vote-btn[data-id="${id}"][data-vote="1"]`);
+        const dislikeBtn = document.querySelector(`.vote-btn[data-id="${id}"][data-vote="-1"]`);
+
+        if (likeBtn) likeBtn.disabled = true;
+        if (dislikeBtn) dislikeBtn.disabled = true;
+
+        try {
+            const res = await fetch('/catalog/review/vote/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrf,
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `review_id=${id}&vote=${vote}`
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                const likesEl = document.querySelector(`.vote-likes-${id}`);
+                const dislikesEl = document.querySelector(`.vote-dislikes-${id}`);
+                if (likesEl) likesEl.textContent = data.likes;
+                if (dislikesEl) dislikesEl.textContent = data.dislikes;
+
+                const userVote = data.user_vote || 0;
+
+                if (userVote === 1) {
+                    likeBtn?.classList.remove('btn-outline-success');
+                    likeBtn?.classList.add('active', 'btn-success');
+                    dislikeBtn?.classList.remove('active', 'btn-danger');
+                    dislikeBtn?.classList.add('btn-outline-danger');
+                } else if (userVote === -1) {
+                    dislikeBtn?.classList.remove('btn-outline-danger');
+                    dislikeBtn?.classList.add('active', 'btn-danger');
+                    likeBtn?.classList.remove('active', 'btn-success');
+                    likeBtn?.classList.add('btn-outline-success');
+                } else {
+                    likeBtn?.classList.remove('active', 'btn-success');
+                    likeBtn?.classList.add('btn-outline-success');
+                    dislikeBtn?.classList.remove('active', 'btn-danger');
+                    dislikeBtn?.classList.add('btn-outline-danger');
                 }
-            } catch(err) { console.error('Vote error:', err); }
-        }
-    });
-
-    document.addEventListener('submit', async function(e) {
-        const commentForm = e.target.closest('.comment-form');
-        if (commentForm) {
-            e.preventDefault();
-            const input = commentForm.querySelector('input[type="text"]');
-            if (!input) return;
-            const text = input.value.trim();
-            if (text.length < 2) return;
-
-            const reviewId = commentForm.dataset.review;
-            const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-            const btn = commentForm.querySelector('button');
-            const oldText = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = '...';
-
-            try {
-                const res = await fetch('/catalog/review/comment/', {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ review_id: reviewId, text: text })
-                });
-                const data = await res.json();
-                if (res.ok && data.status === 'ok') {
-                    const list = document.getElementById(`comments-${reviewId}`);
-                    if (list) {
-                        const el = document.createElement('div');
-                        el.className = 'd-flex gap-2 mb-2 small';
-                        el.innerHTML = `<strong>${data.user}:</strong> <span class="text-muted">${data.text}</span>`;
-                        list.appendChild(el);
-                        input.value = '';
-                    }
-                }
-            } catch(err) { console.error('Comment error:', err); }
-            finally {
-                btn.disabled = false; btn.innerHTML = oldText;
             }
+        } catch(err) {
+            console.error('Vote error:', err);
+        } finally {
+            if (likeBtn) likeBtn.disabled = false;
+            if (dislikeBtn) dislikeBtn.disabled = false;
         }
     });
 
     // ==========================================
-    // 5. ПАГИНАЦИЯ ОТЗЫВОВ
+    // 5. КОММЕНТАРИИ
+    // ==========================================
+    document.addEventListener('submit', async function(e) {
+        const commentForm = e.target.closest('.comment-form');
+        if (!commentForm) return;
+
+        e.preventDefault();
+        const input = commentForm.querySelector('input[type="text"]');
+        if (!input) return;
+
+        const text = input.value.trim();
+        if (text.length < 2) {
+            input.focus();
+            return;
+        }
+
+        const reviewId = commentForm.dataset.review;
+        const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        const btn = commentForm.querySelector('button');
+        const oldText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+        try {
+            const res = await fetch('/catalog/review/comment/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrf,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ review_id: reviewId, text: text })
+            });
+            const data = await res.json();
+
+            if (res.ok && data.status === 'ok') {
+                const list = document.getElementById(`comments-${reviewId}`);
+                if (list) {
+                    const el = document.createElement('div');
+                    el.className = 'd-flex gap-2 mb-2 small';
+                    el.innerHTML = `<strong>${data.user}:</strong> <span class="text-muted">${data.text}</span>`;
+                    list.appendChild(el);
+                    input.value = '';
+
+                    const counter = commentForm.closest('.border-top')?.querySelector('h6');
+                    if (counter) {
+                        const match = counter.textContent.match(/\d+/);
+                        const currentCount = match ? parseInt(match[0]) + 1 : 1;
+                        counter.textContent = counter.textContent.replace(/\d+/, currentCount);
+                    }
+
+                    const collapseEl = document.getElementById(`comments-${reviewId}`);
+                    if (collapseEl && !collapseEl.classList.contains('show')) {
+                        const bsCollapse = new bootstrap.Collapse(collapseEl, { show: true });
+                    }
+                }
+            } else {
+                alert(data.error || 'Ошибка при отправке комментария');
+            }
+        } catch(err) {
+            console.error('Comment error:', err);
+            alert('Произошла ошибка при отправке комментария');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = oldText;
+        }
+    });
+
+    // ==========================================
+    // 6. ПАГИНАЦИЯ ОТЗЫВОВ
     // ==========================================
     window.loadMoreReviews = function() {
         const container = document.getElementById('reviews-container');
@@ -199,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const toShow = hiddenReviews.slice(0, 3);
 
         toShow.forEach(review => {
-            container.appendChild(review); // Переносим элемент (делегирование событий сохранится)
+            container.appendChild(review);
         });
 
         const remaining = hiddenContainer.querySelectorAll('.review-item').length;
@@ -211,58 +364,163 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================
-    // 6. ФИЛЬТРЫ И СОРТИРОВКА ОТЗЫВОВ (ИСПРАВЛЕНО)
+    // 7. СБРОС СТРАНИЦЫ ПРИ ПРИМЕНЕНИИ ФИЛЬТРОВ
     // ==========================================
-    document.addEventListener('click', function(e) {
-        // Ищем кнопку, даже если клик был по иконке <i> внутри неё
-        const filterBtn = e.target.closest('.filter-btn, .filter-rating-btn');
-        if (!filterBtn) return;
+    const filterForm = document.getElementById('review-filter-form');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function() {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('page');
+            this.action = url.toString();
+        });
+    }
 
-        e.preventDefault();
+    // ==========================================
+    // 8. МОДАЛЬНОЕ ОКНО ПРОСМОТРА (ОТЗЫВЫ)
+    // ==========================================
+    let modalInstance = null;
 
-        const url = new URL(window.location.href);
-
-        if (filterBtn.classList.contains('filter-btn')) {
-            const filter = filterBtn.dataset.filter;
-            const isActive = filterBtn.dataset.state === 'true';
-
-            if (filter === 'all') {
-                url.searchParams.delete('filter_photos');
-                url.searchParams.delete('filter_videos');
-                url.searchParams.delete('filter_rating');
-            } else if (filter === 'photos') {
-                isActive ? url.searchParams.delete('filter_photos') : url.searchParams.set('filter_photos', 'on');
-            } else if (filter === 'videos') {
-                isActive ? url.searchParams.delete('filter_videos') : url.searchParams.set('filter_videos', 'on');
-            }
-        }
-        else if (filterBtn.classList.contains('filter-rating-btn')) {
-            const rating = filterBtn.dataset.rating;
-            const isActive = filterBtn.dataset.active === 'true';
-            const currentRatings = url.searchParams.getAll('filter_rating');
-
-            if (isActive) {
-                // Удаляем этот рейтинг и перезаписываем остальные
-                const newRatings = currentRatings.filter(r => r !== rating);
-                url.searchParams.delete('filter_rating');
-                newRatings.forEach(r => url.searchParams.append('filter_rating', r));
-            } else {
-                // Добавляем новый рейтинг
-                url.searchParams.append('filter_rating', rating);
-            }
+    window.openModal = function(file, index) {
+        let modal = document.getElementById('filePreviewModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'filePreviewModal';
+            modal.tabIndex = '-1';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content bg-dark border-0">
+                        <div class="modal-header border-0">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-0 d-flex align-items-center justify-content-center" style="min-height: 400px;">
+                            <div id="modalContent"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
-        // Сбрасываем пагинацию при изменении фильтров
-        url.searchParams.delete('page');
+        const modalContent = modal.querySelector('#modalContent');
 
-        // Перенаправляем (используем toString() для максимальной совместимости)
-        window.location.href = url.toString();
-    });
+        if (file.type.startsWith('image/')) {
+            modalContent.innerHTML = `<img src="${URL.createObjectURL(file)}" class="img-fluid" style="max-height: 80vh;">`;
+        } else if (file.type.startsWith('video/')) {
+            modalContent.innerHTML = `<video controls class="w-100" style="max-height: 80vh;"><source src="${URL.createObjectURL(file)}"></video>`;
+        }
 
-    document.getElementById('review-sort-select')?.addEventListener('change', function() {
-        const url = new URL(window.location.href);
-        url.searchParams.set('sort', this.value);
-        url.searchParams.delete('page');
-        window.location.href = url.toString();
-    });
-});
+        if (!modalInstance) {
+            modalInstance = new bootstrap.Modal(modal);
+        }
+        modalInstance.show();
+    };
+
+    window.openExistingMedia = function(url, type) {
+        let modal = document.getElementById('existingMediaModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'existingMediaModal';
+            modal.tabIndex = '-1';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content bg-dark border-0">
+                        <div class="modal-header border-0">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-0 d-flex align-items-center justify-content-center" style="min-height: 400px;">
+                            <div id="existingModalContent"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        const modalContent = modal.querySelector('#existingModalContent');
+
+        if (type === 'image') {
+            modalContent.innerHTML = `<img src="${url}" class="img-fluid" style="max-height: 80vh;">`;
+        } else {
+            modalContent.innerHTML = `<video controls class="w-100" style="max-height: 80vh;"><source src="${url}"></video>`;
+        }
+
+        const instance = new bootstrap.Modal(modal);
+        instance.show();
+    };
+
+        // ==========================================
+    // 9. МОДАЛЬНОЕ ОКНО ДЛЯ ИЗОБРАЖЕНИЙ ТОВАРА
+    // ==========================================
+    window.openProductImageModal = function(index) {
+        // Берем данные из глобальных переменных, заданных в HTML
+        const images = window.PRODUCT_IMAGES || [];
+        const productTitle = window.PRODUCT_TITLE || 'Товар';
+
+        if (!images || images.length === 0) return;
+
+        let modal = document.getElementById('productImageModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'productImageModal';
+            modal.tabIndex = '-1';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered modal-xl">
+                    <div class="modal-content bg-dark border-0">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title text-white">${productTitle}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-0 d-flex align-items-center justify-content-center" style="min-height: 600px;">
+                            <img id="modalProductImage" src="" class="img-fluid" style="max-height: 85vh;">
+                        </div>
+                        <div class="modal-footer border-0 bg-dark">
+                            <button type="button" class="btn btn-outline-light btn-sm" id="prevImageBtn">
+                                <i class="bi bi-chevron-left"></i> Назад
+                            </button>
+                            <span class="text-white" id="imageCounter">1 / ${images.length}</span>
+                            <button type="button" class="btn btn-outline-light btn-sm" id="nextImageBtn">
+                                Вперёд <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            let currentIndex = 0;
+
+            document.getElementById('prevImageBtn').addEventListener('click', function() {
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
+                updateModalImage();
+            });
+
+            document.getElementById('nextImageBtn').addEventListener('click', function() {
+                currentIndex = (currentIndex + 1) % images.length;
+                updateModalImage();
+            });
+
+            function updateModalImage() {
+                document.getElementById('modalProductImage').src = images[currentIndex];
+                document.getElementById('imageCounter').textContent = `${currentIndex + 1} / ${images.length}`;
+            }
+
+            window.productImageModalInstance = new bootstrap.Modal(modal);
+        }
+
+        const modalImg = modal.querySelector('#modalProductImage');
+        if (modalImg) {
+            modalImg.src = images[index];
+            modal.querySelector('#imageCounter').textContent = `${index + 1} / ${images.length}`;
+        }
+
+        modal.currentIndex = index;
+
+        if (!window.productImageModalInstance) {
+            window.productImageModalInstance = new bootstrap.Modal(modal);
+        }
+        window.productImageModalInstance.show();
+    };
+}); // <-- Убедись, что эта закрывающая скобка DOMContentLoaded осталась в конце файла

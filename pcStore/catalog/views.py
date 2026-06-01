@@ -488,22 +488,33 @@ def search_view(request):
 
 @login_required
 def toggle_vote(request):
-    """AJAX: Лайк/Дизлайк отзыва"""
     if request.method == 'POST':
         review_id = request.POST.get('review_id')
-        vote_type = int(request.POST.get('vote'))
+        vote_type = int(request.POST.get('vote'))  # 1 или -1
         review = get_object_or_404(Review, id=review_id)
 
-        vote, created = ReviewVote.objects.update_or_create(
-            review=review, user=request.user,
-            defaults={'vote': vote_type}
-        )
-        if not created and vote.vote == vote_type:
-            vote.delete()
+        existing_vote = ReviewVote.objects.filter(review=review, user=request.user).first()
+
+        if existing_vote:
+            if existing_vote.vote == vote_type:
+                existing_vote.delete()
+                user_vote = 0
+            else:
+                existing_vote.vote = vote_type
+                existing_vote.save()
+                user_vote = vote_type
+        else:
+            ReviewVote.objects.create(review=review, user=request.user, vote=vote_type)
+            user_vote = vote_type
 
         total_likes = review.votes.filter(vote=1).count()
         total_dislikes = review.votes.filter(vote=-1).count()
-        return JsonResponse({'likes': total_likes, 'dislikes': total_dislikes})
+
+        return JsonResponse({
+            'likes': total_likes,
+            'dislikes': total_dislikes,
+            'user_vote': user_vote  # 🔥 Эта строка критически важна!
+        })
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
