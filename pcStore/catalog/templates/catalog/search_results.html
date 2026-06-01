@@ -1,7 +1,8 @@
 ﻿{% extends 'main/layout.html' %}
 {% load static %}
+{% load catalog_extras %}
 
-{% block title %}Поиск: "{{ query }}" - pcStore{% endblock %}
+{% block title %}Поиск: "{{ query }}" - Каталог{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -13,8 +14,42 @@
         </ol>
     </nav>
 
+    <!-- 🔥 УМНЫЙ БАННЕР РЕЗУЛЬТАТОВ -->
+    <!-- 🔥 ЗАГОЛОВОК С КАТЕГОРИЯМИ (как в DNS) -->
+    {% if primary_category %}
+    <div class="mb-4">
+        <h2 class="h4 fw-bold mb-3">
+            Найдено <span class="text-primary">{{ products.paginator.count }}</span> товара в категории
+            <span class="text-dark">{{ primary_category.title }}</span>
+        </h2>
+
+        <!-- Плитки категорий -->
+        <div class="d-flex flex-wrap gap-2">
+            {% for cat in found_categories %}
+            <a href="{% url 'catalog:category' cat.slug %}?q={{ query|urlencode }}"
+               class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-light rounded-3 text-decoration-none text-dark hover-shadow transition-all"
+               style="min-width: 150px;">
+                {% if cat.icon %}
+                <i class="bi {{ cat.icon }} fs-4 text-muted"></i>
+                {% else %}
+                <i class="bi bi-box-seam fs-4 text-muted"></i>
+                {% endif %}
+                <div>
+                    <div class="small fw-medium">{{ cat.title }}</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">{{ cat.count }} товаров</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-secondary mb-4">
+        По запросу "{{ query }}" найдено <strong>{{ products.paginator.count }}</strong> товаров.
+    </div>
+    {% endif %}
+
     <div class="row g-3">
-        <!-- 📦 ЛЕВАЯ ПАНЕЛЬ: Фильтры -->
+        <!-- 📦 ЛЕВАЯ ПАНЕЛЬ: Фильтры (аналогично catalog.html) -->
         <aside class="col-lg-3">
             <div class="card border-0 shadow-sm sticky-filter">
                 <div class="card-body p-3">
@@ -22,47 +57,83 @@
                         <i class="bi bi-funnel"></i> Фильтры
                     </h5>
 
-                    <form method="get" action="">
-                        <!-- Сохраняем поисковый запрос -->
-                        <input type="hidden" name="q" value="{{ query }}">
+                    <form method="get" action="" id="filter-form">
+                        <input type="hidden" name="q" value="{{ query }}"> <!-- Сохраняем запрос -->
 
-                        <!-- Цена -->
-                        <div class="mb-3">
-                            <label class="fw-semibold small text-uppercase text-muted ls-1 mb-1 d-block">Цена, ₽</label>
-                            <div class="d-flex gap-2">
-                                <input type="number" name="price_min" class="form-control form-control-sm"
-                                       placeholder="От" value="{{ request.GET.price_min|default:'' }}">
-                                <input type="number" name="price_max" class="form-control form-control-sm"
-                                       placeholder="До" value="{{ request.GET.price_max|default:'' }}">
+                        {% for key, spec in filters.items %}
+                            <!-- 🔹 Выпадающий список (чекбоксы) -->
+                            {% if spec.type == 'select' %}
+                            <div class="filter-section mb-2">
+                                <div class="filter-header d-flex justify-content-between align-items-center p-2 rounded-3" style="cursor: pointer; background: #f8f9fa;" onclick="toggleFilter('{{ key }}')">
+                                    <span class="fw-semibold small">{{ spec.label }}</span>
+                                    <i class="bi bi-chevron-down" id="icon-{{ key }}"></i>
+                                </div>
+                                <div class="filter-content mt-2" id="content-{{ key }}" style="display: none;">
+                                    {% if key == 'brand' %}
+                                    <div class="mb-2">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                            <input type="text" class="form-control form-control-sm border-start-0" placeholder="Поиск" id="search-{{ key }}" onkeyup="filterOptions('{{ key }}')">
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="filter-options" id="options-{{ key }}" style="max-height: 200px; overflow-y: auto; padding-right: 14px;">
+                                        {% for option in spec.options %}
+                                        <div class="form-check mb-2 filter-option" data-option="{{ option|lower }}">
+                                            <input class="form-check-input" type="checkbox" name="{{ key }}" value="{{ option }}" id="f_{{ key }}_{{ forloop.counter }}" {% if option in spec.selected_values %}checked{% endif %}>
+                                            <label class="form-check-label small d-flex justify-content-between" for="f_{{ key }}_{{ forloop.counter }}">
+                                                <span>{{ option }}</span>
+                                                {% if spec.counts %}<span class="text-muted">{{ spec.counts|get_item:option|default:0 }}</span>{% endif %}
+                                            </label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if spec.options|length > 5 %}
+                                    <button type="button" class="btn btn-link btn-sm p-0 mt-1" onclick="toggleShowAll('{{ key }}', {{ spec.options|length }})">
+                                        <span id="text-{{ key }}">Показать всё</span>
+                                    </button>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
 
-
-                        {% if brands %}
-                        <div class="mb-3">
-                            <label class="fw-semibold small text-uppercase text-muted ls-1 mb-1 d-block">Бренд</label>
-                            <select name="brand" class="form-select form-select-sm" onchange="this.form.submit()">
-                                <option value="">Все бренды</option>
-                                {% for b in brands %}
-                                    <option value="{{ b }}" {% if request.GET.brand == b %}selected{% endif %}>
-                                        {{ b }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        {% endif %}
-
-                        <!-- Наличие -->
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="in_stock" value="1"
-                                       id="f_instock" {% if request.GET.in_stock == '1' %}checked{% endif %}>
-                                <label class="form-check-label small" for="f_instock">Только в наличии</label>
+                            <!-- 🔹 Чекбокс (одиночный) -->
+                            {% elif spec.type == 'checkbox' %}
+                            <div class="filter-section mb-2">
+                                <div class="form-check p-2 ps-4">
+                                    <input class="form-check-input" type="checkbox" name="{{ key }}" value="1" id="f_{{ key }}" {% if spec.value == '1' %}checked{% endif %}>
+                                    <label class="form-check-label small fw-semibold" for="f_{{ key }}">{{ spec.label }}</label>
+                                </div>
                             </div>
-                        </div>
 
-                        <button type="submit" class="btn btn-primary w-100 btn-sm">Применить</button>
-                        <a href="?q={{ query|urlencode }}" class="btn btn-link btn-sm w-100 text-decoration-none mt-2 text-center">Сбросить</a>
+                            <!-- 🔹 Диапазон -->
+                            {% elif spec.type == 'range' %}
+                            <div class="filter-section mb-2">
+                                <div class="filter-header d-flex justify-content-between align-items-center p-2 rounded-3" style="cursor: pointer; background: #f8f9fa;" onclick="toggleFilter('{{ key }}')">
+                                    <span class="fw-semibold small">{{ spec.label }}</span>
+                                    <i class="bi bi-chevron-down" id="icon-{{ key }}"></i>
+                                </div>
+                                <div class="filter-content mt-2" id="content-{{ key }}" style="display: none;">
+                                    <div class="d-flex gap-2 mb-2">
+                                        <div class="flex-grow-1">
+                                            <input type="number" name="{{ key }}_min" class="form-control form-control-sm" placeholder="От" value="{{ spec.current_min }}" min="{{ spec.min|default:0 }}" max="{{ spec.max|default:999999 }}" step="{{ spec.step|default:1 }}">
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <input type="number" name="{{ key }}_max" class="form-control form-control-sm" placeholder="До" value="{{ spec.current_max }}" min="{{ spec.min|default:0 }}" max="{{ spec.max|default:999999 }}" step="{{ spec.step|default:1 }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <div class="mt-3 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary btn-sm w-100 mb-2">
+                                <i class="bi bi-funnel me-1"></i> Применить фильтры
+                            </button>
+                            <a href="?q={{ query|urlencode }}" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="bi bi-x-circle me-1"></i> Сбросить все
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -70,55 +141,50 @@
 
         <!-- 🛒 ПРАВАЯ ЧАСТЬ: Товары -->
         <div class="col-lg-9">
-            <!-- Счетчик -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted small">Найдено: <strong class="text-dark">{{ total_count }}</strong> товаров</span>
+            <!-- Счетчик и Сортировка -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                <span class="text-muted small">Показано: <strong class="text-dark">{{ products.paginator.count }}</strong> товаров</span>
+                <select class="form-select form-select-sm w-auto" id="sort-select">
+                    <option value="popular" {% if request.GET.sort == 'popular' or not request.GET.sort %}selected{% endif %}>По популярности</option>
+                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Сначала недорогие</option>
+                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Сначала дорогие</option>
+                    <option value="new" {% if request.GET.sort == 'new' %}selected{% endif %}>По новинкам</option>
+                    <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>С лучшей оценкой</option>
+                    <option value="reviews" {% if request.GET.sort == 'reviews' %}selected{% endif %}>По кол-ву отзывов</option>
+                </select>
             </div>
 
             <!-- Товары -->
-            <!-- search_results.html -->
             {% for product in products %}
                 {% include 'catalog/_product_card_list.html' with product=product %}
             {% empty %}
                 <div class="col-12">
                     <div class="text-center py-5 bg-white rounded-3 shadow-sm">
                         <i class="bi bi-search fs-1 text-muted d-block mb-2"></i>
-                        <h5 class="fw-medium">Товары не найдены</h5>
-                        <p class="text-muted small">Попробуйте изменить запрос или фильтры</p>
+                        <h5 class="fw-medium">Ничего не найдено</h5>
+                        <p class="text-muted small">Попробуйте изменить запрос или проверить правильность написания</p>
                     </div>
                 </div>
             {% endfor %}
 
-            <!-- 🔑 Пагинация (используем filter_params из view, БЕЗ |replace) -->
+            <!-- Пагинация -->
             {% if products.has_other_pages %}
             <nav aria-label="Навигация" class="mt-4">
                 <ul class="pagination justify-content-center">
                     {% if products.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page=1">&laquo;</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page={{ products.previous_page_number }}">&lsaquo;</a>
-                    </li>
+                    <li class="page-item"><a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page=1">&laquo;</a></li>
+                    <li class="page-item"><a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page={{ products.previous_page_number }}">&lsaquo;</a></li>
                     {% endif %}
-
                     {% for i in products.paginator.page_range %}
                         {% if products.number == i %}
                         <li class="page-item active"><span class="page-link">{{ i }}</span></li>
                         {% elif i > products.number|add:'-3' and i < products.number|add:'3' %}
-                        <li class="page-item">
-                            <a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page={{ i }}">{{ i }}</a>
-                        </li>
+                        <li class="page-item"><a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page={{ i }}">{{ i }}</a></li>
                         {% endif %}
                     {% endfor %}
-
                     {% if products.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page={{ products.next_page_number }}">&rsaquo;</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page={{ products.paginator.num_pages }}">&raquo;</a>
-                    </li>
+                    <li class="page-item"><a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page={{ products.next_page_number }}">&rsaquo;</a></li>
+                    <li class="page-item"><a class="page-link" href="?{% if filter_params %}{{ filter_params }}&{% endif %}q={{ query|urlencode }}&page={{ products.paginator.num_pages }}">&raquo;</a></li>
                     {% endif %}
                 </ul>
             </nav>
@@ -126,4 +192,63 @@
         </div>
     </div>
 </div>
+
+<script>
+// Тот же самый JS, что и в catalog.html
+function toggleFilter(key) {
+    const content = document.getElementById('content-' + key);
+    const icon = document.getElementById('icon-' + key);
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.classList.remove('bi-chevron-down');
+        icon.classList.add('bi-chevron-up');
+    } else {
+        content.style.display = 'none';
+        icon.classList.remove('bi-chevron-up');
+        icon.classList.add('bi-chevron-down');
+    }
+}
+
+function filterOptions(key) {
+    const searchTerm = document.getElementById('search-' + key).value.toLowerCase();
+    const options = document.querySelectorAll('#options-' + key + ' .filter-option');
+    options.forEach(option => {
+        option.style.display = option.dataset.option.toLowerCase().includes(searchTerm) ? 'block' : 'none';
+    });
+}
+
+function toggleShowAll(key, total) {
+    const text = document.getElementById('text-' + key);
+    const optionsContainer = document.getElementById('options-' + key);
+    if (optionsContainer.style.maxHeight === '200px') {
+        optionsContainer.style.maxHeight = 'none';
+        text.textContent = 'Скрыть';
+    } else {
+        optionsContainer.style.maxHeight = '200px';
+        text.textContent = 'Показать всё';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.form-check-input:checked').forEach(checkbox => {
+        const section = checkbox.closest('.filter-content');
+        if (section) {
+            section.style.display = 'block';
+            const key = section.id.replace('content-', '');
+            const icon = document.getElementById('icon-' + key);
+            if (icon) {
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-up');
+            }
+        }
+    });
+
+    document.getElementById('sort-select').addEventListener('change', function() {
+        const url = new URL(window.location);
+        url.searchParams.set('sort', this.value);
+        url.searchParams.delete('page');
+        window.location.href = url;
+    });
+});
+</script>
 {% endblock %}

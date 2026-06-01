@@ -30,7 +30,7 @@ main {
   flex: 1 0 auto;
   /*padding-top: calc(var(--navbar-height) + 1rem); Отступ под fixed-навбар */
   padding-bottom: 2rem;
-  padding-top: 0px;
+  padding-top: 50px;
 }
 
 /* Сбрасываем лишние отступы у контейнеров внутри main */

@@ -146,3 +146,86 @@
     padding-bottom: 0;
   }
 }
+
+/* Фильтры в стиле DNS */
+.filter-section {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.filter-section:last-child {
+    border-bottom: none;
+}
+
+.filter-section .form-check.p-2 {
+    padding-left: 10px !important;  /* Увеличиваем отступ слева */
+}
+
+.filter-header {
+    transition: background 0.2s;
+    user-select: none;
+}
+
+.filter-header:hover {
+    background: #e9ecef !important;
+}
+
+.filter-content {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.filter-options {
+    transition: max-height 0.3s ease;
+}
+
+.filter-option {
+    transition: background 0.15s;
+    padding: 2px 0;
+}
+
+.filter-option:hover {
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* Скроллбар для списка опций */
+.filter-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-options::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.filter-options::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.filter-options::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Чекбоксы */
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Адаптив */
+@media (max-width: 991.98px) {
+    .sticky-filter {
+        position: static !important;
+    }
+}
+
+/* Плитки категорий в поиске */
+.hover-shadow:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.transition-all {
+    transition: all 0.2s ease;
+}

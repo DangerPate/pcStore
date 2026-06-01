@@ -94,3 +94,11 @@ def humanize_key(key):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+
+@register.filter(name='get_item')
+def get_item(dictionary, key):
+    """Получить значение из словаря по ключу"""
+    if isinstance(dictionary, dict):
+        return dictionary.get(key)
+    return None

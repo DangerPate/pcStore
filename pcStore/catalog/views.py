@@ -10,6 +10,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.files.storage import default_storage
 from django.conf import settings
 from .filters_config import FILTERS_CONFIG
+from django.db.models.functions import Coalesce
 
 import json
 
@@ -21,6 +22,7 @@ def apply_filters(queryset, request, category_slug=None):
     """
     Объединяет общие фильтры (цена, бренд, наличие, сортировка)
     и динамические JSON-фильтры для конкретной категории.
+    Поддерживает множественный выбор для чекбоксов.
     """
     # === 1. ОБЩИЕ ФИЛЬТРЫ ===
     price_min = request.GET.get('price_min')
@@ -30,31 +32,40 @@ def apply_filters(queryset, request, category_slug=None):
     if price_max and price_max.isdigit():
         queryset = queryset.filter(price__lte=int(price_max))
 
-    brand = request.GET.get('brand')
-    if brand:
-        queryset = queryset.filter(brand__icontains=brand)
+    # 🔥 Бренд теперь поддерживает множественный выбор
+    brands = request.GET.getlist('brand')
+    if brands:
+        queryset = queryset.filter(brand__in=brands)
 
     if request.GET.get('in_stock') == '1':
         queryset = queryset.filter(in_stock__gt=0)
-
-    sort = request.GET.get('sort')
-    if sort == 'price_asc':
-        queryset = queryset.order_by('price')
-    elif sort == 'price_desc':
-        queryset = queryset.order_by('-price')
-    elif not sort:
-        queryset = queryset.order_by('-created_at')
 
     # === 2. ДИНАМИЧЕСКИЕ ФИЛЬТРЫ ===
     if category_slug and category_slug in FILTERS_CONFIG:
         specs_config = FILTERS_CONFIG[category_slug]
 
         for key, spec in specs_config.items():
-            if spec['type'] == 'select':
-                value = request.GET.get(key)
-                if value:
-                    queryset = queryset.filter(specifications__contains={key: value})
+            # Пропускаем 'brand', он уже обработан выше
+            if key == 'brand':
+                continue
 
+            # 🔹 Выпадающие списки (теперь с поддержкой множественного выбора)
+            if spec['type'] == 'select':
+                values = request.GET.getlist(key)
+                if values:
+                    # Используем OR-логику: товар подходит, если хотя бы одно значение совпадает
+                    q_filter = Q()
+                    for value in values:
+                        q_filter |= Q(specifications__contains={key: value})
+                    queryset = queryset.filter(q_filter)
+
+            # 🔹 Чекбоксы (одиночные)
+            elif spec['type'] == 'checkbox':
+                value = request.GET.get(key)
+                if value == '1':
+                    queryset = queryset.filter(specifications__contains={key: True})
+
+            # 🔹 Диапазоны (частоты, TDP и т.д.)
             elif spec['type'] == 'range':
                 min_val = request.GET.get(f'{key}_min')
                 max_val = request.GET.get(f'{key}_max')
@@ -75,7 +86,7 @@ def apply_filters(queryset, request, category_slug=None):
 
 
 def category_view(request, category_slug):
-    """Отображение товаров категории с динамическими фильтрами"""
+    """Отображение товаров категории с динамическими фильтрами (стиль DNS)"""
     category = get_object_or_404(Category, slug=category_slug)
 
     # 🔥 Базовый запрос
@@ -90,24 +101,75 @@ def category_view(request, category_slug):
         avg_rating=Avg('catalog_reviews__rating'),
         is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
         is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-    ).prefetch_related('images')  # 🔥 Подгружаем доп. изображения за 1 запрос
+    ).prefetch_related('images')
 
-    # 🔥 Формируем конфигурацию фильтров для шаблона
-    config = {**FILTERS_CONFIG.get('_common', {}), **FILTERS_CONFIG.get(category_slug, {})}
-    if 'brand' in config:
-        config['brand']['options'] = list(
-            Product.objects.filter(categories=category, is_active=True, brand__isnull=False)
-            .exclude(brand='').values_list('brand', flat=True).distinct().order_by('brand')
+    sort = request.GET.get('sort', 'popular')
+
+    if sort == 'price_asc':
+        products = products.order_by('price')
+    elif sort == 'price_desc':
+        products = products.order_by('-price')
+    elif sort == 'new':
+        products = products.order_by('-created_at')
+    elif sort == 'rating':
+        products = products.order_by(
+            Coalesce('avg_rating', 0).desc(),
+            '-reviews_count',
+            '-views'
         )
+    elif sort == 'reviews':
+        products = products.order_by(
+            '-reviews_count',
+            Coalesce('avg_rating', 0).desc(),
+            '-views'
+        )
+    else:  # 'popular' или по умолчанию
+        products = products.order_by('-views')
+
+    #  Формируем конфигурацию фильтров для шаблона
+    config = {**FILTERS_CONFIG.get('_common', {}), **FILTERS_CONFIG.get(category_slug, {})}
+
+    # Базовые товары для подсчёта (без применения фильтров, только категория)
+    base_products = Product.objects.filter(categories=category, is_active=True).distinct()
 
     filters = {}
     for key, spec in config.items():
-        filters[key] = {
+        # Получаем все выбранные значения (для множественного выбора)
+        selected_values = request.GET.getlist(key)
+
+        filter_data = {
             **spec,
-            'value': request.GET.get(key),
+            'value': request.GET.get(key),  # Для обратной совместимости
+            'selected_values': selected_values,  # Список выбранных значений
             'current_min': request.GET.get(f'{key}_min', ''),
             'current_max': request.GET.get(f'{key}_max', ''),
         }
+
+        # 🔥 Для select-фильтров считаем количество товаров по каждому значению
+        if spec['type'] == 'select':
+            counts = {}
+            for option in spec.get('options', []):
+                counts[option] = base_products.filter(
+                    specifications__contains={key: option}
+                ).count()
+            filter_data['counts'] = counts
+
+            # Для брендов — отдельная логика (поле brand, не specifications)
+            if key == 'brand':
+                counts = {}
+                brands = base_products.filter(
+                    brand__isnull=False
+                ).exclude(brand='').values('brand').annotate(
+                    count=Count('id')
+                ).order_by('brand')
+
+                for b in brands:
+                    counts[b['brand']] = b['count']
+
+                filter_data['options'] = [b['brand'] for b in brands]
+                filter_data['counts'] = counts
+
+        filters[key] = filter_data
 
     # 🔥 Пагинация
     paginator = Paginator(products, 12)
@@ -125,7 +187,7 @@ def category_view(request, category_slug):
 
     return render(request, 'catalog/catalog.html', {
         'category': category,
-        'products': products_page,  # 🔥 Это Page объект, используй products_page.paginator.count в шаблоне
+        'products': products_page,
         'filters': filters,
         'filter_params': filter_params.urlencode(),
     })
@@ -254,19 +316,91 @@ def add_review(request, slug):
 
 
 def search_view(request):
-    """Поиск товаров с общими фильтрами"""
+    """Умный поиск товаров с категориями"""
     query = request.GET.get('q', '').strip()
     products = Product.objects.filter(is_active=True).distinct()
 
     if query:
-        products = products.filter(
-            Q(title__icontains=query) | Q(info__icontains=query) |
-            Q(description__icontains=query) | Q(brand__icontains=query)
-        )
+        # Умный поиск по словам
+        words = query.split()
+        q_objects = Q()
+        for word in words:
+            q_objects &= (
+                    Q(title__icontains=word) |
+                    Q(info__icontains=word) |
+                    Q(description__icontains=word) |
+                    Q(brand__icontains=word) |
+                    Q(sku__icontains=word)
+            )
+        products = products.filter(q_objects)
 
-    products = apply_filters(products, request)
+    # 🔥 Получаем ВСЕ категории с количеством товаров
+    categories_with_counts = products.values(
+        'categories__slug',
+        'categories__title',
+        'categories__icon'
+    ).annotate(
+        count=Count('id')
+    ).order_by('-count')
 
-    # 🔥 Добавляем аннотации для поиска
+    # Основная категория (с наибольшим количеством)
+    primary_category = None
+    if categories_with_counts:
+        top_cat = categories_with_counts[0]
+        primary_category = {
+            'slug': top_cat['categories__slug'],
+            'title': top_cat['categories__title'],
+            'icon': top_cat['categories__icon'],
+            'count': top_cat['count'],
+        }
+
+    # Преобразуем queryset в список словарей для шаблона
+    found_categories = [
+        {
+            'slug': cat['categories__slug'],
+            'title': cat['categories__title'],
+            'icon': cat['categories__icon'],
+            'count': cat['count'],
+        }
+        for cat in categories_with_counts if cat['categories__slug']
+    ]
+
+    # Применяем фильтры
+    target_slug = primary_category['slug'] if primary_category else None
+    products = apply_filters(products, request, category_slug=target_slug)
+
+    # Формируем конфиг фильтров
+    filters = {}
+    if target_slug:
+        config = {**FILTERS_CONFIG.get('_common', {}), **FILTERS_CONFIG.get(target_slug, {})}
+        base_products = products
+
+        for key, spec in config.items():
+            filter_data = {
+                **spec,
+                'value': request.GET.get(key),
+                'selected_values': request.GET.getlist(key),
+                'current_min': request.GET.get(f'{key}_min', ''),
+                'current_max': request.GET.get(f'{key}_max', ''),
+            }
+            if spec['type'] == 'select':
+                counts = {}
+                for option in spec.get('options', []):
+                    if key == 'brand':
+                        counts[option] = base_products.filter(brand=option).count()
+                    else:
+                        counts[option] = base_products.filter(specifications__contains={key: option}).count()
+                filter_data['counts'] = counts
+
+                if key == 'brand':
+                    brands = base_products.filter(brand__isnull=False).exclude(brand='').values('brand').annotate(
+                        count=Count('id')).order_by('brand')
+                    filter_data['options'] = [b['brand'] for b in brands]
+                    filter_data['counts'] = {b['brand']: b['count'] for b in brands}
+
+            filters[key] = filter_data
+
+    # Аннотации
     products = products.annotate(
         reviews_count=Count('catalog_reviews'),
         avg_rating=Avg('catalog_reviews__rating'),
@@ -274,6 +408,22 @@ def search_view(request):
         is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
     ).prefetch_related('images')
 
+    # Сортировка
+    sort = request.GET.get('sort', 'popular')
+    if sort == 'price_asc':
+        products = products.order_by('price')
+    elif sort == 'price_desc':
+        products = products.order_by('-price')
+    elif sort == 'new':
+        products = products.order_by('-created_at')
+    elif sort == 'rating':
+        products = products.order_by(Coalesce('avg_rating', 0).desc(), '-reviews_count', '-views')
+    elif sort == 'reviews':
+        products = products.order_by('-reviews_count', Coalesce('avg_rating', 0).desc(), '-views')
+    else:
+        products = products.order_by('-views')
+
+    # Пагинация
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     try:
@@ -290,7 +440,9 @@ def search_view(request):
     return render(request, 'catalog/search_results.html', {
         'query': query,
         'products': products_page,
-        'total_count': paginator.count,
+        'primary_category': primary_category,
+        'found_categories': found_categories,  # 🔥 Все найденные категории
+        'filters': filters,
         'filter_params': filter_params.urlencode(),
     })
 
