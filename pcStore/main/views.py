@@ -53,11 +53,15 @@ def index(request):
     new_products = annotate_products(
         base_products.order_by('-created_at')[:15]
     )
-
-    promotions = Promotion.objects.filter(
+    promotions = list(Promotion.objects.filter(
         is_active=True,
         products__isnull=False
-    ).distinct().order_by('order', '-created_at')[:5]
+    ).distinct().order_by('order', '-created_at')[:5])
+
+    for promotion in promotions:
+        promotion.annotated_products = annotate_products(
+            promotion.products.filter(is_active=True)
+        )
 
     if request.user.is_authenticated:
         cart_count = CartItem.objects.filter(user=request.user).count()

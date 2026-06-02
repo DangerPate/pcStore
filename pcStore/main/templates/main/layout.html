@@ -11,19 +11,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
-<script>
-        {% if user.is_authenticated %}
-            window.IS_AUTHENTICATED = true;
-        {% else %}
-            window.IS_AUTHENTICATED = false;
-        {% endif %}
-        window.LOGIN_URL = "/auth/login/";
-</script>
-<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="{% static 'main/js/ecommerce.js' %}"></script>
+
 <body>
-    
+    <!-- === НАВБАР === -->
     <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
@@ -31,20 +21,17 @@
                 <span class="fw-bold fs-5 text-dark tracking-tight">pcStore</span>
             </a>
 
-
-            
+            <!-- Кнопка каталога -->
             <button class="btn btn-outline-dark d-none d-lg-flex align-items-center me-3"
                     type="button"
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#catalogOffcanvas"
-                    aria-controls="catalogOffcanvas"
+                    id="catalogButton"
                     aria-label="Открыть каталог">
                 <i class="bi bi-grid-3x3-gap me-2"></i> Каталог
             </button>
 
-            
+            <!-- Сворачиваемая часть -->
             <div class="collapse navbar-collapse" id="navbarMain">
-                
+                <!-- Поиск -->
                 <form class="d-flex mx-auto my-3 my-lg-0 w-100 w-lg-50"
                       action="{% url 'catalog:search' %}"
                       method="get"
@@ -58,8 +45,6 @@
                                aria-label="Поиск"
                                value="{{ request.GET.q|default:'' }}"
                                style="border-color: #ced4da;" />
-
-                        
                         <button class="btn bg-white border-start-0"
                                 type="submit"
                                 style="border-color: #ced4da; padding-left: 0; padding-right: 12px;"
@@ -69,7 +54,7 @@
                     </div>
                 </form>
 
-                
+                <!-- Иконки и авторизация -->
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-1" style="margin-left: 10px !important;">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
@@ -89,9 +74,16 @@
                         </a>
                     </li>
                     {% endif %}
+
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               data-bs-auto-close="true"
+                               aria-expanded="false"
+                               id="userDropdown">
                                 {% if user.avatar %}
                                 <img src="{{ user.avatar.url }}" class="rounded-circle" width="32" height="32" style="object-fit: cover;">
                                 {% else %}
@@ -99,23 +91,17 @@
                                 {% endif %}
                                 <span class="d-none d-lg-inline">{{ user.email|truncatechars:20 }}</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
                                 <li>
                                     <a class="dropdown-item" href="{% url 'users:profile' %}">
                                         <i class="bi bi-person me-2"></i>Личный кабинет
                                     </a>
                                 </li>
-
-                                
                                 <li>
-                                    
                                     <a class="dropdown-item" href="{% url 'cart:orders' %}">
                                         <i class="bi bi-bag-check me-2"></i>Мои заказы
                                     </a>
                                 </li>
-
-                                
                                 <li>
                                     <a class="dropdown-item" href="{% url 'cart:favorites' %}">
                                         <i class="bi bi-heart me-2"></i>Избранное
@@ -124,8 +110,6 @@
                                         {% endif %}
                                     </a>
                                 </li>
-
-                                
                                 <li>
                                     <a class="dropdown-item" href="{% url 'cart:cart' %}">
                                         <i class="bi bi-cart3 me-2"></i>Корзина
@@ -134,10 +118,7 @@
                                         {% endif %}
                                     </a>
                                 </li>
-
                                 <li><hr class="dropdown-divider"></li>
-
-                                
                                 <li>
                                     <a class="dropdown-item text-danger" href="{% url 'users:logout' %}">
                                         <i class="bi bi-box-arrow-right me-2"></i>Выйти
@@ -158,7 +139,7 @@
         </div>
     </header>
 
-         
+    <!-- === OFFCANVAS КАТАЛОГ === -->
     <div class="offcanvas offcanvas-top no-overlap-header"
          tabindex="-1"
          id="catalogOffcanvas"
@@ -239,12 +220,68 @@
         </div>
     </div>
 
-    
+    <!-- === ОСНОВНОЙ КОНТЕНТ === -->
     <main>
         <div class="container">{% block content %}{% endblock %}</div>
     </main>
+
+    <!-- === СКРИПТЫ === -->
+    <script>
+        {% if user.is_authenticated %}
+            window.IS_AUTHENTICATED = true;
+        {% else %}
+            window.IS_AUTHENTICATED = false;
+        {% endif %}
+        window.LOGIN_URL = "/auth/login/";
+    </script>
+
+    <!-- Bootstrap JS через CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="{% static 'main/js/ecommerce.js' %}"></script>
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // 🔥 КАТАЛОГ - TOGGLE ЛОГИКА
+        const catalogButton = document.getElementById('catalogButton');
+        const catalogOffcanvas = document.getElementById('catalogOffcanvas');
+
+        if (catalogButton && catalogOffcanvas) {
+            catalogButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Toggle: если открыт - закрываем, если закрыт - открываем
+                if (catalogOffcanvas.classList.contains('show')) {
+                    catalogOffcanvas.classList.remove('show');
+                    document.body.style.overflow = '';
+                } else {
+                    catalogOffcanvas.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                }
+            });
+
+            // Закрытие каталога при клике на кнопку закрытия
+            const closeButtons = catalogOffcanvas.querySelectorAll('[data-bs-dismiss="offcanvas"]');
+            closeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    catalogOffcanvas.classList.remove('show');
+                    document.body.style.overflow = '';
+                });
+            });
+
+            // Закрытие каталога при клике вне его
+            document.addEventListener('click', function(e) {
+                if (catalogOffcanvas.classList.contains('show') &&
+                    !catalogOffcanvas.contains(e.target) &&
+                    !catalogButton.contains(e.target)) {
+                    catalogOffcanvas.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // Swiper карусели
         if (document.querySelector('.promoSwiper')) {
             new Swiper('.promoSwiper', {
                 loop: true,
@@ -309,11 +346,11 @@
         }
     });
     </script>
-    
+
+    <!-- === ФУТЕР === -->
     <footer class="mt-auto">
         <div class="container py-5">
             <div class="row g-4">
-                
                 <div class="col-lg-3 col-md-6">
                     <h5 class="d-flex align-items-center mb-3">
                         <img src="{% static 'main/img/logo-main.svg' %}" alt="pcStore" width="28" height="28" class="me-2" style="filter: brightness(0) invert(1);">
@@ -329,8 +366,6 @@
                         <a href="#" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
                     </div>
                 </div>
-
-                
                 <div class="col-lg-2 col-md-6">
                     <h6>Каталог</h6>
                     <ul class="list-unstyled">
@@ -341,8 +376,6 @@
                         <li><a href="{% url 'catalog:search' %}">Все товары</a></li>
                     </ul>
                 </div>
-
-                
                 <div class="col-lg-2 col-md-6">
                     <h6>Компания</h6>
                     <ul class="list-unstyled">
@@ -351,8 +384,6 @@
                         <li><a href="{% url 'partners' %}">Партнерам</a></li>
                     </ul>
                 </div>
-
-                
                 <div class="col-lg-2 col-md-6">
                     <h6>Покупателям</h6>
                     <ul class="list-unstyled">
@@ -362,8 +393,6 @@
                         <li><a href="{% url 'faq' %}">FAQ</a></li>
                     </ul>
                 </div>
-
-                
                 <div class="col-lg-3 col-md-6">
                     <h6>Контакты</h6>
                     <ul class="list-unstyled small text-muted mb-3">
@@ -377,8 +406,6 @@
                     </form>
                 </div>
             </div>
-
-            
             <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <div>© 2014-2026 pcStore</div>
                 <div class="d-flex flex-wrap gap-3">

@@ -563,12 +563,20 @@ def promotion_view(request, promotion_slug):
 
     products = apply_filters(base_products, request, category_slug=None)
 
-    products = products.annotate(
-        reviews_count=Count('catalog_reviews'),
-        avg_rating=Avg('catalog_reviews__rating'),
-        is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
-        is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-    ).prefetch_related('images')
+    if request.user.is_authenticated:
+        products = products.annotate(
+            reviews_count=Count('catalog_reviews'),
+            avg_rating=Avg('catalog_reviews__rating'),
+            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+        ).prefetch_related('images')
+    else:
+        products = products.annotate(
+            reviews_count=Count('catalog_reviews'),
+            avg_rating=Avg('catalog_reviews__rating'),
+            is_in_cart=Value(False, output_field=BooleanField()),
+            is_favorited=Value(False, output_field=BooleanField())
+        ).prefetch_related('images')
 
     sort = request.GET.get('sort', 'popular')
     if sort == 'price_asc':
