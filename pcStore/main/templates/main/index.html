@@ -4,58 +4,69 @@
 {% block title %}pcStore - Главная{% endblock %}
 
 {% block content %}
-{% if banners_with_products %}
+{% if promotions %}
 <section class="promo-carousel-section mb-5">
     <div class="container-fluid px-3 px-md-4">
 
         <!-- Swiper -->
         <div class="swiper promoSwiper rounded-4 shadow-sm">
             <div class="swiper-wrapper">
-                {% for item in banners_with_products %}
+                {% for promotion in promotions %}
                 <div class="swiper-slide">
                     <div class="slide-content row g-0 bg-white rounded-4 overflow-hidden h-100">
+
+                        <!-- 🔥 ЛЕВАЯ ЧАСТЬ: Баннер -->
                         <div class="col-lg-4 position-relative banner-wrapper">
-                            <a href="{{ item.banner.get_link }}" class="d-block h-100 text-decoration-none">
-                                {% if item.banner.image %}
-                                <img src="{{ item.banner.image.url }}" alt="{{ item.banner.title }}"
+                            <a href="{{ promotion.get_absolute_url }}" class="d-block h-100 text-decoration-none">
+                                {% if promotion.banner_image %}
+                                <img src="{{ promotion.banner_image.url }}" alt="{{ promotion.title }}"
                                      class="w-100 h-100" style="object-fit: cover;">
                                 {% else %}
-                                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
-                                    <i class="bi bi-image text-muted fs-1"></i>
+                                <!-- Фоллбэк, если картинка не загружена -->
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center"
+                                     style="background: {{ promotion.banner_color }};">
+                                    <i class="bi bi-percent text-white fs-1"></i>
                                 </div>
                                 {% endif %}
 
-                                {% if item.banner.overlay_color %}
+                                <!-- Затемнение для читаемости текста -->
                                 <div class="position-absolute top-0 start-0 w-100 h-100"
-                                     style="background: {{ item.banner.overlay_color }}; pointer-events: none;"></div>
-                                {% endif %}
+                                     style="background: rgba(0,0,0,0.3); pointer-events: none;"></div>
 
                                 <div class="banner-content position-absolute top-50 start-50 translate-middle text-center w-100 px-4">
-                                    {% if item.banner.title %}
                                     <h2 class="fw-bold mb-3 text-white" style="font-size: 2rem; text-shadow: 0 2px 6px rgba(0,0,0,0.5);">
-                                        {{ item.banner.title }}
+                                        {{ promotion.title }}
                                     </h2>
-                                    {% endif %}
-                                    {% if item.banner.button_text %}
-                                    <span class="btn px-4 py-2 fw-semibold text-white promo-banner-btn">
-                                        {{ item.banner.button_text }} <i class="bi bi-arrow-right ms-2"></i>
+                                    {% if promotion.discount_percent %}
+                                    <span class="badge bg-warning text-dark fs-5 mb-3">
+                                        Скидка до {{ promotion.discount_percent }}%
                                     </span>
+                                    <br>
                                     {% endif %}
+                                    <span class="btn px-4 py-2 fw-semibold text-white promo-banner-btn">
+                                        Смотреть акцию <i class="bi bi-arrow-right ms-2"></i>
+                                    </span>
                                 </div>
                             </a>
                         </div>
 
+                        <!-- 🔥 ПРАВАЯ ЧАСТЬ: 3 Товара -->
                         <div class="col-lg-8">
                             <div class="row g-0 h-100">
-                                {% for product in item.products|slice:":3" %}
+                                {% for product in promotion.products.all|slice:":3" %}
                                 <div class="col-4">
                                     <div class="p-3 h-100 d-flex align-items-center">
                                         {% include 'product/mini_product_card.html' with product=product %}
                                     </div>
                                 </div>
+                                {% empty %}
+                                <div class="col-12 d-flex align-items-center justify-content-center text-muted p-4">
+                                    <p class="mb-0">В этой акции пока нет товаров.</p>
+                                </div>
                                 {% endfor %}
                             </div>
                         </div>
+
                     </div>
                 </div>
                 {% endfor %}
@@ -70,7 +81,6 @@
         <div class="promo-pagination mt-3"></div>
 
     </div>
-
 </section>
 {% endif %}
 
@@ -83,9 +93,6 @@
         <div class="container-fluid px-0">
             <h3 class="fw-bold px-3 px-md-4 mb-3">
                 🔥 Товары со скидкой
-                <a href="#" class="btn btn-link btn-sm text-decoration-none">
-                    Все акции <i class="bi bi-arrow-right"></i>
-                </a>
             </h3>
 
             <!-- 🔑 Swiper контейнер -->
@@ -115,9 +122,6 @@
         <div class="container-fluid px-0">
             <h3 class="fw-bold px-3 px-md-4 mb-3">
                 ⭐ Популярное
-                <a href="#" class="btn btn-link btn-sm text-decoration-none">
-                    Всё популярное <i class="bi bi-arrow-right"></i>
-                </a>
             </h3>
 
             <!-- Swiper контейнер -->
@@ -147,9 +151,6 @@
         <div class="container-fluid px-0">
             <h3 class="fw-bold px-3 px-md-4 mb-3">
                 ✨ Новинки
-                <a href="#" class="btn btn-link btn-sm text-decoration-none">
-                    Все новинки <i class="bi bi-arrow-right"></i>
-                </a>
             </h3>
 
             <!-- Swiper контейнер -->

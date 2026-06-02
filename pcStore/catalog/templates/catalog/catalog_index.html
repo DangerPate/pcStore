@@ -1,0 +1,75 @@
+﻿{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Каталог товаров{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+            <li class="breadcrumb-item active">Каталог</li>
+        </ol>
+    </nav>
+
+    <h1 class="h2 fw-bold mb-4">Каталог товаров</h1>
+
+    <!-- 🔥 ОСНОВНЫЕ КАТЕГОРИИ (сеткой 3 колонки) -->
+    <div class="row g-4 mb-5">
+        {% for category in categories %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm hover-shadow">
+                <div class="card-body p-4">
+                    <a href="{% url 'catalog:category' category.slug %}" class="text-decoration-none">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi {{ category.icon }} fs-2 text-primary me-3"></i>
+                            <h3 class="h5 fw-bold mb-0 text-dark">{{ category.title }}</h3>
+                        </div>
+                    </a>
+
+                    {% if category.children.exists %}
+                    <div class="ps-5 mt-3">
+                        <ul class="list-unstyled mb-0">
+                            {% for child in category.children.all|slice:":5" %}
+                            <li class="mb-2">
+                                <a href="{% url 'catalog:category' child.slug %}"
+                                   class="text-muted text-decoration-none small hover-primary">
+                                    {{ child.title }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                            {% if category.children.count > 5 %}
+                            <li class="text-muted small">+ ещё {{ category.children.count|add:"-5" }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px);
+    transition: all 0.2s;
+}
+
+.hover-bg-primary:hover {
+    background-color: #e7f1ff !important;
+}
+
+.hover-bg-primary:hover span {
+    color: #0d6efd !important;
+}
+
+.hover-primary:hover {
+    color: #0d6efd !important;
+    text-decoration: none;
+}
+</style>
+{% endblock %}

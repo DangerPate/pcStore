@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
@@ -72,3 +73,39 @@ def profile(request):
 def user_logout(request):
     logout(request)
     return redirect('home')
+
+
+@login_required
+def change_password(request):
+    """Смена пароля пользователя"""
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+
+        # Проверяем текущий пароль
+        if not request.user.check_password(old_password):
+            messages.error(request, 'Неверный текущий пароль.')
+            return redirect('users:profile')
+
+        # Проверяем совпадение новых паролей
+        if new_password1 != new_password2:
+            messages.error(request, 'Новые пароли не совпадают.')
+            return redirect('users:profile')
+
+        # Проверяем длину
+        if len(new_password1) < 8:
+            messages.error(request, 'Пароль должен содержать минимум 8 символов.')
+            return redirect('users:profile')
+
+        # Меняем пароль
+        request.user.set_password(new_password1)
+        request.user.save()
+
+        # Обновляем сессию, чтобы пользователь не вышел
+        update_session_auth_hash(request, request.user)
+
+        messages.success(request, 'Пароль успешно изменён!')
+        return redirect('users:profile')
+
+    return redirect('users:profile')

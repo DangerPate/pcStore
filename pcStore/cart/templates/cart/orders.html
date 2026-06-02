@@ -1,0 +1,121 @@
+﻿{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Мои заказы{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:profile' %}">Личный кабинет</a></li>
+            <li class="breadcrumb-item active">Мои заказы</li>
+        </ol>
+    </nav>
+
+    <h1 class="h2 fw-bold mb-4">Мои заказы</h1>
+
+    {% if orders %}
+    <div class="row g-3">
+        {% for order in orders %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm hover-shadow-sm transition-all">
+                <div class="card-body p-3 p-md-4">
+                    <div class="row align-items-center g-3">
+                        <!-- 1. Номер и дата -->
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold fs-5">Заказ №{{ order.id }}</span>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar3 me-1"></i>{{ order.created_at|date:"d.m.Y" }}
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- 2. Краткий список товаров -->
+                        <div class="col-md-5">
+                            <div class="text-muted small mb-1">Товары в заказе:</div>
+                            <div class="fw-medium text-truncate" title="{% for item in order.items.all %}{{ item.product.title }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                                {% with items=order.items.all %}
+                                    {% for item in items|slice:":2" %}
+                                        {{ item.product.title }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% if items.count > 2 %}
+                                        <span class="text-primary">и ещё {{ items.count|add:"-2" }} шт.</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+
+                        <!-- 3. Сумма и Статус -->
+                        <div class="col-md-2 text-md-end">
+                            <div class="fw-bold fs-5 text-primary mb-1">{{ order.total_price }} ₽</div>
+                            <div>
+                                {% if order.status == 'new' %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Новый</span>
+                                {% elif order.status == 'processing' %}
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">В обработке</span>
+                                {% elif order.status == 'completed' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Выполнен</span>
+                                {% elif order.status == 'cancelled' %}
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Отменен</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 4. Кнопка действия -->
+                        <div class="col-md-2 text-md-end">
+                            <a href="{% url 'cart:order_detail' order.id %}" class="btn btn-outline-primary w-100 w-md-auto">
+                                Подробнее <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if orders.has_other_pages %}
+    <nav aria-label="Навигация" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if orders.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">&laquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}">&lsaquo;</a></li>
+            {% endif %}
+
+            <li class="page-item active"><span class="page-link">{{ orders.number }}</span></li>
+
+            {% if orders.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}">&rsaquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ orders.paginator.num_pages }}">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Пустое состояние -->
+    <div class="text-center py-5 bg-light rounded-4 border border-dashed">
+        <i class="bi bi-bag-x fs-1 text-muted mb-3 d-block"></i>
+        <h3 class="h4 fw-bold mb-2">У вас пока нет заказов</h3>
+        <p class="text-muted mb-4">Оформите свой первый заказ в нашем магазине</p>
+        <a href="{% url 'catalog:catalog_index' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-grid-3x3-gap me-2"></i>Перейти в каталог
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.hover-shadow-sm:hover {
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1) !important;
+    transform: translateY(-1px);
+}
+.transition-all {
+    transition: all 0.2s ease;
+}
+</style>
+{% endblock %}

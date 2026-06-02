@@ -12,4 +12,6 @@ urlpatterns = [
     path('favorites/toggle/<slug:product_slug>/', views.toggle_favorite, name='toggle_favorite'),
     path('bulk-action/', views.bulk_cart_action, name='bulk_action'),  # 🔑 Массовые действия
     path('checkout/', views.checkout_selected, name='checkout'),
+    path('orders/', views.orders_list, name='orders'),
+    path('orders/<int:order_id>/', views.order_detail, name='order_detail'),
 ]

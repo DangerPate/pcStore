@@ -5,25 +5,30 @@ from django.utils import timezone
 from django.conf import settings
 import random
 
+
 class Category(models.Model):
     title = models.CharField('Название', max_length=50)
-    slug = models.SlugField('URL-метка', null=True, blank=True)  # 🔑 НОВОЕ ПОЛЕ
+    slug = models.SlugField('URL-метка', null=True, blank=True)
     icon = models.CharField('Иконка (Bootstrap)', max_length=50, default='bi-box', blank=True)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+                               related_name='children', verbose_name='Родительская категория')
+
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+        ordering = ['parent__slug', 'slug']  # Сначала родительские, потом дочерние
 
     def __str__(self):
+        if self.parent:
+            return f"{self.parent.title} / {self.title}"
         return self.title
 
     def save(self, *args, **kwargs):
-        # Автозаполнение слага из title, если поле пустое
         if not self.slug:
             self.slug = slugify(self.title, allow_unicode=False)
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        """Возвращает URL категории"""
         from django.urls import reverse
         return reverse('catalog:category', kwargs={'category_slug': self.slug})
 
@@ -307,3 +312,46 @@ class ProductImage(models.Model):
         if self.is_main:
             ProductImage.objects.filter(product=self.product).update(is_main=False)
         super().save(*args, **kwargs)
+
+
+class Promotion(models.Model):
+    title = models.CharField('Название акции', max_length=200)
+    slug = models.SlugField('URL-метка', unique=True)
+    description = models.TextField('Описание акции', blank=True)
+    products = models.ManyToManyField(Product, related_name='promotions', verbose_name='Товары в акции')
+    discount_percent = models.PositiveIntegerField('Скидка %', blank=True, null=True,
+                                                   help_text='Общая скидка на акцию (необязательно)')
+
+    # 🔥 ИЗОБРАЖЕНИЯ ДЛЯ БАННЕРА
+    banner_image = models.ImageField('Баннер акции', upload_to='promotions/banners/', blank=True, null=True,
+                                     help_text='Основное изображение для карусели (рекомендуемый размер: 1200x450px)')
+    banner_color = models.CharField('Цвет фона', max_length=7, default='#0d6efd',
+                                    help_text='Цвет фона если нет изображения (например: #0d6efd)')
+
+    is_active = models.BooleanField('Активна', default=True)
+    start_date = models.DateTimeField('Начало акции', auto_now_add=True)
+    end_date = models.DateTimeField('Конец акции', blank=True, null=True)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+
+    # Для сортировки в карусели
+    order = models.PositiveIntegerField('Порядок отображения', default=0, help_text='Меньшее число = выше в списке')
+
+    class Meta:
+        verbose_name = 'Акция'
+        verbose_name_plural = 'Акции'
+        ordering = ['order', '-created_at']
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('catalog:promotion', kwargs={'promotion_slug': self.slug})
+
+    @property
+    def products_count(self):
+        return self.products.count()
+
+    @property
+    def has_banner_image(self):
+        return bool(self.banner_image and self.banner_image.url)

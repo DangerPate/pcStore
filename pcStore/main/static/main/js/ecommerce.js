@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return null;
     }
+
     const csrfToken = getCSRFToken();
     const isFavoritesPage = window.location.pathname.includes('/cart/favorites/');
 
@@ -22,25 +23,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const selector = `[data-slug="${slug}"]${type === 'cart' ? '.btn-add-cart' : '.btn-toggle-fav'}`;
         const buttons = document.querySelectorAll(selector);
 
-        console.log(`🔄 syncButtons: ${type} | найдено: ${buttons.length} | isAdded: ${isAdded}`);
-
         buttons.forEach(btn => {
             const spinner = btn.querySelector('.spinner-border');
             if (spinner) spinner.remove();
 
+            // Сброс стилей
             btn.style.backgroundColor = '';
             btn.style.color = '';
             btn.style.borderColor = '';
 
             if (type === 'cart') {
                 if (isAdded) {
-                    btn.classList.remove('btn-dark');
+                    btn.classList.remove('btn-dark', 'btn-primary');
                     btn.classList.add('btn-success');
                     btn.style.backgroundColor = '#198754';
                     btn.style.color = '#fff';
                     btn.style.borderColor = '#198754';
                     btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> В корзине';
                     if (total !== null) updateBadge('.cart-count-badge', total);
+                } else {
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-primary'); // Или btn-dark, в зависимости от твоего дизайна
+                    btn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> В корзину';
                 }
             } else {
                 const iconHTML = isAdded
@@ -54,12 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.style.borderColor = '#dc3545';
                 } else {
                     btn.classList.remove('active');
-                    btn.style.backgroundColor = '';
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
+                    // Стили сбрасываются выше
                 }
                 btn.innerHTML = iconHTML;
-                if (total !== null) updateBadge('.fav-count-badge', total);
+
+                if (total !== null) {
+                    updateBadge('.fav-count-badge', total);
+                } else {
+                    // Если total не передан, пробуем вычислить локально
+                    const favBadge = document.querySelector('.fav-count-badge');
+                    let current = parseInt(favBadge?.textContent) || 0;
+                    updateBadge('.fav-count-badge', isAdded ? current + 1 : Math.max(0, current - 1));
+                }
             }
 
             btn.disabled = false;
@@ -75,8 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const slug = btn.dataset.slug;
         if (!slug) return;
 
-        console.log(`🎯 Клик: ${type} | ${slug}`);
-
         // 🔑 Для корзины: если уже добавлено → редирект
         if (type === 'cart' && (btn.classList.contains('btn-success') || btn.innerHTML.includes('В корзине'))) {
             window.location.href = '/cart/';
@@ -91,7 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch(url, {
             method: 'POST',
-            headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' }
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         })
         .then(res => {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -102,16 +113,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (type === 'cart') {
                     syncButtons(slug, 'cart', true, data.total);
                 } else {
-                    // 🔑 ИЗМЕНЕНИЕ: если удаляем из избранного НА СТРАНИЦЕ ИЗБРАННОГО → перезагружаем
+                    // 🔑 Если удаляем из избранного НА СТРАНИЦЕ ИЗБРАННОГО → перезагружаем
                     if (!data.is_favorited && isFavoritesPage) {
                         window.location.reload();
                         return;
                     }
-
-                    // Для всех остальных случаев (добавление/удаление вне страницы избранного)
-                    const favBadge = document.querySelector('.fav-count-badge');
-                    let current = parseInt(favBadge?.textContent) || 0;
-                    syncButtons(slug, 'fav', data.is_favorited, data.is_favorited ? current + 1 : Math.max(0, current - 1));
+                    // Для всех остальных случаев
+                    syncButtons(slug, 'fav', data.is_favorited, data.total);
                 }
             }
         })
@@ -119,13 +127,38 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(`❌ Ошибка:`, err);
             btn.disabled = false;
             btn.removeAttribute('data-processing');
-            if (type === 'cart') btn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Купить';
-            else btn.innerHTML = '<i class="bi bi-heart"></i>';
+            if (type === 'cart') {
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-primary');
+                btn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> В корзину';
+            } else {
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="bi bi-heart"></i>';
+            }
         });
     }
 
+    // 🔥 ГЛАВНЫЙ ОБРАБОТЧИК КЛИКОВ С ПРОВЕРКОЙ АВТОРИЗАЦИИ
     document.addEventListener('click', (e) => {
-        if (e.target.closest('.btn-add-cart')) handleAction(e, 'cart');
-        if (e.target.closest('.btn-toggle-fav')) handleAction(e, 'fav');
+        const cartBtn = e.target.closest('.btn-add-cart');
+        const favBtn = e.target.closest('.btn-toggle-fav');
+
+        if (cartBtn || favBtn) {
+            // Проверяем статус авторизации. Если false или undefined - блокируем всё.
+            if (window.IS_AUTHENTICATED !== true) {
+                e.preventDefault();      // Отменяем стандартное действие
+                e.stopPropagation();     // Останавливаем всплытие события
+
+                const loginUrl = window.LOGIN_URL || '/auth/login/';
+
+                // Перенаправляем на страницу входа
+                window.location.href = loginUrl;
+                return; // ВАЖНО: выходим из функции, fetch НИКОГДА не запустится
+            }
+
+            // Если код дошел сюда, значит пользователь ТОЧНО авторизован
+            if (cartBtn) handleAction(e, 'cart');
+            if (favBtn) handleAction(e, 'fav');
+        }
     });
 });

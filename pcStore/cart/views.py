@@ -7,6 +7,7 @@ from django.db.models import Exists, OuterRef, Sum, F
 from .models import CartItem, Favorite, Order, OrderItem
 from .forms import CheckoutForm
 from catalog.models import Product
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 @login_required
@@ -222,3 +223,40 @@ def toggle_favorite(request, product_slug):
             return JsonResponse({'status': 'ok', 'is_favorited': is_fav})
 
         return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+
+@login_required
+def orders_list(request):
+    """Список заказов пользователя"""
+    # Получаем все заказы текущего пользователя
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+
+    # Пагинация
+    paginator = Paginator(orders, 10)  # По 10 заказов на странице
+
+    # 🔥 Добавляем значение по умолчанию '1', если параметра page нет в URL
+    page_number = request.GET.get('page', 1)
+
+    try:
+        orders_page = paginator.page(page_number)
+    except PageNotAnInteger:
+        # Если передано не число, показываем первую страницу
+        orders_page = paginator.page(1)
+    except EmptyPage:
+        # Если страница вне диапазона (например, 9999), показываем последнюю
+        orders_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'cart/orders.html', {
+        'orders': orders_page,
+    })
+
+
+@login_required
+def order_detail(request, order_id):
+    """Детальная страница конкретного заказа"""
+    # Получаем заказ и проверяем, что он принадлежит текущему пользователю
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    return render(request, 'cart/order_detail.html', {
+        'order': order,
+    })

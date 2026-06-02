@@ -24,6 +24,7 @@ def add_page_filter(value, page_number):
     get_params['page'] = page_number
     return f'?{get_params.urlencode()}'
 
+
 @register.filter
 def humanize_key(key):
     """Превращает 'gpu_model' в 'Графический процессор'"""
@@ -91,10 +92,6 @@ def humanize_key(key):
     }
     return mapping.get(key, key.replace('_', ' ').title())
 
-@register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
-
 
 @register.filter(name='get_item')
 def get_item(dictionary, key):
@@ -102,3 +99,13 @@ def get_item(dictionary, key):
     if isinstance(dictionary, dict):
         return dictionary.get(key)
     return None
+
+
+@register.filter(name='get_brands')
+def get_brands(products):
+    """Получить уникальные бренды из queryset продуктов"""
+    try:
+        brands = products.values_list('brand', flat=True).distinct()
+        return sorted([b for b in brands if b])
+    except Exception:
+        return []

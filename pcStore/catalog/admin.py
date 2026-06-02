@@ -1,6 +1,6 @@
 # catalog/admin.py
 from django.contrib import admin
-from .models import Product, Category, Review, ReviewAttachment, ReviewVote, ReviewComment, ProductImage
+from .models import Product, Category, Review, ReviewAttachment, ReviewVote, ReviewComment, ProductImage, Promotion
 
 
 # 🔥 Inline для изображений — ОПРЕДЕЛЯЕМ ПЕРЕД ИСПОЛЬЗОВАНИЕМ
@@ -86,3 +86,26 @@ class ProductImageAdmin(admin.ModelAdmin):
     list_display = ['product', 'is_main', 'order', 'created_at']
     list_filter = ['is_main', 'created_at']
     list_editable = ['is_main', 'order']
+
+
+@admin.register(Promotion)
+class PromotionAdmin(admin.ModelAdmin):
+    list_display = ['title', 'discount_percent', 'products_count', 'order', 'is_active', 'created_at']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['title', 'description']
+    prepopulated_fields = {'slug': ('title',)}
+    filter_horizontal = ['products']
+    list_editable = ['order']
+
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('title', 'slug', 'description', 'products', 'order')
+        }),
+        ('Настройки акции', {
+            'fields': ('discount_percent', 'is_active', 'end_date')  # 🔥 Убрали start_date отсюда
+        }),
+        ('Баннер', {
+            'fields': ('banner_image', 'banner_color'),
+            'description': 'Загрузите изображение для баннера или укажите цвет фона'
+        }),
+    )

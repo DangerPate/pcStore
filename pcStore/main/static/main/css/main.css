@@ -63,11 +63,24 @@ header {
 
   /* Скрыт за навбаром по умолчанию */
   transform: translateY(calc(-1 * var(--navbar-height))) !important;
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  transition: none !important;  /* 🔥 Убрали анимацию */
+}
+
+/* 🔥 НОВОЕ: убираем анимацию при скрытии */
+.offcanvas-top.no-overlap-header.showing,
+.offcanvas-top.no-overlap-header.hiding,
+.offcanvas-top.no-overlap-header.show {
+  transform: translateY(0) !important;
+  transition: none !important;
 }
 
 .offcanvas-top.no-overlap-header.show {
   transform: translateY(0) !important;
+}
+
+.hover-primary:hover {
+    color: #0d6efd !important;
+    text-decoration: none;
 }
 
 /* Элементы каталога */
@@ -82,6 +95,7 @@ header {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   transform: translateX(4px);
   text-decoration: none;
+  color: #0d6efd !important;
 }
 
 .catalog-category i {

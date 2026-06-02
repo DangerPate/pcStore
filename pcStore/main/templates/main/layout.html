@@ -11,10 +11,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
+<script>
+        {% if user.is_authenticated %}
+            window.IS_AUTHENTICATED = true;
+        {% else %}
+            window.IS_AUTHENTICATED = false;
+        {% endif %}
+        window.LOGIN_URL = "/auth/login/";
+</script>
 <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'main/js/ecommerce.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
+<script src="{% static 'main/js/ecommerce.js' %}"></script>
 <body>
     <!-- === НАВБАР === -->
     <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
@@ -63,7 +70,8 @@
                 </form>
 
                 <!-- Иконки и авторизация -->
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-1" style="margin-left: 10px !important;">
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{% url 'cart:favorites' %}" title="Избранное">
                             <i class="bi bi-heart fs-5"></i>
@@ -80,6 +88,7 @@
                             </span>
                         </a>
                     </li>
+                    {% endif %}
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
@@ -91,16 +100,56 @@
                                 <span class="d-none d-lg-inline">{{ user.email|truncatechars:20 }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                <li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="bi bi-person me-2"></i>Кабинет</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-heart me-2"></i>Избранное</a></li>
+                                <!-- Личный кабинет -->
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'users:profile' %}">
+                                        <i class="bi bi-person me-2"></i>Личный кабинет
+                                    </a>
+                                </li>
+
+                                <!-- 🔥 Мои заказы (полезное дополнение) -->
+                                <li>
+                                    <!-- Если твое приложение с заказами называется иначе, поменяй 'cart:orders' на нужный namespace -->
+                                    <a class="dropdown-item" href="{% url 'cart:orders' %}">
+                                        <i class="bi bi-bag-check me-2"></i>Мои заказы
+                                    </a>
+                                </li>
+
+                                <!-- Избранное (исправлена ссылка) -->
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'cart:favorites' %}">
+                                        <i class="bi bi-heart me-2"></i>Избранное
+                                        {% if fav_count > 0 %}
+                                            <span class="badge bg-danger rounded-pill ms-auto" style="font-size: 0.7rem;">{{ fav_count }}</span>
+                                        {% endif %}
+                                    </a>
+                                </li>
+
+                                <!-- 🔥 Корзина (добавлена по запросу) -->
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'cart:cart' %}">
+                                        <i class="bi bi-cart3 me-2"></i>Корзина
+                                        {% if cart_count > 0 %}
+                                            <span class="badge bg-dark rounded-pill ms-auto" style="font-size: 0.7rem;">{{ cart_count }}</span>
+                                        {% endif %}
+                                    </a>
+                                </li>
+
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="{% url 'users:logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Выйти</a></li>
+
+                                <!-- Выйти -->
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'users:logout' %}">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Выйти
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="btn btn-outline-dark btn-sm rounded-pill px-3" href="{% url 'users:login' %}">
-                                <i class="bi bi-person-circle me-1"></i> Войти
+                        <li class="nav-item ms-lg-3">
+                            <a class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" href="{% url 'users:login' %}"
+                               style="font-weight: 500; background-color: #0d6efd; border: none;">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Войти
                             </a>
                         </li>
                     {% endif %}
@@ -109,7 +158,7 @@
         </div>
     </header>
 
-    <!-- === OFFCANVAS КАТАЛОГ === -->
+         <!-- === OFFCANVAS КАТАЛОГ === -->
     <div class="offcanvas offcanvas-top no-overlap-header"
          tabindex="-1"
          id="catalogOffcanvas"
@@ -119,72 +168,70 @@
 
         <div class="offcanvas-header border-bottom">
             <h5 class="offcanvas-title fw-bold" id="catalogOffcanvasLabel">
-                <i class="bi bi-grid-3x3-gap me-2 text-primary"></i>Каталог компонентов
+                <i class="bi bi-grid-3x3-gap me-2 text-primary"></i>Каталог
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
         </div>
 
         <div class="offcanvas-body py-4">
             <div class="container">
-                <div class="row g-3 g-md-4">
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a href="{% url 'catalog:category' 'cpu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
-                            <i class="bi bi-cpu fs-5 me-3"></i><span class="fw-medium">Процессоры</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a href="{% url 'catalog:category' 'gpu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
-                            <i class="bi bi-gpu-card fs-5 me-3"></i><span class="fw-medium">Видеокарты</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a href="{% url 'catalog:category' 'ram' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
-                            <i class="bi bi-memory fs-5 me-3"></i><span class="fw-medium">Оперативная память</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a href="{% url 'catalog:category' 'motherboard' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
-                            <i class="bi bi-motherboard fs-5 me-3"></i><span class="fw-medium">Материнские платы</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a href="{% url 'catalog:category' 'psu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
-                            <i class="bi bi-plug fs-5 me-3"></i><span class="fw-medium">Блоки питания</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a href="{% url 'catalog:category' 'pc-case' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
-                            <i class="bi bi-pc fs-5 me-3"></i><span class="fw-medium">Корпус</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a href="{% url 'catalog:category' 'pc-cooling' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
-                            <i class="bi bi-fan fs-5 me-3"></i><span class="fw-medium">Охлаждение</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a href="{% url 'catalog:category' 'hdd' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
-                            <i class="bi bi-device-hdd fs-5 me-3"></i><span class="fw-medium">HDD</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <a href="{% url 'catalog:category' 'ssd' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark">
-                            <i class="bi bi-device-ssd fs-5 me-3"></i><span class="fw-medium">SSD</span>
-                        </a>
-                    </div>
-                </div>
+                <a href="{% url 'catalog:catalog_index' %}" class="btn btn-primary btn-lg w-100 mb-4">
+                    <i class="bi bi-grid-3x3-gap me-2"></i> Весь каталог
+                </a>
 
-                <div class="mt-4 pt-3 border-top">
-                    <h6 class="text-muted small fw-bold text-uppercase mb-3">Популярные разделы</h6>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="#" class="badge bg-light text-dark text-decoration-none px-3 py-2 hover-bg-primary">
-                            <i class="bi bi-fire me-1"></i>Новинки
+                <div class="row g-3">
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'catalog:category' 'cpu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
+                            <i class="bi bi-cpu fs-4 me-3 text-primary"></i>
+                            <span class="fw-medium">Процессоры</span>
                         </a>
-                        <a href="#" class="badge bg-light text-dark text-decoration-none px-3 py-2 hover-bg-primary">
-                            <i class="bi bi-percent me-1"></i>Акции
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'catalog:category' 'gpu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
+                            <i class="bi bi-gpu-card fs-4 me-3 text-primary"></i>
+                            <span class="fw-medium">Видеокарты</span>
                         </a>
-                        <a href="#" class="badge bg-light text-dark text-decoration-none px-3 py-2 hover-bg-primary">
-                            <i class="bi bi-truck me-1"></i>Доставка
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'catalog:category' 'ram' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
+                            <i class="bi bi-memory fs-4 me-3 text-primary"></i>
+                            <span class="fw-medium">Память</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'catalog:category' 'motherboard' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
+                            <i class="bi bi-motherboard fs-4 me-3 text-primary"></i>
+                            <span class="fw-medium">Материнские платы</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'catalog:category' 'psu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
+                            <i class="bi bi-plug fs-4 me-3 text-primary"></i>
+                            <span class="fw-medium">Блоки питания</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'catalog:category' 'pc-case' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
+                            <i class="bi bi-pc fs-4 me-3 text-primary"></i>
+                            <span class="fw-medium">Корпуса</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'catalog:category' 'pc-cooling' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
+                            <i class="bi bi-fan fs-4 me-3 text-primary"></i>
+                            <span class="fw-medium">Охлаждение</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'catalog:category' 'hdd' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
+                            <i class="bi bi-device-hdd fs-4 me-3 text-primary"></i>
+                            <span class="fw-medium">HDD</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'catalog:category' 'ssd' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
+                            <i class="bi bi-device-ssd fs-4 me-3 text-primary"></i>
+                            <span class="fw-medium">SSD</span>
                         </a>
                     </div>
                 </div>

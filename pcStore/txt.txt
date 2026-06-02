@@ -1,0 +1,58 @@
+﻿структура проекта:
+pcStore
+├── cart/
+│   ├── templates/
+│	│	 └── cart/
+│	│		  ├── cart.html
+│   │         ├── checkout.html
+│   │         ├── favorites.html
+│   │         ├── order_detail.html
+│   │         └── order.html
+│   ├── context_processors.py
+│   └── forms.py
+├── catalog/
+│   ├── templates/
+│	│	 └── catalog/
+│	│		  ├── _product_card_list.html
+│   │         ├── catalog.html
+│   │         ├── catalog_index.html
+│   │         ├── catalog_detail.html
+│   │         ├── promotion.html
+│   │         └── search_results.html
+│   ├── templatetags/
+│   │   ├── __init__.py
+│   │   ├── catalog_extras.py
+│   │   └── catalog_filters.py
+│   └── filters_config.py
+├── main/
+│   ├── static/
+│   └── templates/
+│		 └── main/
+│             ├── info/
+│			  │    ├── about.html
+│			  │    ├── delivery.html
+│			  │    ├── faq.html
+│			  │    ├── partners.html
+│			  │    ├── privacy.html
+│			  │    ├── public_offer.html
+│			  │    ├── returns.html
+│			  │    ├── terms.html
+│			  │    ├── vacancies.html
+│			  │    └── warranty.html
+│			  ├── static_page.html
+│    	      ├── index.html
+│    	      └── layout.html
+├── product/
+│   └── templates/
+│		 └── product/
+│			  ├── mini_product_card.html
+│    	      ├── product_card.html
+│    	      └── _review_card.html
+├── users/
+│   ├── templates/
+│	│	 └── users/
+│	│		  ├── login.html
+│   │ 	      ├── profile.html
+│   │ 	      └── register.html
+│   └── forms.py
+├── pcStore/

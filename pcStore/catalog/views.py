@@ -2,8 +2,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Q, Exists, OuterRef, Value, BooleanField, Count, Avg, Prefetch
-from catalog.models import Product, Category, Review, ReviewAttachment, ReviewVote, ReviewComment, ProductImage
+from django.db.models import Q, Exists, OuterRef, Value, BooleanField, Count, Avg, Prefetch, F
+from catalog.models import Product, Category, Review, ReviewAttachment, ReviewVote, ReviewComment, ProductImage, Promotion
 from cart.models import CartItem, Favorite
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -89,19 +89,35 @@ def category_view(request, category_slug):
     """Отображение товаров категории с динамическими фильтрами (стиль DNS)"""
     category = get_object_or_404(Category, slug=category_slug)
 
+    if category.children.exists() and not category.products.exists():
+        return render(request, 'catalog/category_detail.html', {
+            'category': category,
+        })
+
     # 🔥 Базовый запрос
     products = Product.objects.filter(categories=category, is_active=True).distinct()
 
     # 🔥 Применяем фильтры
     products = apply_filters(products, request, category_slug)
 
-    # 🔥 Добавляем аннотации ДЛЯ КАРТОЧЕК (после фильтров, до пагинации)
-    products = products.annotate(
-        reviews_count=Count('catalog_reviews'),
-        avg_rating=Avg('catalog_reviews__rating'),
-        is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
-        is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-    ).prefetch_related('images')
+    # 🔥 БЕЗОПАСНЫЕ аннотации ДЛЯ КАРТОЧЕК (после фильтров, до пагинации)
+    if request.user.is_authenticated:
+        # Если пользователь вошел в систему, проверяем его корзину и избранное
+        products = products.annotate(
+            reviews_count=Count('catalog_reviews'),
+            avg_rating=Avg('catalog_reviews__rating'),
+            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+        ).prefetch_related('images')
+    else:
+        # Если пользователь НЕ вошел в систему, жестко подставляем False,
+        # чтобы база данных не пыталась искать AnonymousUser и не выдавала ошибку 500
+        products = products.annotate(
+            reviews_count=Count('catalog_reviews'),
+            avg_rating=Avg('catalog_reviews__rating'),
+            is_in_cart=Value(False, output_field=BooleanField()),
+            is_favorited=Value(False, output_field=BooleanField())
+        ).prefetch_related('images')
 
     sort = request.GET.get('sort', 'popular')
 
@@ -126,7 +142,7 @@ def category_view(request, category_slug):
     else:  # 'popular' или по умолчанию
         products = products.order_by('-views')
 
-    #  Формируем конфигурацию фильтров для шаблона
+    # Формируем конфигурацию фильтров для шаблона
     config = {**FILTERS_CONFIG.get('_common', {}), **FILTERS_CONFIG.get(category_slug, {})}
 
     # Базовые товары для подсчёта (без применения фильтров, только категория)
@@ -448,12 +464,20 @@ def search_view(request):
             filters[key] = filter_data
 
     # Аннотации
-    products = products.annotate(
-        reviews_count=Count('catalog_reviews'),
-        avg_rating=Avg('catalog_reviews__rating'),
-        is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
-        is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
-    ).prefetch_related('images')
+    if request.user.is_authenticated:
+        products = products.annotate(
+            reviews_count=Count('catalog_reviews'),
+            avg_rating=Avg('catalog_reviews__rating'),
+            is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+            is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+        ).prefetch_related('images')
+    else:
+        products = products.annotate(
+            reviews_count=Count('catalog_reviews'),
+            avg_rating=Avg('catalog_reviews__rating'),
+            is_in_cart=Value(False, output_field=BooleanField()),
+            is_favorited=Value(False, output_field=BooleanField())
+        ).prefetch_related('images')
 
     # Сортировка
     sort = request.GET.get('sort', 'popular')
@@ -556,3 +580,84 @@ def add_comment(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def catalog_index(request):
+    """Главная страница каталога со всеми категориями"""
+    # Получаем все категории, сгруппированные по родительским
+    categories = Category.objects.filter(parent__isnull=True).prefetch_related('children').order_by('title')
+    return render(request, 'catalog/catalog_index.html', {
+        'categories': categories,
+    })
+
+
+def promotion_view(request, promotion_slug):
+    """Страница акции со списком товаров"""
+    promotion = get_object_or_404(Promotion, slug=promotion_slug, is_active=True)
+
+    # 1. Базовый запрос товаров акции (до пагинации)
+    base_products = promotion.products.filter(is_active=True).distinct()
+
+    # 2. 🔥 ПРАВИЛЬНОЕ ПОЛУЧЕНИЕ БРЕНДОВ (с группировкой и подсчетом)
+    from django.db.models import Count
+    brands_qs = base_products.filter(brand__isnull=False).exclude(brand='').values(
+        'brand'
+    ).annotate(
+        count=Count('id')
+    ).order_by('brand')
+
+    # Преобразуем в список словарей: [{'brand': 'AMD', 'count': 5}, ...]
+    brands_list = [{'name': b['brand'], 'count': b['count']} for b in brands_qs]
+
+    # 3. Применяем фильтры
+    products = apply_filters(base_products, request, category_slug=None)
+
+    # 4. Аннотации для карточек
+    products = products.annotate(
+        reviews_count=Count('catalog_reviews'),
+        avg_rating=Avg('catalog_reviews__rating'),
+        is_in_cart=Exists(CartItem.objects.filter(user=request.user, product=OuterRef('pk'))),
+        is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
+    ).prefetch_related('images')
+
+    # 5. Сортировка
+    sort = request.GET.get('sort', 'popular')
+    if sort == 'price_asc':
+        products = products.order_by('price')
+    elif sort == 'price_desc':
+        products = products.order_by('-price')
+    elif sort == 'new':
+        products = products.order_by('-created_at')
+    elif sort == 'rating':
+        products = products.order_by(Coalesce('avg_rating', 0).desc(), '-reviews_count', '-views')
+    elif sort == 'reviews':
+        products = products.order_by('-reviews_count', Coalesce('avg_rating', 0).desc(), '-views')
+    else:
+        products = products.order_by('-views')
+
+    # 6. Пагинация
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page')
+    try:
+        products_page = paginator.page(page_number)
+    except PageNotAnInteger:
+        products_page = paginator.page(1)
+    except EmptyPage:
+        products_page = paginator.page(paginator.num_pages)
+
+    filter_params = request.GET.copy()
+    if 'page' in filter_params:
+        del filter_params['page']
+
+    return render(request, 'catalog/promotion.html', {
+        'promotion': promotion,
+        'products': products_page,
+        'brands': brands_list,  # 🔥 Теперь это список словарей с count
+        'filter_params': filter_params.urlencode(),
+    })
+
+def get_active_promotions(request):
+    """Получить активные акции для карусели"""
+    return Promotion.objects.filter(
+        is_active=True,
+        products__isnull=False  # Только акции с товарами
+    ).distinct().order_by('order', '-created_at')[:5]  # Максимум 5 акций
