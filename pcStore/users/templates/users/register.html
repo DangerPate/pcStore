@@ -20,21 +20,21 @@
                     <form method="post">
                         {% csrf_token %}
 
-                        <!-- Email -->
+                        
                         <div class="mb-3">
                             <label class="form-label small text-muted">Email <span class="text-danger">*</span></label>
                             <input type="email" name="email" class="form-control" placeholder="you@example.com"
                                    value="{{ form.email.value|default:'' }}" required>
                         </div>
 
-                        <!-- Телефон -->
+                        
                         <div class="mb-3">
                             <label class="form-label small text-muted">Телефон <span class="text-danger">*</span></label>
                             <input type="tel" name="phone" class="form-control" placeholder="+7 (999) 123-45-67"
                                    value="{{ form.phone.value|default:'' }}" required>
                         </div>
 
-                        <!-- Пароль (с глазом) -->
+                        
                         <div class="mb-3">
                             <label class="form-label small text-muted">Пароль <span class="text-danger">*</span></label>
                             <div class="position-relative">
@@ -47,7 +47,7 @@
                             </div>
                         </div>
 
-                        <!-- Подтверждение (без глаза) -->
+                        
                         <div class="mb-4">
                             <label class="form-label small text-muted">Подтверждение пароля <span class="text-danger">*</span></label>
                             <input type="password" name="password2" class="form-control" placeholder="••••••••" required>
@@ -64,7 +64,7 @@
     </div>
 </div>
 
-<!-- Скрипт переключения видимости пароля -->
+
 <script>
 function togglePassword(inputId, btn) {
     const input = document.getElementById(inputId);

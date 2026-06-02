@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="container py-5">
-    <!-- Хлебные крошки -->
+    
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
@@ -15,7 +15,7 @@
 
     <h1 class="h2 fw-bold mb-4">Каталог товаров</h1>
 
-    <!-- 🔥 ОСНОВНЫЕ КАТЕГОРИИ (сеткой 3 колонки) -->
+    
     <div class="row g-4 mb-5">
         {% for category in categories %}
         <div class="col-md-6 col-lg-4">

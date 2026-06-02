@@ -18,7 +18,6 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
-
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField('Email адрес', unique=True)
@@ -48,19 +47,16 @@ class CustomUser(AbstractUser):
         """Возвращает никнейм или авто-сгенерированный"""
         if self.nickname:
             return self.nickname
-        # 🔥 Генерируем автоматический никнейм
+
         return f"Пользователь-{self.id:07d}"
 
     def save(self, *args, **kwargs):
-        # 🔥 Автогенерация никнейма при создании
+
         if not self.nickname and self.pk is None:
-            # Генерируем случайный никнейм
+
             random_suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
             self.nickname = f"Пользователь-{random_suffix}"
         super().save(*args, **kwargs)
-
-
-# === ЗАГОТОВКИ ПОД БУДУЩИЕ ФУНКЦИИ ===
 
 class Review(models.Model):
     """Отзывы к товарам"""
@@ -72,11 +68,4 @@ class Review(models.Model):
 
     class Meta:
         verbose_name = 'Отзыв'
-        unique_together = ('user', 'product')  # 1 отзыв от 1 пользователя на 1 товар
-
-
-
-
-
-
-
+        unique_together = ('user', 'product')

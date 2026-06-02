@@ -1,8 +1,7 @@
-# product/views.py
+
 from django.shortcuts import render, get_object_or_404
 from cart.models import CartItem, Favorite
 from catalog.models import Product
-
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
@@ -11,7 +10,7 @@ def product_detail(request, slug):
     is_favorited = False
 
     if request.user.is_authenticated:
-        # 🔍 Проверяем, что в БД
+
         cart_item = CartItem.objects.filter(
             cart__user=request.user,
             product=product
@@ -25,7 +24,6 @@ def product_detail(request, slug):
         is_in_cart = cart_item is not None
         is_favorited = fav_item is not None
 
-        # 🔥 ДЕТАЛЬНАЯ ОТЛАДКА — смотрите в терминал
         print(f"\n📦 DEBUG product_detail:")
         print(f"   User: {request.user.email} (ID: {request.user.id})")
         print(f"   Product: {product.title} (slug: {slug})")
@@ -36,7 +34,6 @@ def product_detail(request, slug):
         if fav_item:
             print(f"   → Favorite: id={fav_item.id}")
 
-        # 🔍 Проверяем, есть ли вообще корзина у пользователя
         from cart.models import Cart
         cart = Cart.objects.filter(user=request.user).first()
         if cart:

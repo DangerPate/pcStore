@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="container py-4">
-    <!-- Хлебные крошки -->
+    
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
@@ -14,7 +14,7 @@
     </nav>
 
     <div class="row g-3">
-        <!-- 📦 ЛЕВАЯ ПАНЕЛЬ: Фильтры в стиле DNS -->
+        
         <aside class="col-lg-3">
             <div class="card border-0 shadow-sm sticky-filter">
                 <div class="card-body p-3">
@@ -25,7 +25,7 @@
                     <form method="get" action="" id="filter-form">
                         {% for key, spec in filters.items %}
 
-                            <!-- 🔹 Выпадающий список (чекбоксы) -->
+                            
                             {% if spec.type == 'select' %}
                             <div class="filter-section mb-2">
                                 <div class="filter-header d-flex justify-content-between align-items-center p-2 rounded-3"
@@ -37,7 +37,7 @@
 
                                 <div class="filter-content mt-2" id="content-{{ key }}" style="display: none;">
 
-                                    <!-- Поиск для брендов -->
+                                    
                                     {% if key == 'brand' %}
                                     <div class="mb-2">
                                         <div class="input-group input-group-sm">
@@ -53,7 +53,7 @@
                                     </div>
                                     {% endif %}
 
-                                    <!-- Опции с чекбоксами -->
+                                    
                                     <div class="filter-options" id="options-{{ key }}" style="max-height: 200px; overflow-y: auto; padding-right: 14px;">
                                         {% for option in spec.options %}
                                         <div class="form-check mb-2 filter-option" data-option="{{ option|lower }}">
@@ -74,7 +74,7 @@
                                         {% endfor %}
                                     </div>
 
-                                    <!-- Показать всё / Скрыть -->
+                                    
                                     {% if spec.options|length > 5 %}
                                     <button type="button"
                                             class="btn btn-link btn-sm p-0 mt-1"
@@ -85,7 +85,7 @@
                                 </div>
                             </div>
 
-                            <!-- 🔹 Чекбокс (одиночный) -->
+                            
                             {% elif spec.type == 'checkbox' %}
                             <div class="filter-section mb-2">
                                 <div class="form-check p-2 ps-4">
@@ -101,7 +101,7 @@
                                 </div>
                             </div>
 
-                            <!-- 🔹 Диапазон (цена, частоты, длина) -->
+                            
                             {% elif spec.type == 'range' %}
                             <div class="filter-section mb-2">
                                 <div class="filter-header d-flex justify-content-between align-items-center p-2 rounded-3"
@@ -134,14 +134,14 @@
                                                    step="{{ spec.step|default:1 }}">
                                         </div>
                                     </div>
-                                    <!-- 🔥 КНОПКИ "ПРИМЕНИТЬ" НЕТ — только общая внизу -->
+                                    
                                 </div>
                             </div>
                             {% endif %}
 
                         {% endfor %}
 
-                        <!-- 🔥 ОБЩАЯ КНОПКА ПРИМЕНИТЬ -->
+                        
                         <div class="mt-3 pt-3 border-top">
                             <button type="submit" class="btn btn-primary btn-sm w-100 mb-2">
                                 <i class="bi bi-funnel me-1"></i> Применить фильтры
@@ -155,10 +155,10 @@
             </div>
         </aside>
 
-        <!-- 🛒 ПРАВАЯ ЧАСТЬ: Товары -->
+        
         <div class="col-lg-9">
-            <!-- Счетчик -->
-            <!-- Счетчик и Сортировка -->
+            
+            
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
                 <span class="text-muted small">Найдено: <strong class="text-dark">{{ products.paginator.count }}</strong> товаров</span>
 
@@ -172,11 +172,11 @@
                 </select>
             </div>
 
-            <!-- Товары -->
+            
             {% for product in products %}
                 {% include 'catalog/_product_card_list.html' with product=product %}
             {% empty %}
-                <!-- 🔥 Этот блок должен быть ЗДЕСЬ, а не в include -->
+                
                 <div class="col-12">
                     <div class="text-center py-5 bg-white rounded-3 shadow-sm">
                         <i class="bi bi-search fs-1 text-muted d-block mb-2"></i>
@@ -186,7 +186,7 @@
                 </div>
             {% endfor %}
 
-            <!-- 🔑 Пагинация (используем filter_params из view, БЕЗ |replace) -->
+            
             {% if products.has_other_pages %}
             <nav aria-label="Навигация" class="mt-4">
                 <ul class="pagination justify-content-center">

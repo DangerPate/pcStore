@@ -23,7 +23,7 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="{% static 'main/js/ecommerce.js' %}"></script>
 <body>
-    <!-- === НАВБАР === -->
+    
     <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
@@ -32,7 +32,7 @@
             </a>
 
 
-            <!-- Кнопка каталога -->
+            
             <button class="btn btn-outline-dark d-none d-lg-flex align-items-center me-3"
                     type="button"
                     data-bs-toggle="offcanvas"
@@ -42,9 +42,9 @@
                 <i class="bi bi-grid-3x3-gap me-2"></i> Каталог
             </button>
 
-            <!-- Сворачиваемая часть -->
+            
             <div class="collapse navbar-collapse" id="navbarMain">
-                <!-- Поиск -->
+                
                 <form class="d-flex mx-auto my-3 my-lg-0 w-100 w-lg-50"
                       action="{% url 'catalog:search' %}"
                       method="get"
@@ -59,7 +59,7 @@
                                value="{{ request.GET.q|default:'' }}"
                                style="border-color: #ced4da;" />
 
-                        <!-- 🔥 Исправленная кнопка без лишней рамки -->
+                        
                         <button class="btn bg-white border-start-0"
                                 type="submit"
                                 style="border-color: #ced4da; padding-left: 0; padding-right: 12px;"
@@ -69,7 +69,7 @@
                     </div>
                 </form>
 
-                <!-- Иконки и авторизация -->
+                
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-1" style="margin-left: 10px !important;">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
@@ -100,22 +100,22 @@
                                 <span class="d-none d-lg-inline">{{ user.email|truncatechars:20 }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                <!-- Личный кабинет -->
+                                
                                 <li>
                                     <a class="dropdown-item" href="{% url 'users:profile' %}">
                                         <i class="bi bi-person me-2"></i>Личный кабинет
                                     </a>
                                 </li>
 
-                                <!-- 🔥 Мои заказы (полезное дополнение) -->
+                                
                                 <li>
-                                    <!-- Если твое приложение с заказами называется иначе, поменяй 'cart:orders' на нужный namespace -->
+                                    
                                     <a class="dropdown-item" href="{% url 'cart:orders' %}">
                                         <i class="bi bi-bag-check me-2"></i>Мои заказы
                                     </a>
                                 </li>
 
-                                <!-- Избранное (исправлена ссылка) -->
+                                
                                 <li>
                                     <a class="dropdown-item" href="{% url 'cart:favorites' %}">
                                         <i class="bi bi-heart me-2"></i>Избранное
@@ -125,7 +125,7 @@
                                     </a>
                                 </li>
 
-                                <!-- 🔥 Корзина (добавлена по запросу) -->
+                                
                                 <li>
                                     <a class="dropdown-item" href="{% url 'cart:cart' %}">
                                         <i class="bi bi-cart3 me-2"></i>Корзина
@@ -137,7 +137,7 @@
 
                                 <li><hr class="dropdown-divider"></li>
 
-                                <!-- Выйти -->
+                                
                                 <li>
                                     <a class="dropdown-item text-danger" href="{% url 'users:logout' %}">
                                         <i class="bi bi-box-arrow-right me-2"></i>Выйти
@@ -158,7 +158,7 @@
         </div>
     </header>
 
-         <!-- === OFFCANVAS КАТАЛОГ === -->
+         
     <div class="offcanvas offcanvas-top no-overlap-header"
          tabindex="-1"
          id="catalogOffcanvas"
@@ -239,13 +239,12 @@
         </div>
     </div>
 
-    <!-- === ОСНОВНОЙ КОНТЕНТ === -->
+    
     <main>
         <div class="container">{% block content %}{% endblock %}</div>
     </main>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // 🔥 Карусель акций (не трогаем)
         if (document.querySelector('.promoSwiper')) {
             new Swiper('.promoSwiper', {
                 loop: true,
@@ -269,21 +268,19 @@
             });
         }
 
-        // 🔥 Карусель товаров со скидкой (НОВАЯ ВЕРСИЯ)
         if (document.querySelector('.discountSwiper')) {
             new Swiper('.discountSwiper', {
-                loop: true,              /* 🔑 БЕСКОНЕЧНАЯ ПРОКРУТКА */
+                loop: true,
                 speed: 500,
                 slidesPerView: 'auto',
                 spaceBetween: 0,
-                loopedSlides: 5,         /* 🔑 Количество дублируемых слайдов */
+                loopedSlides: 5,
                 navigation: {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
                 },
             });
         }
-        // 🔥 Карусель популярного
         if (document.querySelector('.popularSwiper')) {
             new Swiper('.popularSwiper', {
                 loop: true,
@@ -297,7 +294,6 @@
                 },
             });
         }
-        // 🔥 Карусель новинок
         if (document.querySelector('.newSwiper')) {
             new Swiper('.newSwiper', {
                 loop: true,
@@ -313,11 +309,11 @@
         }
     });
     </script>
-    <!-- === ФУТЕР === -->
+    
     <footer class="mt-auto">
         <div class="container py-5">
             <div class="row g-4">
-                <!-- 1. Логотип + Соцсети (3/12) -->
+                
                 <div class="col-lg-3 col-md-6">
                     <h5 class="d-flex align-items-center mb-3">
                         <img src="{% static 'main/img/logo-main.svg' %}" alt="pcStore" width="28" height="28" class="me-2" style="filter: brightness(0) invert(1);">
@@ -334,7 +330,7 @@
                     </div>
                 </div>
 
-                <!-- 2. Каталог (2/12) -->
+                
                 <div class="col-lg-2 col-md-6">
                     <h6>Каталог</h6>
                     <ul class="list-unstyled">
@@ -346,7 +342,7 @@
                     </ul>
                 </div>
 
-                <!-- 3. Компания (2/12) 🔥 НОВАЯ КОЛОНКА -->
+                
                 <div class="col-lg-2 col-md-6">
                     <h6>Компания</h6>
                     <ul class="list-unstyled">
@@ -356,7 +352,7 @@
                     </ul>
                 </div>
 
-                <!-- 4. Покупателям (2/12) -->
+                
                 <div class="col-lg-2 col-md-6">
                     <h6>Покупателям</h6>
                     <ul class="list-unstyled">
@@ -367,7 +363,7 @@
                     </ul>
                 </div>
 
-                <!-- 5. Контакты (3/12) -->
+                
                 <div class="col-lg-3 col-md-6">
                     <h6>Контакты</h6>
                     <ul class="list-unstyled small text-muted mb-3">
@@ -382,7 +378,7 @@
                 </div>
             </div>
 
-            <!-- Нижняя полоса -->
+            
             <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <div>© 2014-2026 pcStore</div>
                 <div class="d-flex flex-wrap gap-3">

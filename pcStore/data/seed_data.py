@@ -1,15 +1,13 @@
-﻿# seed_data.py
+﻿
 import os
 import django
 import random
 
-# Настройка Django окружения
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pcStore.settings')
 django.setup()
 
 from catalog.models import Product, Category
 
-# Данные для генерации
 BRANDS = ["NVIDIA", "AMD", "Intel", "Samsung", "Kingston", "Corsair", "Seagate", "MSI", "ASUS", "Gigabyte"]
 MODELS = ["RTX 4060", "RTX 4070", "Ryzen 5 5600", "Ryzen 7 5800X", "Core i5-12400", "Core i7-13700K",
           "Fury Beast 32GB", "Aorus Elite", "P44 Pro", "IronWolf 4TB", "Barracuda 2TB", "Vengeance DDR5"]
@@ -21,11 +19,9 @@ CATEGORIES_MAP = {
     "Материнские платы": ["Aorus", "MSI", "Gigabyte"]
 }
 
-
 def seed():
     print("🌱 Начинаю наполнение базы данных...")
 
-    # 1. Создаем категории (если нет)
     categories = {}
     for cat_name in CATEGORIES_MAP.keys():
         cat, created = Category.objects.get_or_create(title=cat_name)
@@ -33,13 +29,11 @@ def seed():
         if created:
             print(f"   + Создана категория: {cat_name}")
 
-    # 2. Создаем 50 товаров
     for i in range(50):
-        # Выбираем случайную категорию
+
         cat_name = random.choice(list(categories.keys()))
         category = categories[cat_name]
 
-        # Подбираем бренд/модель под категорию (немного логики для реалистичности)
         valid_brands = ["Intel", "AMD"] if cat_name == "Процессоры" else BRANDS
         brand = random.choice(valid_brands)
         model = random.choice(MODELS)
@@ -47,7 +41,6 @@ def seed():
         title = f"{brand} {model} - Версия {random.randint(10, 99)}"
         price = random.randint(4000, 85000)
 
-        # Создаем товар
         product = Product.objects.create(
             title=title,
             brand=brand,
@@ -55,17 +48,13 @@ def seed():
             info=f"Характеристики: {model}, Бренд: {brand}, Скорость: {random.randint(3000, 6000)} MHz",
             in_stock=random.randint(1, 50),
             warranty="12 месяцев",
-            # 🔑 ВАЖНО: Оставляем дефолтные значения
-            # old_price = None (нет скидки)
-            # views = 0 (не хит)
+
         )
 
-        # Добавляем в категорию
         product.categories.add(category)
 
     print("✅ Готово! Создано 50 товаров.")
     print("💡 Теперь заходи в админку или на страницу товара, чтобы тестировать карусели.")
-
 
 if __name__ == '__main__':
     seed()

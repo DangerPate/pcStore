@@ -17,7 +17,6 @@ def register(request):
         form = CustomUserCreationForm()
     return render(request, 'users/register.html', {'form': form})
 
-
 def user_login(request):
     if request.method == 'POST':
         email = request.POST.get('username')
@@ -25,20 +24,18 @@ def user_login(request):
 
         print(f"📥 Email: {email} | Пароль: {password}")
 
-        # Прямая проверка логина/пароля
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
             print(f"✅ Пользователь найден: {user.email}")
             login(request, user)
             print("🚀 Выполняю редирект...")
-            return redirect('home')  # Убедись, что в urls.py есть name='home'
+            return redirect('home')
         else:
             print("❌ Неверный email или пароль")
             messages.error(request, 'Неверный email или пароль')
 
     return render(request, 'users/login.html')
-
 
 @login_required
 def profile(request):
@@ -59,7 +56,6 @@ def profile(request):
             messages.success(request, 'Профиль успешно обновлён!')
             return redirect('users:profile')
 
-    # 🔥 Передаём счётчики для меню (если используются)
     from cart.models import CartItem, Favorite
     fav_count = Favorite.objects.filter(user=request.user).count() if request.user.is_authenticated else 0
     cart_count = CartItem.objects.filter(user=request.user).count() if request.user.is_authenticated else 0
@@ -74,7 +70,6 @@ def user_logout(request):
     logout(request)
     return redirect('home')
 
-
 @login_required
 def change_password(request):
     """Смена пароля пользователя"""
@@ -83,26 +78,21 @@ def change_password(request):
         new_password1 = request.POST.get('new_password1')
         new_password2 = request.POST.get('new_password2')
 
-        # Проверяем текущий пароль
         if not request.user.check_password(old_password):
             messages.error(request, 'Неверный текущий пароль.')
             return redirect('users:profile')
 
-        # Проверяем совпадение новых паролей
         if new_password1 != new_password2:
             messages.error(request, 'Новые пароли не совпадают.')
             return redirect('users:profile')
 
-        # Проверяем длину
         if len(new_password1) < 8:
             messages.error(request, 'Пароль должен содержать минимум 8 символов.')
             return redirect('users:profile')
 
-        # Меняем пароль
         request.user.set_password(new_password1)
         request.user.save()
 
-        # Обновляем сессию, чтобы пользователь не вышел
         update_session_auth_hash(request, request.user)
 
         messages.success(request, 'Пароль успешно изменён!')

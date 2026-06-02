@@ -17,13 +17,13 @@
 
     <form method="post" action="{% url 'cart:checkout' %}">
         {% csrf_token %}
-        <!-- Скрытые поля с ID товаров (на случай повторной отправки) -->
+        
         {% for item in cart_items %}
             <input type="hidden" name="item_ids" value="{{ item.id }}">
         {% endfor %}
 
         <div class="row g-4">
-            <!-- Левая колонка: Форма данных -->
+            
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body p-4">
@@ -58,7 +58,7 @@
                 </div>
             </div>
 
-            <!-- Правая колонка: Итог заказа -->
+            
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm sticky-lg-top" style="top: 100px; z-index: 100;">
                     <div class="card-body p-4">
@@ -81,7 +81,7 @@
                                 <span class="fs-5 fw-bold">Итого:</span>
                                 <span class="fs-4 fw-bold text-primary">
                                     {% widthratio cart_items|length 1 1 as dummy %} {# Хак для суммы, лучше посчитать в view, но тут просто покажем #}
-                                    {{ cart_items.0.order.total_price|default:"0" }} ₽ <!-- Заглушка, лучше передать total из view -->
+                                    {{ cart_items.0.order.total_price|default:"0" }} ₽ 
                                 </span>
                             </div>
                         </div>

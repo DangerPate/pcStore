@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser
 
 class CustomUserCreationForm(UserCreationForm):
-    # 🔑 required=True на уровне поля Django
+
     email = forms.EmailField(
         label='Email',
         required=True,

@@ -1,15 +1,15 @@
-﻿// product/static/product.js
+﻿
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 🔥 Читаем данные, переданные из Django
+
     const productDataScript = document.getElementById('product-data');
     const productData = productDataScript ? JSON.parse(productDataScript.textContent) : { images: [], title: 'Товар' };
     const images = productData.images || [];
     const productTitle = productData.title || 'Товар';
 
-    // ==========================================
-    // 1. ГАЛЕРЕЯ И ХАРАКТЕРИСТИКИ
-    // ==========================================
+
+
+
     window.toggleSpecs = function() {
         const short = document.getElementById('specs-short');
         const full = document.getElementById('specs-full');
@@ -36,9 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // ==========================================
-    // 2. ФОРМА ОТЗЫВА (Звёзды и Валидация)
-    // ==========================================
+
+
+
     const stars = document.querySelectorAll('.rating-star');
     const ratingInput = document.getElementById('ratingInput');
     const ratingError = document.getElementById('rating-error');
@@ -98,9 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('issueBlock')?.classList.toggle('d-none', !this.checked);
     });
 
-    // ==========================================
-    // 3. DRAG & DROP ФАЙЛОВ
-    // ==========================================
+
+
+
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('attachmentInput');
     const fileList = document.getElementById('fileList');
@@ -208,9 +208,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFilePreviews();
     }
 
-    // ==========================================
-    // 4. ЛАЙКИ/ДИЗЛАЙКИ
-    // ==========================================
+
+
+
     document.addEventListener('click', async function(e) {
         const voteBtn = e.target.closest('.vote-btn');
         if (!voteBtn) return;
@@ -270,9 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ==========================================
-    // 5. КОММЕНТАРИИ
-    // ==========================================
+
+
+
     document.addEventListener('submit', async function(e) {
         const commentForm = e.target.closest('.comment-form');
         if (!commentForm) return;
@@ -338,9 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ==========================================
-    // 6. ПАГИНАЦИЯ ОТЗЫВОВ
-    // ==========================================
+
+
+
     window.loadMoreReviews = function() {
         const container = document.getElementById('reviews-container');
         const hiddenContainer = document.getElementById('hidden-reviews');
@@ -363,9 +363,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // ==========================================
-    // 7. СБРОС СТРАНИЦЫ ПРИ ПРИМЕНЕНИИ ФИЛЬТРОВ
-    // ==========================================
+
+
+
     const filterForm = document.getElementById('review-filter-form');
     if (filterForm) {
         filterForm.addEventListener('submit', function() {
@@ -375,9 +375,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // 8. МОДАЛЬНОЕ ОКНО ПРОСМОТРА (ОТЗЫВЫ)
-    // ==========================================
+
+
+
     let modalInstance = null;
 
     window.openModal = function(file, index) {
@@ -450,11 +450,11 @@ document.addEventListener('DOMContentLoaded', () => {
         instance.show();
     };
 
-        // ==========================================
-    // 9. МОДАЛЬНОЕ ОКНО ДЛЯ ИЗОБРАЖЕНИЙ ТОВАРА
-    // ==========================================
+
+
+
     window.openProductImageModal = function(index) {
-        // Берем данные из глобальных переменных, заданных в HTML
+
         const images = window.PRODUCT_IMAGES || [];
         const productTitle = window.PRODUCT_TITLE || 'Товар';
 
@@ -523,4 +523,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         window.productImageModalInstance.show();
     };
-}); // <-- Убедись, что эта закрывающая скобка DOMContentLoaded осталась в конце файла
+});

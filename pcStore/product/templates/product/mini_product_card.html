@@ -2,14 +2,14 @@
 <div class="col">
   <div class="card h-100 shadow border-0 position-relative product-card">
 
-    <!-- 🔥 Бейдж скидки -->
+    
     {% if product.old_price and product.old_price > product.price %}
     <span class="position-absolute top-0 start-0 badge bg-danger rounded-0 m-3 px-2 py-1" style="z-index: 3; font-size: 0.75rem;">
       -{{ product.discount_percent }}%
     </span>
     {% endif %}
 
-    <!-- 🔥 Изображение (Главное -> Первое доп. -> Заглушка) -->
+    
     <div class="position-relative bg-light" style="height: 180px;">
       {% if product.image %}
         <a href="{% url 'catalog:product_detail' product.slug %}" class="d-block h-100 w-100">
@@ -26,18 +26,18 @@
       {% endif %}
     </div>
 
-    <!-- Контент карточки -->
+    
     <div class="card-body d-flex flex-column p-3">
 
-      <!-- Название -->
+      
       <h6 class="card-title mb-2" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; height: 4.2em;">
         <a href="{% url 'catalog:product_detail' product.slug %}" class="text-decoration-none text-dark stretched-link">
           {{ product.title }}
         </a>
       </h6>
 
-      <!-- 🔥 Реальный рейтинг и кол-во отзывов -->
-      <!-- 🔥 Реальный рейтинг и кол-во отзывов -->
+      
+      
       {% with review_count=product.reviews_count|default:0 %}
       {% if review_count > 0 %}
         {% with avg_rating=product.avg_rating|default:0 %}
@@ -62,12 +62,12 @@
         </div>
         {% endwith %}
       {% else %}
-        <!-- Отступ, если отзывов нет -->
+        
         <div class="mb-2" style="height: 20px;"></div>
       {% endif %}
       {% endwith %}
 
-      <!-- Цены -->
+      
       <div class="d-flex align-items-center gap-2 mb-3">
         <span class="fw-bold text-dark fs-5">{{ product.price }} ₽</span>
         {% if product.old_price and product.old_price > product.price %}
@@ -77,7 +77,7 @@
         {% endif %}
       </div>
 
-      <!-- Кнопки -->
+      
       <div class="mt-auto d-flex gap-2 position-relative" style="z-index: 2;">
           {% if product.is_in_cart %}
           <button type="button" class="btn btn-success btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}">

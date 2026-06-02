@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{% static 'main/css/product.css' %}">
 
 <div class="container py-4">
-    <!-- Хлебные крошки -->
+    
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
@@ -23,9 +23,9 @@
         </ol>
     </nav>
 
-    <!-- 🔝 ВЕРХНЯЯ ЧАСТЬ (как в DNS) -->
+    
     <div class="row g-4 mb-5">
-        <!-- Галерея -->
+        
         <div class="col-lg-5">
             <div class="product-gallery bg-white rounded-3 p-3">
                 <div class="product-main-image mb-3 text-center">
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <!-- Информация о товаре -->
+        
         <div class="col-lg-7">
             <div class="product-info">
                 <h1 class="h3 fw-bold mb-3">{{ product.title }}</h1>
@@ -101,7 +101,7 @@
                     {% endif %}
                 </div>
 
-                <!-- Кнопки -->
+                
                 <div class="d-flex gap-3 mb-4">
                     {% if is_in_cart %}
                     <button type="button" class="btn btn-success btn-lg px-4 btn-add-cart" data-slug="{{ product.slug }}">
@@ -117,17 +117,17 @@
                     </button>
                 </div>
 
-                <!-- 🔥 ВЫБОР ВАРИАНТОВ (Конфигурации) -->
+                
                 {% if variants %}
                 <div class="mb-4">
                     <span class="small text-muted d-block mb-2">Доступные конфигурации:</span>
                     <div class="d-flex flex-wrap gap-2">
-                        <!-- Сначала выводим текущий товар как активную кнопку (без ссылки) -->
+                        
                         <span class="btn btn-sm btn-primary disabled" style="pointer-events: none; opacity: 1;">
                             {{ product.title }}
                         </span>
 
-                        <!-- Затем выводим остальные варианты как ссылки -->
+                        
                         {% for v in variants %}
                         <a href="{{ v.get_absolute_url }}" class="btn btn-sm btn-outline-primary">
                             {{ v.title }}
@@ -136,7 +136,7 @@
                     </div>
                 </div>
                 {% endif %}
-                <!-- Краткие характеристики -->
+                
                 {% if product.specifications %}
                 <div class="border-top pt-3">
                     <h6 class="fw-bold mb-3">Основные характеристики</h6>
@@ -152,7 +152,7 @@
         </div>
     </div>
 
-    <!-- 📝 ОПИСАНИЕ ТОВАРА -->
+    
     <section class="mb-5">
         <h2 class="h4 fw-bold mb-3">Описание товара</h2>
         <div class="card border-0 shadow-sm">
@@ -168,7 +168,7 @@
         </div>
     </section>
 
-    <!-- ⚙️ ХАРАКТЕРИСТИКИ (с кнопкой "Развернуть") -->
+    
     {% if product.specifications %}
     <section class="mb-5">
         <h2 class="h4 fw-bold mb-3">Характеристики</h2>
@@ -189,7 +189,7 @@
                         <dt class="col-sm-4 col-md-3 text-muted mb-2">{{ key|humanize_key }}</dt>
                         <dd class="col-sm-8 col-md-9 mb-2">{{ value }}</dd>
                         {% endfor %}
-                        <!-- Стандартные поля -->
+                        
                         <dt class="col-sm-4 col-md-3 text-muted mb-2">Название</dt>
                         <dd class="col-sm-8 col-md-9 mb-2">{{ product.title }}</dd>
                         <dt class="col-sm-4 col-md-3 text-muted mb-2">Артикул</dt>
@@ -215,11 +215,11 @@
     </section>
     {% endif %}
 
-    <!-- 💬 ОТЗЫВЫ -->
+    
     <section id="reviews-section" class="mb-5">
         <h2 class="h4 fw-bold mb-4">Отзывы ({{ total_reviews }})</h2>
 
-        <!-- Статистика -->
+        
         <div class="row g-4 mb-4">
             <div class="col-md-4">
                 <div class="card border-0 bg-light">
@@ -252,15 +252,15 @@
             </div>
         </div>
 
-        <!-- Кнопка добавления отзыва -->
+        
         <div class="mb-4">
             <button class="btn btn-primary btn-lg" data-bs-toggle="collapse" data-bs-target="#reviewFormCollapse">
                 Добавить отзыв
             </button>
         </div>
 
-        <!-- Форма отзыва -->
-                <!-- Форма отзыва -->
+        
+                
         <div class="collapse mb-4" id="reviewFormCollapse">
             {% if user.is_authenticated %}
             <div class="card border-0 shadow-sm">
@@ -317,7 +317,7 @@
             </div>
 
             {% else %}
-            <!-- 🔥 Для гостей: приглашение войти -->
+            
             <div class="card border-0 shadow-sm bg-light">
                 <div class="card-body p-4 text-center">
                     <i class="bi bi-chat-square-text fs-1 text-muted mb-2 d-block"></i>
@@ -331,9 +331,9 @@
             {% endif %}
         </div>
 
-        <!-- 🔥 СОРТИРОВКА И ФИЛЬТРЫ ОТЗЫВОВ -->
+        
         <form method="get" action="" id="review-filter-form" class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 p-3 bg-light rounded-3">
-            <!-- Левая часть: Фильтры -->
+            
             <div class="d-flex flex-wrap align-items-center gap-3">
                 <div class="d-flex align-items-center gap-2">
                     <span class="small fw-semibold text-muted">Тип:</span>
@@ -349,7 +349,7 @@
 
                 <div class="vr mx-2" style="height: 24px;"></div>
 
-                <!-- Оценка -->
+                
                 <div class="d-flex align-items-center gap-2">
                     <span class="small fw-semibold text-muted">Оценка:</span>
                     {% for i in "54321"|make_list %}
@@ -369,7 +369,7 @@
                 </div>
             </div>
 
-            <!-- Правая часть: Сортировка и Кнопки -->
+            
             <div class="d-flex align-items-center gap-2 ms-auto">
                 <select class="form-select form-select-sm w-auto" name="sort">
                     <option value="new" {% if current_sort == 'new' or not current_sort %}selected{% endif %}>Сначала новые</option>
@@ -390,16 +390,16 @@
             </div>
         </form>
 
-        <!-- 🔥 СПИСОК ОТЗЫВОВ (с пагинацией через include) -->
+        
         {% if reviews %}
         <div class="reviews-list" id="reviews-container">
-            <!-- Первые 3 отзыва -->
+            
             {% for review in reviews|slice:":3" %}
                 {% include 'product/_review_card.html' with review=review review_index=forloop.counter0 %}
             {% endfor %}
         </div>
 
-        <!-- Скрытые отзывы (после 3-го) -->
+        
         {% if reviews|length > 3 %}
         <div id="hidden-reviews" class="d-none">
             {% for review in reviews|slice:"3:" %}
@@ -407,7 +407,7 @@
             {% endfor %}
         </div>
 
-        <!-- Кнопка "Показать ещё" -->
+        
         <div class="text-center mt-4">
             <button class="btn btn-outline-primary btn-lg" id="load-more-reviews" onclick="loadMoreReviews()">
                 Показать ещё отзывы ({{ reviews|length|add:"-3" }})

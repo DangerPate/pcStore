@@ -1,7 +1,6 @@
-# main/admin.py
+
 from django.contrib import admin
 from .models import Banner
-
 
 @admin.register(Banner)
 class BannerAdmin(admin.ModelAdmin):
@@ -9,7 +8,7 @@ class BannerAdmin(admin.ModelAdmin):
     list_filter = ['is_active', 'link_type', 'created_at']
     search_fields = ['title', 'subtitle', 'description']
     ordering = ['order', '-created_at']
-    filter_horizontal = ['products']  # Удобный виджет для ManyToMany
+    filter_horizontal = ['products']
 
     fieldsets = (
         ('Изображение', {
@@ -18,7 +17,7 @@ class BannerAdmin(admin.ModelAdmin):
         }),
         ('Текстовый контент', {
             'fields': ('title', 'subtitle', 'description'),
-            'classes': ('collapse',)  # Сворачиваемая секция
+            'classes': ('collapse',)
         }),
         ('Кнопка', {
             'fields': ('button_text', 'button_color'),

@@ -5,7 +5,6 @@ from django.utils import timezone
 from django.conf import settings
 import random
 
-
 class Category(models.Model):
     title = models.CharField('Название', max_length=50)
     slug = models.SlugField('URL-метка', null=True, blank=True)
@@ -16,7 +15,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-        ordering = ['parent__slug', 'slug']  # Сначала родительские, потом дочерние
+        ordering = ['parent__slug', 'slug']
 
     def __str__(self):
         if self.parent:
@@ -32,11 +31,8 @@ class Category(models.Model):
         from django.urls import reverse
         return reverse('catalog:category', kwargs={'category_slug': self.slug})
 
-
-# catalog/models.py
-
 class Product(models.Model):
-    # === БАЗОВЫЕ ПОЛЯ ===
+
     title = models.CharField('Название', max_length=150, db_index=True)
     info = models.TextField('Краткая информация / характеристики', blank=True)
     price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
@@ -49,14 +45,12 @@ class Product(models.Model):
     warranty = models.CharField('Гарантия', max_length=50, default='12 месяцев', blank=True)
     categories = models.ManyToManyField('Category', blank=True, related_name='products', verbose_name='Категории')
 
-    # === ИДЕНТИФИКАТОРЫ ===
     slug = models.SlugField('URL-метка', blank=True, db_index=True)
     sku = models.CharField('Артикул', max_length=50, unique=True, blank=True, null=True, db_index=True)
     description = models.TextField('Полное описание', blank=True)
     old_price = models.DecimalField('Старая цена', max_digits=10, decimal_places=2, blank=True, null=True,
                                     help_text='Заполните для отображения скидки')
 
-    # === СТАТУСЫ ===
     is_active = models.BooleanField('Опубликован', default=True, db_index=True)
     brand = models.CharField('Бренд / Производитель', max_length=100, blank=True, db_index=True)
 
@@ -69,24 +63,19 @@ class Product(models.Model):
         help_text="Одинаковое значение связывает товары. Например: 'kingston-a400'"
     )
 
-    # === 🔥 АВТО-МАРКЕРЫ (ручное переопределение возможно) ===
-    # Для принудительного включения/выключения (опционально)
     force_hit = models.BooleanField('🔥 Принудительно хит', default=False, help_text='Игнорировать авто-расчёт')
     force_new = models.BooleanField('✨ Принудительно новинка', default=False, help_text='Игнорировать авто-расчёт')
 
-    # === ТЕХНИЧЕСКИЕ ===
     weight = models.DecimalField('Вес (кг)', max_digits=6, decimal_places=2, blank=True, null=True)
     views = models.PositiveIntegerField('Просмотры', default=0, editable=False)
     specifications = models.JSONField('Характеристики', blank=True, null=True, default=dict)
 
-    # === ДАТЫ ===
     created_at = models.DateTimeField('Дата создания', auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
-    # === НАСТРОЙКИ АВТО-МАРКЕРОВ ===
-    NEW_PRODUCT_DAYS = 14  # 🔑 Товар считается новинкой первые 14 дней
-    HIT_VIEWS_THRESHOLD = 500  # 🔑 Минимум просмотров для статуса "хит"
-    HIT_TOP_PERCENT = 10  # 🔑 Или топ-10% товаров по просмотрам
+    NEW_PRODUCT_DAYS = 14
+    HIT_VIEWS_THRESHOLD = 500
+    HIT_TOP_PERCENT = 10
 
     class Meta:
         verbose_name = 'Товар'
@@ -97,14 +86,14 @@ class Product(models.Model):
             models.Index(fields=['price']),
             models.Index(fields=['is_active', 'created_at']),
             models.Index(fields=['brand']),
-            models.Index(fields=['-views']),  # 🔑 Для быстрых запросов по популярности
+            models.Index(fields=['-views']),
         ]
 
     def __str__(self):
         return f"{self.title} ({self.sku or 'Без артикула'})"
 
     def save(self, *args, **kwargs):
-        # Автогенерация slug
+
         if not self.slug:
             base_slug = slugify(self.title, allow_unicode=False)
             slug = base_slug
@@ -114,7 +103,6 @@ class Product(models.Model):
                 counter += 1
             self.slug = slug
 
-        # Автогенерация SKU
         if not self.sku:
             self.sku = f"PRD-{timezone.now().strftime('%y%m%d')}-{random.randint(1000, 9999)}"
 
@@ -124,7 +112,6 @@ class Product(models.Model):
         from django.urls import reverse
         return reverse('catalog:product_detail', kwargs={'slug': self.slug})
 
-    # 🔥 === АВТО-МАРКЕР: НОВИНКА ===
     @property
     def is_new(self):
         """Товар — новинка, если создан менее чем NEW_PRODUCT_DAYS дней назад"""
@@ -144,7 +131,6 @@ class Product(models.Model):
         end_date = self.created_at + timedelta(days=self.NEW_PRODUCT_DAYS)
         return (end_date - timezone.now()).days
 
-    # 🔥 === АВТО-МАРКЕР: ХИТ ПРОДАЖ ===
     @property
     def is_hit(self):
         """
@@ -156,11 +142,9 @@ class Product(models.Model):
         if self.force_hit:
             return True
 
-        # Простая проверка по порогу
         if self.views >= self.HIT_VIEWS_THRESHOLD:
             return True
 
-        # Проверка по проценту (топ-10%)
         from django.db.models import Max
         max_views = Product.objects.filter(is_active=True).aggregate(max_v=Max('views'))['max_v'] or 1
         if max_views > 0 and self.views / max_views >= (1 - self.HIT_TOP_PERCENT / 100):
@@ -171,12 +155,11 @@ class Product(models.Model):
     @property
     def views_rank(self):
         """Место товара в рейтинге по просмотрам (1 = самый популярный)"""
-        # 🔥 Оптимизация: кэшировать в продакшене
+
         return Product.objects.filter(
             is_active=True, views__gte=self.views
         ).count()
 
-    # === БИЗНЕС-ЛОГИКА ===
     @property
     def price_with_discount(self):
         if self.old_price and self.old_price > self.price:
@@ -205,29 +188,25 @@ class Product(models.Model):
     @property
     def review_count(self):
         """Заглушка: возвращает случайное число отзывов (10-500)"""
-        # 🔥 В будущем: return self.reviews.count()
-        return (self.id * 7 + 13) % 491 + 10  # Псевдо-рандом на основе ID
-    # 🔥 === УВЕЛИЧЕНИЕ ПРОСМОТРОВ ===
+
+        return (self.id * 7 + 13) % 491 + 10
+
     def increment_views(self):
         """Безопасное увеличение счётчика просмотров"""
         Product.objects.filter(pk=self.pk).update(views=models.F('views') + 1)
-        self.views += 1  # Обновляем локально
-
+        self.views += 1
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='catalog_reviews')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     author_name = models.CharField('Имя автора', max_length=100, blank=True)
 
-    # 🔥 Рейтинг
     rating = models.PositiveSmallIntegerField('Оценка', choices=[(i, str(i)) for i in range(1, 6)])
 
-    # 🔥 Новые поля
     pros = models.TextField('Достоинства', blank=True, help_text='Что понравилось?')
     cons = models.TextField('Недостатки', blank=True, help_text='Что не понравилось?')
     comment = models.TextField('Комментарий', help_text='Ваш подробный отзыв')
 
-    # 🔥 Чекбокс проблемы
     has_issue = models.BooleanField('Есть проблема с описанием', default=False)
     issue_description = models.TextField('Описание проблемы', blank=True, help_text='Опишите, что не соответствует')
 
@@ -241,7 +220,6 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Отзыв на {self.product.title} от {self.author_name or self.user}"
-
 
 class ReviewAttachment(models.Model):
     """Вложения к отзыву (фото/видео)"""
@@ -260,8 +238,6 @@ class ReviewAttachment(models.Model):
     def __str__(self):
         return f"Вложение для отзыва #{self.review.id}"
 
-# catalog/models.py
-
 class ReviewVote(models.Model):
     """Лайки и дизлайки отзывов"""
     review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='votes')
@@ -275,7 +251,6 @@ class ReviewVote(models.Model):
 
     def __str__(self):
         return f"{'👍' if self.vote == 1 else '👎'} {self.user} для отзыва #{self.review.id}"
-
 
 class ReviewComment(models.Model):
     """Комментарии под отзывами"""
@@ -308,11 +283,10 @@ class ProductImage(models.Model):
         return f"Изображение для {self.product.title}"
 
     def save(self, *args, **kwargs):
-        # Если это главное изображение, снимаем флаг с остальных
+
         if self.is_main:
             ProductImage.objects.filter(product=self.product).update(is_main=False)
         super().save(*args, **kwargs)
-
 
 class Promotion(models.Model):
     title = models.CharField('Название акции', max_length=200)
@@ -322,7 +296,6 @@ class Promotion(models.Model):
     discount_percent = models.PositiveIntegerField('Скидка %', blank=True, null=True,
                                                    help_text='Общая скидка на акцию (необязательно)')
 
-    # 🔥 ИЗОБРАЖЕНИЯ ДЛЯ БАННЕРА
     banner_image = models.ImageField('Баннер акции', upload_to='promotions/banners/', blank=True, null=True,
                                      help_text='Основное изображение для карусели (рекомендуемый размер: 1200x450px)')
     banner_color = models.CharField('Цвет фона', max_length=7, default='#0d6efd',
@@ -333,7 +306,6 @@ class Promotion(models.Model):
     end_date = models.DateTimeField('Конец акции', blank=True, null=True)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
-    # Для сортировки в карусели
     order = models.PositiveIntegerField('Порядок отображения', default=0, help_text='Меньшее число = выше в списке')
 
     class Meta:

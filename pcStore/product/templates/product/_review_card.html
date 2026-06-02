@@ -41,7 +41,7 @@
 
         <p class="text-muted mb-3">{{ review.comment|linebreaksbr }}</p>
 
-        <!-- 🔥 ОТОБРАЖЕНИЕ ПРОБЛЕМЫ (Товар не соответствует описанию) -->
+        
         {% if review.has_issue and review.issue_description %}
         <div class="alert alert-warning py-2 mb-3 small border-warning bg-warning-subtle">
             <strong><i class="bi bi-exclamation-triangle me-1"></i> Несоответствие описанию:</strong>
@@ -72,7 +72,7 @@
         </div>
         {% endif %}
 
-        <!-- Лайки/Дизлайки (справа) -->
+        
         <div class="d-flex align-items-center justify-content-end gap-3 mt-3 pt-3 border-top">
             <button class="btn btn-sm {% if user_votes|get_item:review.id == 1 %}btn-success active{% else %}btn-outline-success{% endif %} vote-btn"
                     data-id="{{ review.id }}"
@@ -90,7 +90,7 @@
             </button>
         </div>
 
-        <!-- Комментарии -->
+        
         <div class="border-top mt-3 pt-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="small fw-bold mb-0">Комментарии ({{ review.comments.count }})</h6>

@@ -1,30 +1,25 @@
-# main/models.py
+
 from django.db import models
 from catalog.models import Product, Category
-
 
 class Banner(models.Model):
     """Модель промо-баннера для главной страницы"""
 
-    # === Изображение и внешний вид ===
     image = models.ImageField('Изображение баннера', upload_to='banners/%Y/%m/%d/')
     overlay_color = models.CharField('Цвет наложения', max_length=30,
                                      default='rgba(0,0,0,0.3)',
                                      help_text='Прозрачное наложение на изображение (HEX или RGBA)')
 
-    # === Текстовый контент ===
     title = models.CharField('Заголовок', max_length=100, blank=True)
     subtitle = models.CharField('Подзаголовок', max_length=200, blank=True)
     description = models.TextField('Описание', blank=True)
 
-    # === Кнопка ===
     button_text = models.CharField('Текст кнопки', max_length=50,
                                    default='Подробнее', blank=True)
     button_color = models.CharField('Цвет кнопки', max_length=7,
                                     default='#ff6b00',
                                     help_text='HEX цвет (например, #ff6b00)')
 
-    # === Ссылка ===
     LINK_TYPES = [
         ('category', 'Категория'),
         ('product', 'Товар'),
@@ -33,36 +28,32 @@ class Banner(models.Model):
     ]
     link_type = models.CharField('Тип ссылки', max_length=10,
                                  choices=LINK_TYPES, default='category')
-    link_category = models.ForeignKey(Category, models.SET_NULL,  # 🔑 Исправлено!
+    link_category = models.ForeignKey(Category, models.SET_NULL,
                                       null=True, blank=True,
                                       verbose_name='Категория',
                                       help_text='Если выбран тип "Категория"')
-    link_product = models.ForeignKey(Product, models.SET_NULL,  # 🔑 Исправлено!
+    link_product = models.ForeignKey(Product, models.SET_NULL,
                                      null=True, blank=True,
                                      verbose_name='Товар',
                                      help_text='Если выбран тип "Товар"')
     link_url = models.URLField('Произвольный URL', blank=True,
                                help_text='Если выбран тип "Произвольный URL"')
 
-    # === Товары акции ===
     products = models.ManyToManyField(Product,
                                       verbose_name='Товары акции',
                                       related_name='banners',
                                       blank=True,
                                       help_text='Товары, участвующие в этой акции')
 
-    # === Настройки отображения ===
     is_active = models.BooleanField('Активен', default=True)
     order = models.PositiveIntegerField('Порядок', default=0,
                                         help_text='Чем меньше число, тем выше баннер')
 
-    # === Даты акции ===
     start_date = models.DateTimeField('Дата начала', null=True, blank=True,
                                       help_text='Если не указано, баннер показывается всегда')
     end_date = models.DateTimeField('Дата окончания', null=True, blank=True,
                                     help_text='Если не указано, баннер показывается всегда')
 
-    # === Метаданные ===
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
@@ -89,7 +80,7 @@ class Banner(models.Model):
 
     def get_discounted_products(self, count=3):
         """Возвращает товары из акции (не только со скидкой)"""
-        # 🔑 Берём ВСЕ товары из акции, не только со скидкой
+
         if self.products.exists():
             return self.products.all().order_by('?')[:count]
         return []

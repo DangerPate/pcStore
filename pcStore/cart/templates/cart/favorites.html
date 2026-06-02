@@ -14,7 +14,7 @@
         </ol>
     </nav>
 
-    <!-- 🔑 ВЕРХНЯЯ ПАНЕЛЬ: Только "Выбрать все" -->
+    
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <h2 class="fw-bold mb-0">Избранное <span class="fs-6 text-muted fw-normal">{{ total_count }} товаров</span></h2>
         <div class="form-check mb-0">
@@ -24,7 +24,7 @@
     </div>
 
     <div class="row g-4">
-        <!-- 🔑 ЛЕВАЯ КОЛОНКА: Таблица -->
+        
         <div class="col-lg-8">
             {% if favorites %}
             <div class="card border-0 shadow-sm">
@@ -68,7 +68,7 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-2 align-items-center">
-                                    <!-- Кнопка корзины -->
+                                    
                                     {% if fav.is_in_cart %}
                                     <button type="button" class="btn btn-success btn-sm btn-add-cart" data-slug="{{ fav.product.slug }}">
                                         <i class="bi bi-check-lg me-1"></i> В корзине
@@ -79,7 +79,7 @@
                                     </button>
                                     {% endif %}
 
-                                    <!-- 🔑 Кнопка удаления (иконка корзины/удаления) -->
+                                    
                                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove-fav" data-slug="{{ fav.product.slug }}" title="Удалить из избранного">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -92,7 +92,7 @@
                 </div>
             </div>
             {% else %}
-                <!-- 🔑 СПИСОК ПУСТ: Заглушка с кнопкой (унифицирована с корзиной) -->
+                
                 <div class="text-center py-5">
                     <div class="bg-white rounded-4 shadow-sm p-5 mx-auto" style="max-width: 500px;">
                         <i class="bi bi-heart fs-1 text-muted d-block mb-3"></i>
@@ -106,7 +106,7 @@
             {% endif %}
         </div>
 
-        <!-- 🔑 ПРАВАЯ КОЛОНКА: Сайдбар (единственное место с кнопками действий) -->
+        
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm sticky-lg-top" style="top: 80px; z-index: 100;">
                 <div class="card-body p-4">
@@ -134,7 +134,7 @@
     </div>
 </div>
 
-<!-- 🔑 СКРИПТ (без изменений, работает как раньше) -->
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     function getCSRFToken() {

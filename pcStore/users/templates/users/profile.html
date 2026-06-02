@@ -8,11 +8,11 @@
     <h2 class="fw-bold mb-4">Личный кабинет</h2>
 
     <div class="row g-4">
-        <!-- Левая колонка: Информация -->
+        
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4 text-center">
-                    <!-- Аватар -->
+                    
                     <div class="mb-3">
                         {% if user.avatar %}
                         <img src="{{ user.avatar.url }}" class="rounded-circle" width="120" height="120" style="object-fit: cover;">
@@ -23,7 +23,7 @@
                         {% endif %}
                     </div>
 
-                    <!-- Имя и почта -->
+                    
                     <h5 class="mb-1">{{ user.get_display_name }}</h5>
                     <p class="text-muted small mb-3">{{ user.email }}</p>
 
@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <!-- Меню -->
+            
             <div class="card border-0 shadow-sm mt-4">
                 <div class="list-group list-group-flush">
                     <a href="{% url 'cart:orders' %}" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
@@ -60,9 +60,9 @@
             </div>
         </div>
 
-        <!-- Правая колонка: Редактирование -->
+        
         <div class="col-lg-8">
-            <!-- Редактирование профиля -->
+            
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-4"><i class="bi bi-person-gear me-2"></i>Редактировать профиль</h5>
@@ -70,7 +70,7 @@
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
 
-                        <!-- Никнейм -->
+                        
                         <div class="mb-4">
                             <label class="form-label fw-medium">Никнейм <span class="text-danger">*</span></label>
                             <input type="text" name="nickname" class="form-control"
@@ -88,14 +88,14 @@
                             {% endif %}
                         </div>
 
-                        <!-- Email (только просмотр) -->
+                        
                         <div class="mb-4">
                             <label class="form-label fw-medium">Email</label>
                             <input type="email" class="form-control" value="{{ user.email }}" disabled>
                             <small class="text-muted">Для изменения email обратитесь в поддержку</small>
                         </div>
 
-                        <!-- Телефон (теперь редактируемый) -->
+                        
                         <div class="mb-4">
                             <label class="form-label fw-medium">Телефон</label>
                             <input type="tel" name="phone" class="form-control"
@@ -105,14 +105,14 @@
                             <small class="text-muted">Используется для связи по заказам</small>
                         </div>
 
-                        <!-- Аватар -->
+                        
                         <div class="mb-4">
                             <label class="form-label fw-medium">Аватар</label>
                             <input type="file" name="avatar" class="form-control" accept="image/*">
                             <small class="text-muted">JPG, PNG. Макс. 5 МБ</small>
                         </div>
 
-                        <!-- Кнопки -->
+                        
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary px-4">
                                 <i class="bi bi-check-lg me-1"></i>Сохранить изменения
@@ -123,7 +123,7 @@
                 </div>
             </div>
 
-            <!-- 🔥 Смена пароля -->
+            
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-4"><i class="bi bi-shield-lock me-2"></i>Сменить пароль</h5>
@@ -131,26 +131,26 @@
                     <form method="post" action="{% url 'users:change_password' %}">
                         {% csrf_token %}
 
-                        <!-- Текущий пароль -->
+                        
                         <div class="mb-3">
                             <label class="form-label fw-medium">Текущий пароль <span class="text-danger">*</span></label>
                             <input type="password" name="old_password" class="form-control" required>
                         </div>
 
-                        <!-- Новый пароль -->
+                        
                         <div class="mb-3">
                             <label class="form-label fw-medium">Новый пароль <span class="text-danger">*</span></label>
                             <input type="password" name="new_password1" class="form-control" required minlength="8">
                             <small class="text-muted">Минимум 8 символов</small>
                         </div>
 
-                        <!-- Подтверждение пароля -->
+                        
                         <div class="mb-4">
                             <label class="form-label fw-medium">Подтвердите новый пароль <span class="text-danger">*</span></label>
                             <input type="password" name="new_password2" class="form-control" required minlength="8">
                         </div>
 
-                        <!-- Кнопка -->
+                        
                         <button type="submit" class="btn btn-outline-primary px-4">
                             <i class="bi bi-key me-1"></i>Сменить пароль
                         </button>

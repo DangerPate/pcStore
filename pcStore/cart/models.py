@@ -1,4 +1,4 @@
-# cart/models.py
+
 from django.db import models
 from django.conf import settings
 from catalog.models import Product
@@ -17,7 +17,7 @@ class CartItem(models.Model):
     class Meta:
         verbose_name = 'Позиция корзины'
         verbose_name_plural = 'Позиции корзины'
-        unique_together = ('user', 'product')  # Один товар у пользователя — одна запись
+        unique_together = ('user', 'product')
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['user', 'product']),
@@ -29,7 +29,6 @@ class CartItem(models.Model):
     def get_total_price(self):
         """Стоимость этой позиции (цена × количество)"""
         return self.product.price * self.quantity
-
 
 class Favorite(models.Model):
     """Избранное — привязано напрямую к пользователю"""
@@ -57,9 +56,6 @@ class Favorite(models.Model):
     def __str__(self):
         return f"{self.product.title} in favorites of {self.user.email}"
 
-
-# 🔹 Заглушка для модели Cart (если где-то в коде остались ссылки)
-# Можно удалить, если нигде не используется
 class Cart(models.Model):
     """
     ЗАГЛУШКА — не используется.
@@ -81,7 +77,6 @@ class Cart(models.Model):
 
     def __str__(self):
         return f"Cart of {self.user.email if self.user else 'Anonymous'}"
-
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -110,10 +105,9 @@ class Order(models.Model):
     def __str__(self):
         return f"Заказ #{self.id} от {self.first_name}"
 
-
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name='Заказ')
-    # Используем строку 'catalog.Product', чтобы избежать циклического импорта
+
     product = models.ForeignKey('catalog.Product', on_delete=models.PROTECT, verbose_name='Товар')
     price = models.DecimalField('Цена на момент заказа', max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField('Количество', default=1)

@@ -1,6 +1,6 @@
-﻿/* catalog.css — Чистые стили для каталога и поиска */
+﻿
 
-/* === КАРТОЧКА ТОВАРА === */
+
 .catalog-card {
   border-radius: 12px;
   border: 1px solid #e9ecef;
@@ -14,7 +14,7 @@
   border-color: #ddd;
 }
 
-/* Изображение */
+
 .catalog-img-link {
   display: flex;
   align-items: center;
@@ -30,7 +30,7 @@
   object-fit: contain;
 }
 
-/* Текст */
+
 .catalog-title {
   font-size: 0.95rem;
   font-weight: 500;
@@ -57,7 +57,7 @@
   margin-bottom: 0.5rem;
 }
 
-/* Кнопки */
+
 .btn-add-cart.btn-dark {
   background: #000;
   border-color: #000;
@@ -94,7 +94,7 @@
   color: #fff;
 }
 
-/* === SIDEBAR ФИЛЬТРОВ === */
+
 .sticky-filter {
   position: sticky;
   top: 90px;
@@ -102,7 +102,7 @@
   border-radius: 12px;
 }
 
-/* === ПАГИНАЦИЯ === */
+
 .pagination {
   margin: 2rem 0 1rem;
 }
@@ -121,7 +121,7 @@
   color: #fff;
 }
 
-/* === МОБИЛЬНЫЕ === */
+
 @media (max-width: 767.98px) {
   .catalog-img-link {
     height: 100px;
@@ -147,7 +147,7 @@
   }
 }
 
-/* Фильтры в стиле DNS */
+
 .filter-section {
     border-bottom: 1px solid #e9ecef;
 }
@@ -157,7 +157,7 @@
 }
 
 .filter-section .form-check.p-2 {
-    padding-left: 10px !important;  /* Увеличиваем отступ слева */
+    padding-left: 10px !important;  
 }
 
 .filter-header {
@@ -188,7 +188,7 @@
     border-radius: 4px;
 }
 
-/* Скроллбар для списка опций */
+
 .filter-options::-webkit-scrollbar {
     width: 6px;
 }
@@ -207,20 +207,20 @@
     background: #a8a8a8;
 }
 
-/* Чекбоксы */
+
 .form-check-input:checked {
     background-color: #0d6efd;
     border-color: #0d6efd;
 }
 
-/* Адаптив */
+
 @media (max-width: 991.98px) {
     .sticky-filter {
         position: static !important;
     }
 }
 
-/* Плитки категорий в поиске */
+
 .hover-shadow:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     transform: translateY(-2px);

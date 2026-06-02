@@ -1,13 +1,9 @@
-﻿/* =========================================
-   1. ПЕРЕМЕННЫЕ (обязательно в начале)
-   ========================================= */
+﻿
 :root {
   --navbar-height: 72px;
 }
 
-/* =========================================
-   2. БАЗОВЫЕ СТИЛИ & СБРОС
-   ========================================= */
+
 html, body {
   height: 100%;
   margin: 0;
@@ -22,35 +18,31 @@ body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-/* =========================================
-   3. LAYOUT & STICKY FOOTER
-   ========================================= */
-/* Основной контент растягивается, толкая футер вниз */
+
+
 main {
   flex: 1 0 auto;
-  /*padding-top: calc(var(--navbar-height) + 1rem); Отступ под fixed-навбар */
+  
   padding-bottom: 2rem;
   padding-top: 50px;
 }
 
-/* Сбрасываем лишние отступы у контейнеров внутри main */
+
 main .container {
   padding-top: 0;
   margin-top: 0 !important;
 }
 
-/* Футер не сжимается и прижимается к низу */
+
 footer {
   flex-shrink: 0;
   margin-top: auto;
 }
 
-/* =========================================
-   4. НАВБАР & OFFCANVAS КАТАЛОГ
-   ========================================= */
+
 header {
   background-color: #fff;
-  z-index: 1050; /* Поверх всего, кроме модалок */
+  z-index: 1050; 
 }
 
 .offcanvas-top.no-overlap-header {
@@ -61,12 +53,12 @@ header {
   border-bottom-right-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
-  /* Скрыт за навбаром по умолчанию */
+  
   transform: translateY(calc(-1 * var(--navbar-height))) !important;
-  transition: none !important;  /* 🔥 Убрали анимацию */
+  transition: none !important;  
 }
 
-/* 🔥 НОВОЕ: убираем анимацию при скрытии */
+
 .offcanvas-top.no-overlap-header.showing,
 .offcanvas-top.no-overlap-header.hiding,
 .offcanvas-top.no-overlap-header.show {
@@ -83,7 +75,7 @@ header {
     text-decoration: none;
 }
 
-/* Элементы каталога */
+
 .catalog-category {
   padding: 0.75rem 1.25rem;
   transition: all 0.2s ease;
@@ -114,9 +106,7 @@ header {
   transition: all 0.2s;
 }
 
-/* =========================================
-   5. ФУТЕР (ЧЁРНО-БЕЛЫЙ СТИЛЬ)
-   ========================================= */
+
 footer {
   background-color: #000;
   color: #fff;
@@ -155,7 +145,7 @@ footer .list-unstyled li {
   margin-bottom: 0.5rem;
 }
 
-/* Соцсети */
+
 footer .social-links a {
   width: 36px;
   height: 36px;
@@ -175,7 +165,7 @@ footer .social-links a:hover {
   border-color: #fff;
 }
 
-/* Форма подписки */
+
 footer .newsletter-form .form-control {
   background: #1a1a1a;
   border: 1px solid #444;
@@ -208,7 +198,7 @@ footer .newsletter-form .btn:hover {
   color: #fff;
 }
 
-/* Нижняя полоса */
+
 footer .footer-bottom {
   border-top: 1px solid #333;
   padding-top: 1.5rem;
@@ -236,9 +226,7 @@ footer .payment-badge {
   border: 1px solid #444;
 }
 
-/* =========================================
-   6. АДАПТИВ
-   ========================================= */
+
 @media (max-width: 768px) {
   footer .row > [class*="col-"] {
     text-align: center;
@@ -266,13 +254,11 @@ footer .payment-badge {
     gap: 0.5rem;
   }
 }
-/* ==========================================
-   SWIPER КАРУСЕЛЬ
-   ========================================== */
+
 
 .promo-carousel-section {
     padding-bottom: 20px;
-    position: relative !important;  /* 🔑 ИЗОЛЯЦИЯ */
+    position: relative !important;  
     z-index: 1 !important;
     overflow: hidden !important;
 }
@@ -326,7 +312,7 @@ footer .payment-badge {
     transform: translateY(-2px);
 }
 
-/* 🔑 ТОЧКИ - ОТДЕЛЬНО СНИЗУ */
+
 .promo-pagination {
     display: flex;
     justify-content: center;
@@ -346,7 +332,7 @@ footer .payment-badge {
     transform: scale(1.3);
 }
 
-/* СТРЕЛКИ */
+
 .promo-carousel-section .swiper-button-next,
 .promo-carousel-section .swiper-button-prev {
     color: #333 !important;
@@ -372,7 +358,7 @@ footer .payment-badge {
     font-weight: bold;
 }
 
-/* ТОВАРЫ */
+
 .promo-carousel-section .col-4 {
     height: 100%;
 }
@@ -409,9 +395,7 @@ footer .payment-badge {
     }
 }
 
-/* ==========================================
-   КАРУСЕЛЬ ТОВАРОВ СО СКИДКОЙ
-   ========================================== */
+
 
 .discount-carousel-section {
     background: #f8f9fa;
@@ -435,12 +419,12 @@ footer .payment-badge {
 .discount-carousel-section .swiper-wrapper {
     padding-bottom: 0px;
     gap: 30px ;
-    height: 450px !important;  /* Твоё значение - не трогаю */
+    height: 450px !important;  
 
 }
 
 .discount-carousel-section .swiper-slide {
-    width: 245px !important;   /* Фиксированная ширина */
+    width: 245px !important;   
     flex-shrink: 0 !important;
 }
 
@@ -450,7 +434,7 @@ footer .payment-badge {
     width: 100% !important;
 }
 
-/* 🔑 СТРЕЛКИ - ГАРАНТИРОВАННО РАБОЧИЕ */
+
 .discount-carousel-section .swiper-button-prev,
 .discount-carousel-section .swiper-button-next {
     color: #333 !important;
@@ -478,16 +462,14 @@ footer .payment-badge {
     font-weight: bold;
 }
 
-/* Адаптив */
+
 @media (max-width: 767.98px) {
     .discount-carousel-section .swiper-slide div {
         height: 370px !important;
     }
 }
 
-/* ==========================================
-   КАРУСЕЛЬ ПОПУЛЯРНОГО (без фона)
-   ========================================== */
+
 
 .popular-carousel-section {
     padding: 0.8rem 0 1.5rem !important;
@@ -523,7 +505,7 @@ footer .payment-badge {
     width: 100% !important;
 }
 
-/* СТРЕЛКИ */
+
 .popular-carousel-section .swiper-button-prev,
 .popular-carousel-section .swiper-button-next {
     color: #333 !important;
@@ -554,9 +536,7 @@ footer .payment-badge {
         height: 370px !important;
     }
 }
-/* ==========================================
-   КАРУСЕЛЬ НОВИНОК (полный аналог хитов)
-   ========================================== */
+
 .new-carousel-section {
     padding: 0.8rem 0 1.5rem !important;
     border-radius: 12px;
@@ -591,7 +571,7 @@ footer .payment-badge {
     width: 100% !important;
 }
 
-/* СТРЕЛКИ */
+
 .new-carousel-section .swiper-button-prev,
 .new-carousel-section .swiper-button-next {
     color: #333 !important;
@@ -625,13 +605,13 @@ footer .payment-badge {
     }
 }
 
-/* Делаем карусель во всю ширину */
+
 .discount-carousel-section,
 .popular-carousel-section,
 .new-carousel-section
 {
-    width: 1377px !important;           /* 100% ширины окна */
-    margin-left: calc(-105px / 2) !important;  /* центрируем относительно окна */
+    width: 1377px !important;           
+    margin-left: calc(-105px / 2) !important;  
     position: relative !important;
     left: 0 !important;
 }
@@ -639,45 +619,43 @@ footer .payment-badge {
 .promo-carousel-section
 {
     width: 1377px !important;
-    margin-left: calc(-85px / 2) !important;  /* центрирование */
+    margin-left: calc(-85px / 2) !important;  
     position: relative !important;
     left: 0 !important;
 }
 
 .promo-carousel-section .banner-wrapper {
     width: 546px !important;
-    flex: 0 0 546px !important;  /* 🔑 добавляем это */
+    flex: 0 0 546px !important;  
 }
 
 .promo-carousel-section .col-lg-8 {
-    width: calc(100% - 546px) !important;  /* оставшееся место */
+    width: calc(100% - 546px) !important;  
     flex: 1 !important;
     max-width: none !important;
 }
 
-/* ==========================================
-   MINI PRODUCT CARD — ДОПОЛНИТЕЛЬНЫЕ ЭЛЕМЕНТЫ
-   ========================================== */
 
-/* Рейтинг: звёзды */
+
+
 .product-card .text-warning i {
     font-size: 0.85rem;
     margin-right: 1px;
 }
 
-/* Старая цена: зачёркнутая */
+
 .product-card .text-decoration-line-through {
     color: #999 !important;
     font-weight: 400;
 }
 
-/* Бейдж скидки */
+
 .product-card .badge.bg-danger {
     font-weight: 600;
     letter-spacing: 0.3px;
 }
 
-/* Адаптив для мобильных */
+
 @media (max-width: 767.98px) {
     .product-card .text-warning i {
         font-size: 0.75rem;

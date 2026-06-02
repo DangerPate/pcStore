@@ -2,23 +2,18 @@
 import os
 import django
 
-#  ИСПРАВЛЕНИЕ: Указываем Python, где лежит корень проекта
-# Берем путь к этому файлу, поднимаемся на 1 уровень вверх (из data в корень)
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 
-# Теперь Django сможет найти настройки pcStore.settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pcStore.settings')
 django.setup()
 
 import random
 from catalog.models import Product, Category
 
-# 1. Получаем или создаем категорию "Видеокарты"
 gpu_cat, _ = Category.objects.get_or_create(title='Видеокарты', slug='gpu')
 
-# 2. Список из 20 РЕАЛИСТИЧНЫХ видеокарт
 REALISTIC_GPUS = [
     {
         "title": "NVIDIA GeForce RTX 4090 Founders Edition",

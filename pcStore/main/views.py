@@ -4,15 +4,11 @@ from django.db.models import Exists, OuterRef, Value, BooleanField, Q, F, Count,
 from cart.models import CartItem, Favorite
 from .models import Banner
 
-
 def index(request):
     """Главная страница с баннерами и каруселями"""
 
     base_products = Product.objects.filter(is_active=True)
 
-    # 🔥 ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ для безопасной аннотации
-    # Если пользователь вошел - проверяем его корзину/избранное.
-    # Если нет - просто ставим False, чтобы не крашить БД объектом AnonymousUser.
     def annotate_products(qs):
         if request.user.is_authenticated:
             return qs.annotate(
@@ -29,46 +25,40 @@ def index(request):
                 is_favorited=Value(False, output_field=BooleanField())
             ).prefetch_related('images')
 
-    # === 1. БАННЕРЫ С ТОВАРАМИ ===
     banners_with_products = []
     active_banners = Banner.objects.filter(
         is_active=True
     ).select_related('link_category', 'link_product').prefetch_related('products')
 
     for banner in active_banners:
-        if getattr(banner, 'is_current', True):  # Безопасная проверка, если поля is_current нет
+        if getattr(banner, 'is_current', True):
             products_qs = banner.products.filter(is_active=True)
-            products_qs = annotate_products(products_qs)  # 🔥 Безопасная аннотация
+            products_qs = annotate_products(products_qs)
 
             banners_with_products.append({
                 'banner': banner,
                 'products': list(products_qs[:3]),
             })
 
-    # === 2. ТОВАРЫ СО СКИДКОЙ ===
     discounted_products_all = annotate_products(
         base_products.filter(
             old_price__isnull=False
         ).exclude(old_price__lte=F('price')).order_by('-created_at')[:15]
     )
 
-    # === 3. ПОПУЛЯРНОЕ ===
     popular_products = annotate_products(
         base_products.filter(views__gt=0).order_by('-views')[:15]
     )
 
-    # === 4. НОВИНКИ ===
     new_products = annotate_products(
         base_products.order_by('-created_at')[:15]
     )
 
-    # === 5. АКЦИИ (Promotions) ===
     promotions = Promotion.objects.filter(
         is_active=True,
         products__isnull=False
     ).distinct().order_by('order', '-created_at')[:5]
 
-    # === 6. СЧЕТЧИКИ ДЛЯ НАВБАРА ===
     if request.user.is_authenticated:
         cart_count = CartItem.objects.filter(user=request.user).count()
         fav_count = Favorite.objects.filter(user=request.user).count()
@@ -82,10 +72,9 @@ def index(request):
         'popular_products': popular_products,
         'new_products': new_products,
         'promotions': promotions,
-        'cart_count': cart_count,  # 🔥 Передаем для навбара
-        'fav_count': fav_count,  # 🔥 Передаем для навбара
+        'cart_count': cart_count,
+        'fav_count': fav_count,
     })
-
 
 def about(request):
     return render(request, 'main/info/about.html')

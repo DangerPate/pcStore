@@ -1,13 +1,13 @@
-﻿# catalog/filters_config.py
+﻿
 
 FILTERS_CONFIG = {
-    # === ВИДЕОКАРТЫ ===
+
     'gpu': {
         'gpu_model': {
             'label': 'Графический процессор',
             'type': 'select',
             'options': [
-                # NVIDIA RTX 50 / 40 / 30 / 20 / 16 / 10 & Legacy
+
                 'GeForce RTX 5090', 'GeForce RTX 5080', 'GeForce RTX 5070 Ti', 'GeForce RTX 5070',
                 'GeForce RTX 4090', 'GeForce RTX 4080 SUPER', 'GeForce RTX 4080', 'GeForce RTX 4070 Ti SUPER',
                 'GeForce RTX 4070 Ti', 'GeForce RTX 4070 SUPER', 'GeForce RTX 4070', 'GeForce RTX 4060 Ti',
@@ -19,7 +19,7 @@ FILTERS_CONFIG = {
                 'GeForce GTX 1650 SUPER', 'GeForce GTX 1650', 'GeForce GTX 1080 Ti', 'GeForce GTX 1080',
                 'GeForce GTX 1070 Ti', 'GeForce GTX 1070', 'GeForce GTX 1060', 'GeForce GTX 1050 Ti',
                 'GeForce GTX 1050', 'GeForce GT 1030', 'GeForce GT 710',
-                # AMD Radeon RX 9000 / 7000 / 6000 / 5000 / 400 & Legacy
+
                 'Radeon RX 9070 XT', 'Radeon RX 9070', 'Radeon RX 7900 XTX', 'Radeon RX 7900 XT',
                 'Radeon RX 7900 GRE', 'Radeon RX 7800 XT', 'Radeon RX 7700 XT', 'Radeon RX 7600 XT',
                 'Radeon RX 7600', 'Radeon RX 6950 XT', 'Radeon RX 6900 XT', 'Radeon RX 6800 XT',
@@ -29,7 +29,7 @@ FILTERS_CONFIG = {
                 'Radeon RX Vega 64', 'Radeon RX Vega 56', 'Radeon RX 590', 'Radeon RX 580',
                 'Radeon RX 570', 'Radeon RX 560', 'Radeon RX 480', 'Radeon RX 470', 'Radeon R9 390X',
                 'Radeon R9 290X', 'Radeon R7 370', 'Radeon HD 7970',
-                # Intel Arc
+
                 'Intel Arc A770', 'Intel Arc A750', 'Intel Arc A580', 'Intel Arc A380', 'Intel Arc A310'
             ],
         },
@@ -92,7 +92,6 @@ FILTERS_CONFIG = {
         },
     },
 
-    # === ПРОЦЕССОРЫ ===
     'cpu': {
         'socket': {
             'label': 'Сокет',
@@ -174,8 +173,6 @@ FILTERS_CONFIG = {
         }
     },
 
-
-    # === МАТЕРИНСКИЕ ПЛАТЫ ===
     'motherboard': {
         'socket': {
             'label': 'Сокет',
@@ -233,8 +230,6 @@ FILTERS_CONFIG = {
         }
     },
 
-
-    # === SSD / HDD ===
     'ssd': {
         'capacity': {
             'label': 'Объём',
@@ -253,7 +248,6 @@ FILTERS_CONFIG = {
         },
     },
 
-    # === БЛОКИ ПИТАНИЯ ===
     'psu': {
         'wattage': {
             'label': 'Мощность (Вт)',
@@ -273,7 +267,7 @@ FILTERS_CONFIG = {
             'options': ['Не модульный', 'Полумодульный', 'Полностью модульный'],
         },
     },
-    # === ОПЕРАТИВНАЯ ПАМЯТЬ ===
+
     'ram': {
         'memory_type': {
             'label': 'Тип памяти',
@@ -321,7 +315,7 @@ FILTERS_CONFIG = {
             'options': ['Есть', 'Нет']
         }
     },
-    # === БЛОКИ ПИТАНИЯ (PSU) ===
+
     'psu': {
         'wattage': {
             'label': 'Мощность (Вт)',
@@ -349,7 +343,7 @@ FILTERS_CONFIG = {
             'type': 'select',
             'options': ['ATX', 'SFX', 'SFX-L', 'TFX', 'FlexATX', 'EPS 12V (Server)', 'SFX Gold']
         },
-        # 🔹 ИСПРАВЛЕНО: Подробные типы коннекторов
+
         'pci_e_connectors': {
             'label': 'Разъемы для видеокарты (PCI-E)',
             'type': 'select',
@@ -360,7 +354,7 @@ FILTERS_CONFIG = {
                 '1x 12+4 pin (12VHPWR)', '2x 12+4 pin (12VHPWR)'
             ]
         },
-        # 🔹 ИСПРАВЛЕНО: Все стандарты ATX
+
         'atx_standard': {
             'label': 'Соответствие стандартам ATX',
             'type': 'select',
@@ -376,7 +370,7 @@ FILTERS_CONFIG = {
             'type': 'select',
             'options': ['Активный (Active PFC)', 'Пассивный (Passive PFC)', 'Без PFC']
         },
-        # 🔹 ИСПРАВЛЕНО: Варианты питания процессора
+
         'cpu_connectors': {
             'label': 'Разъемы для питания процессора',
             'type': 'select',
@@ -390,7 +384,7 @@ FILTERS_CONFIG = {
             'options': ['В оплетке', 'Без оплетки', 'Красная/Цветная', 'Плоские кабели', 'Silicone Cables']
         }
     },
-    # === КОРПУСА ===
+
     'pc-case': {
         'mb_support': {
             'label': 'Форм-фактор совместимых плат',
@@ -450,7 +444,7 @@ FILTERS_CONFIG = {
             'options': ['Есть', 'Нет']
         }
     },
-    # === ВОЗДУШНОЕ ОХЛАЖДЕНИЕ (КУЛЕРЫ) ===
+
     'pc-cooling': {
         'socket': {
             'label': 'Сокет',
@@ -515,12 +509,12 @@ FILTERS_CONFIG = {
             'step': 1
         }
     },
-    # === УНИВЕРСАЛЬНЫЕ ФИЛЬТРЫ (для всех категорий) ===
+
     '_common': {
         'brand': {
             'label': 'Бренд',
             'type': 'select',
-            'options': [],  # Заполняется динамически из БД
+            'options': [],
         },
         'price': {
             'label': 'Цена',

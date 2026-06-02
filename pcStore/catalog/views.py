@@ -1,4 +1,4 @@
-# catalog/views.py
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import JsonResponse
@@ -15,8 +15,7 @@ from django.db.models.functions import Coalesce
 import json
 
 ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'video/mp4']
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 МБ
-
+MAX_FILE_SIZE = 50 * 1024 * 1024
 
 def apply_filters(queryset, request, category_slug=None):
     """
@@ -24,7 +23,7 @@ def apply_filters(queryset, request, category_slug=None):
     и динамические JSON-фильтры для конкретной категории.
     Поддерживает множественный выбор для чекбоксов.
     """
-    # === 1. ОБЩИЕ ФИЛЬТРЫ ===
+
     price_min = request.GET.get('price_min')
     price_max = request.GET.get('price_max')
     if price_min and price_min.isdigit():
@@ -32,7 +31,6 @@ def apply_filters(queryset, request, category_slug=None):
     if price_max and price_max.isdigit():
         queryset = queryset.filter(price__lte=int(price_max))
 
-    # 🔥 Бренд теперь поддерживает множественный выбор
     brands = request.GET.getlist('brand')
     if brands:
         queryset = queryset.filter(brand__in=brands)
@@ -40,32 +38,28 @@ def apply_filters(queryset, request, category_slug=None):
     if request.GET.get('in_stock') == '1':
         queryset = queryset.filter(in_stock__gt=0)
 
-    # === 2. ДИНАМИЧЕСКИЕ ФИЛЬТРЫ ===
     if category_slug and category_slug in FILTERS_CONFIG:
         specs_config = FILTERS_CONFIG[category_slug]
 
         for key, spec in specs_config.items():
-            # Пропускаем 'brand', он уже обработан выше
+
             if key == 'brand':
                 continue
 
-            # 🔹 Выпадающие списки (теперь с поддержкой множественного выбора)
             if spec['type'] == 'select':
                 values = request.GET.getlist(key)
                 if values:
-                    # Используем OR-логику: товар подходит, если хотя бы одно значение совпадает
+
                     q_filter = Q()
                     for value in values:
                         q_filter |= Q(specifications__contains={key: value})
                     queryset = queryset.filter(q_filter)
 
-            # 🔹 Чекбоксы (одиночные)
             elif spec['type'] == 'checkbox':
                 value = request.GET.get(key)
                 if value == '1':
                     queryset = queryset.filter(specifications__contains={key: True})
 
-            # 🔹 Диапазоны (частоты, TDP и т.д.)
             elif spec['type'] == 'range':
                 min_val = request.GET.get(f'{key}_min')
                 max_val = request.GET.get(f'{key}_max')
@@ -84,7 +78,6 @@ def apply_filters(queryset, request, category_slug=None):
 
     return queryset
 
-
 def category_view(request, category_slug):
     """Отображение товаров категории с динамическими фильтрами (стиль DNS)"""
     category = get_object_or_404(Category, slug=category_slug)
@@ -94,15 +87,12 @@ def category_view(request, category_slug):
             'category': category,
         })
 
-    # 🔥 Базовый запрос
     products = Product.objects.filter(categories=category, is_active=True).distinct()
 
-    # 🔥 Применяем фильтры
     products = apply_filters(products, request, category_slug)
 
-    # 🔥 БЕЗОПАСНЫЕ аннотации ДЛЯ КАРТОЧЕК (после фильтров, до пагинации)
     if request.user.is_authenticated:
-        # Если пользователь вошел в систему, проверяем его корзину и избранное
+
         products = products.annotate(
             reviews_count=Count('catalog_reviews'),
             avg_rating=Avg('catalog_reviews__rating'),
@@ -110,8 +100,7 @@ def category_view(request, category_slug):
             is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
         ).prefetch_related('images')
     else:
-        # Если пользователь НЕ вошел в систему, жестко подставляем False,
-        # чтобы база данных не пыталась искать AnonymousUser и не выдавала ошибку 500
+
         products = products.annotate(
             reviews_count=Count('catalog_reviews'),
             avg_rating=Avg('catalog_reviews__rating'),
@@ -139,29 +128,26 @@ def category_view(request, category_slug):
             Coalesce('avg_rating', 0).desc(),
             '-views'
         )
-    else:  # 'popular' или по умолчанию
+    else:
         products = products.order_by('-views')
 
-    # Формируем конфигурацию фильтров для шаблона
     config = {**FILTERS_CONFIG.get('_common', {}), **FILTERS_CONFIG.get(category_slug, {})}
 
-    # Базовые товары для подсчёта (без применения фильтров, только категория)
     base_products = Product.objects.filter(categories=category, is_active=True).distinct()
 
     filters = {}
     for key, spec in config.items():
-        # Получаем все выбранные значения (для множественного выбора)
+
         selected_values = request.GET.getlist(key)
 
         filter_data = {
             **spec,
-            'value': request.GET.get(key),  # Для обратной совместимости
-            'selected_values': selected_values,  # Список выбранных значений
+            'value': request.GET.get(key),
+            'selected_values': selected_values,
             'current_min': request.GET.get(f'{key}_min', ''),
             'current_max': request.GET.get(f'{key}_max', ''),
         }
 
-        # 🔥 Для select-фильтров считаем количество товаров по каждому значению
         if spec['type'] == 'select':
             counts = {}
             for option in spec.get('options', []):
@@ -170,7 +156,6 @@ def category_view(request, category_slug):
                 ).count()
             filter_data['counts'] = counts
 
-            # Для брендов — отдельная логика (поле brand, не specifications)
             if key == 'brand':
                 counts = {}
                 brands = base_products.filter(
@@ -187,7 +172,6 @@ def category_view(request, category_slug):
 
         filters[key] = filter_data
 
-    # 🔥 Пагинация
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     try:
@@ -208,7 +192,6 @@ def category_view(request, category_slug):
         'filter_params': filter_params.urlencode(),
     })
 
-
 def product_detail(request, slug):
     """Детальная страница товара"""
     product = get_object_or_404(Product, slug=slug, is_active=True)
@@ -216,12 +199,10 @@ def product_detail(request, slug):
 
     reviews_qs = product.catalog_reviews.select_related('user')
 
-    # 🔥 1. ОПРЕДЕЛЯЕМ ПЕРЕМЕННЫЕ ФИЛЬТРОВ (Именно этого не хватало!)
     filter_photos = request.GET.get('filter_photos') == 'on'
     filter_videos = request.GET.get('filter_videos') == 'on'
-    filter_ratings = request.GET.getlist('filter_rating')  # <-- ВОТ ЭТА СТРОКА
+    filter_ratings = request.GET.getlist('filter_rating')
 
-    # Применяем фильтры к queryset
     if filter_photos:
         reviews_qs = reviews_qs.filter(attachments__file_type='image').distinct()
     if filter_videos:
@@ -229,7 +210,6 @@ def product_detail(request, slug):
     if filter_ratings:
         reviews_qs = reviews_qs.filter(rating__in=[int(r) for r in filter_ratings])
 
-    # 🔥 2. СОРТИРОВКА
     sort = request.GET.get('sort', 'new')
     if sort == 'old':
         reviews_qs = reviews_qs.order_by('created_at')
@@ -237,16 +217,14 @@ def product_detail(request, slug):
         reviews_qs = reviews_qs.order_by('rating', '-created_at')
     elif sort == 'good_rating':
         reviews_qs = reviews_qs.order_by('-rating', '-created_at')
-    else:  # 'new' по умолчанию
+    else:
         reviews_qs = reviews_qs.order_by('-created_at')
 
-    # Аннотации для лайков
     reviews = reviews_qs.annotate(
         likes_count=Count('votes', filter=Q(votes__vote=1)),
         dislikes_count=Count('votes', filter=Q(votes__vote=-1))
     )
 
-    # Голоса пользователя
     if request.user.is_authenticated:
         user_votes = ReviewVote.objects.filter(
             review__in=reviews, user=request.user
@@ -255,10 +233,8 @@ def product_detail(request, slug):
     else:
         votes_dict = {}
 
-    # Средний рейтинг (всегда по ВСЕМ отзывам)
     avg_rating = product.catalog_reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
-    # Распределение оценок
     rating_dist = []
     total_reviews = product.catalog_reviews.count()
     for i in range(5, 0, -1):
@@ -273,7 +249,6 @@ def product_detail(request, slug):
             is_active=True
         ).exclude(id=product.id).order_by('price')
 
-    # Изображения
     images = []
     if product.image:
         images.append(product.image.url)
@@ -283,14 +258,12 @@ def product_detail(request, slug):
     if not images and product.specifications and 'gallery' in product.specifications:
         images.extend(product.specifications['gallery'])
 
-    # Корзина и избранное
     is_in_cart = False
     is_favorited = False
     if request.user.is_authenticated:
         is_in_cart = CartItem.objects.filter(user=request.user, product=product).exists()
         is_favorited = Favorite.objects.filter(user=request.user, product=product).exists()
 
-    # 🔥 3. ПЕРЕДАЧА В ШАБЛОН (теперь filter_ratings точно существует)
     return render(request, 'product/product_card.html', {
         'product': product,
         'is_in_cart': is_in_cart,
@@ -308,7 +281,6 @@ def product_detail(request, slug):
         'variants': variants,
     })
 
-
 def add_review(request, slug):
     """Создание отзыва с полной валидацией"""
     if request.method == 'POST':
@@ -316,7 +288,6 @@ def add_review(request, slug):
         rating = request.POST.get('rating', '').strip()
         comment = request.POST.get('comment', '').strip()
 
-        # 🔥 ВАЛИДАЦИЯ ОЦЕНКИ
         if not rating:
             messages.error(request, 'Пожалуйста, поставьте оценку (выберите звёзды).')
             return redirect('catalog:product_detail', slug=slug)
@@ -330,12 +301,10 @@ def add_review(request, slug):
             messages.error(request, 'Некорректная оценка.')
             return redirect('catalog:product_detail', slug=slug)
 
-        # 🔥 ВАЛИДАЦИЯ КОММЕНТАРИЯ
         if not comment:
             messages.error(request, 'Заполните текст комментария.')
             return redirect('catalog:product_detail', slug=slug)
 
-        # Авто-подстановка имени
         author_name = request.user.get_display_name() if request.user.is_authenticated else 'Гость'
 
         review = Review.objects.create(
@@ -352,7 +321,6 @@ def add_review(request, slug):
             is_verified_purchase=request.user.is_authenticated
         )
 
-        # Файлы
         files = request.FILES.getlist('attachments')
         valid_count = 0
         for f in files:
@@ -370,16 +338,15 @@ def add_review(request, slug):
 
     return redirect('catalog:product_detail', slug=slug)
 
-
 def search_view(request):
     """Поиск с выбором категории"""
     query = request.GET.get('q', '').strip()
-    category_slug = request.GET.get('category', '').strip()  # 🔥 Выбранная категория
+    category_slug = request.GET.get('category', '').strip()
 
     products = Product.objects.filter(is_active=True).distinct()
 
     if query:
-        # Умный поиск по словам
+
         words = query.split()
         q_objects = Q()
         for word in words:
@@ -392,7 +359,6 @@ def search_view(request):
             )
         products = products.filter(q_objects)
 
-    # 🔥 Получаем ВСЕ категории с количеством товаров
     categories_with_counts = products.values(
         'categories__slug',
         'categories__title',
@@ -401,7 +367,6 @@ def search_view(request):
         count=Count('id')
     ).order_by('-count')
 
-    # Преобразуем в список
     found_categories = [
         {
             'slug': cat['categories__slug'],
@@ -412,27 +377,24 @@ def search_view(request):
         for cat in categories_with_counts if cat['categories__slug']
     ]
 
-    # 🔥 Определяем выбранную категорию (или первую по количеству)
     primary_category = None
     if category_slug:
-        # Пользователь выбрал конкретную категорию
+
         for cat in found_categories:
             if cat['slug'] == category_slug:
                 primary_category = cat
                 break
-        # 🔥 ФИЛЬТРУЕМ товары по выбранной категории
+
         products = products.filter(categories__slug=category_slug)
     elif found_categories:
-        # Категория не выбрана — берем первую (с наибольшим количеством)
+
         primary_category = found_categories[0]
-        # 🔥 ФИЛЬТРУЕМ товары по первой категории
+
         products = products.filter(categories__slug=primary_category['slug'])
 
-    # Применяем фильтры
     target_slug = primary_category['slug'] if primary_category else None
     products = apply_filters(products, request, category_slug=target_slug)
 
-    # Формируем конфиг фильтров
     filters = {}
     if target_slug:
         config = {**FILTERS_CONFIG.get('_common', {}), **FILTERS_CONFIG.get(target_slug, {})}
@@ -463,7 +425,6 @@ def search_view(request):
 
             filters[key] = filter_data
 
-    # Аннотации
     if request.user.is_authenticated:
         products = products.annotate(
             reviews_count=Count('catalog_reviews'),
@@ -479,7 +440,6 @@ def search_view(request):
             is_favorited=Value(False, output_field=BooleanField())
         ).prefetch_related('images')
 
-    # Сортировка
     sort = request.GET.get('sort', 'popular')
     if sort == 'price_asc':
         products = products.order_by('price')
@@ -494,7 +454,6 @@ def search_view(request):
     else:
         products = products.order_by('-views')
 
-    # Пагинация
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     try:
@@ -517,12 +476,11 @@ def search_view(request):
         'filter_params': filter_params.urlencode(),
     })
 
-
 @login_required
 def toggle_vote(request):
     if request.method == 'POST':
         review_id = request.POST.get('review_id')
-        vote_type = int(request.POST.get('vote'))  # 1 или -1
+        vote_type = int(request.POST.get('vote'))
         review = get_object_or_404(Review, id=review_id)
 
         existing_vote = ReviewVote.objects.filter(review=review, user=request.user).first()
@@ -545,10 +503,9 @@ def toggle_vote(request):
         return JsonResponse({
             'likes': total_likes,
             'dislikes': total_dislikes,
-            'user_vote': user_vote  # 🔥 Эта строка критически важна!
+            'user_vote': user_vote
         })
     return JsonResponse({'error': 'Invalid request'}, status=400)
-
 
 @login_required
 def add_comment(request):
@@ -583,21 +540,18 @@ def add_comment(request):
 
 def catalog_index(request):
     """Главная страница каталога со всеми категориями"""
-    # Получаем все категории, сгруппированные по родительским
+
     categories = Category.objects.filter(parent__isnull=True).prefetch_related('children').order_by('title')
     return render(request, 'catalog/catalog_index.html', {
         'categories': categories,
     })
 
-
 def promotion_view(request, promotion_slug):
     """Страница акции со списком товаров"""
     promotion = get_object_or_404(Promotion, slug=promotion_slug, is_active=True)
 
-    # 1. Базовый запрос товаров акции (до пагинации)
     base_products = promotion.products.filter(is_active=True).distinct()
 
-    # 2. 🔥 ПРАВИЛЬНОЕ ПОЛУЧЕНИЕ БРЕНДОВ (с группировкой и подсчетом)
     from django.db.models import Count
     brands_qs = base_products.filter(brand__isnull=False).exclude(brand='').values(
         'brand'
@@ -605,13 +559,10 @@ def promotion_view(request, promotion_slug):
         count=Count('id')
     ).order_by('brand')
 
-    # Преобразуем в список словарей: [{'brand': 'AMD', 'count': 5}, ...]
     brands_list = [{'name': b['brand'], 'count': b['count']} for b in brands_qs]
 
-    # 3. Применяем фильтры
     products = apply_filters(base_products, request, category_slug=None)
 
-    # 4. Аннотации для карточек
     products = products.annotate(
         reviews_count=Count('catalog_reviews'),
         avg_rating=Avg('catalog_reviews__rating'),
@@ -619,7 +570,6 @@ def promotion_view(request, promotion_slug):
         is_favorited=Exists(Favorite.objects.filter(user=request.user, product=OuterRef('pk')))
     ).prefetch_related('images')
 
-    # 5. Сортировка
     sort = request.GET.get('sort', 'popular')
     if sort == 'price_asc':
         products = products.order_by('price')
@@ -634,7 +584,6 @@ def promotion_view(request, promotion_slug):
     else:
         products = products.order_by('-views')
 
-    # 6. Пагинация
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     try:
@@ -651,7 +600,7 @@ def promotion_view(request, promotion_slug):
     return render(request, 'catalog/promotion.html', {
         'promotion': promotion,
         'products': products_page,
-        'brands': brands_list,  # 🔥 Теперь это список словарей с count
+        'brands': brands_list,
         'filter_params': filter_params.urlencode(),
     })
 
@@ -659,5 +608,5 @@ def get_active_promotions(request):
     """Получить активные акции для карусели"""
     return Promotion.objects.filter(
         is_active=True,
-        products__isnull=False  # Только акции с товарами
-    ).distinct().order_by('order', '-created_at')[:5]  # Максимум 5 акций
+        products__isnull=False
+    ).distinct().order_by('order', '-created_at')[:5]

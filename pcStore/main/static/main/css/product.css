@@ -1,6 +1,4 @@
-﻿/* ==========================================
-   ГАЛЕРЕЯ ТОВАРА
-   ========================================== */
+﻿
 .product-gallery {
     position: sticky;
     top: 90px;
@@ -19,7 +17,7 @@
     transform: scale(1.02);
 }
 
-/* Миниатюры */
+
 .product-thumbnails {
     display: flex;
     gap: 8px;
@@ -56,9 +54,7 @@
     transform: scale(1.05);
 }
 
-/* ==========================================
-   ИНФОРМАЦИЯ О ТОВАРЕ
-   ========================================== */
+
 .product-info h1 {
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -66,13 +62,13 @@
 
 .ls-1 { letter-spacing: 0.1em; }
 
-/* Бейджи */
+
 .badge {
     font-weight: 500;
     padding: 0.4em 0.75em;
 }
 
-/* Рейтинг */
+
 .product-rating .bi-star,
 .product-rating .bi-star-fill,
 .review-item .bi-star,
@@ -81,9 +77,7 @@
     margin-right: 1px;
 }
 
-/* ==========================================
-   ТАБЫ
-   ========================================== */
+
 .product-tabs .nav-link {
     border: none;
     color: #6c757d;
@@ -121,9 +115,7 @@
     border-radius: 0 0 12px 12px;
 }
 
-/* ==========================================
-   ОТЗЫВЫ И РЕЙТИНГ
-   ========================================== */
+
 .review-form {
     border: 1px solid #e9ecef;
 }
@@ -169,9 +161,7 @@
     padding: 0.25em 0.5em;
 }
 
-/* ==========================================
-   ХАРАКТЕРИСТИКИ
-   ========================================== */
+
 .product-specs-quick dt {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -188,9 +178,7 @@
     background-color: rgba(0, 0, 0, 0.02);
 }
 
-/* ==========================================
-   АДАПТИВ
-   ========================================== */
+
 @media (max-width: 991.98px) {
     .product-gallery {
         position: relative;
@@ -237,11 +225,9 @@
     }
 }
 
-/* ==========================================
-   ОТЗЫВЫ — НОВЫЕ СТИЛИ
-   ========================================== */
 
-/* Интерактивные звёзды */
+
+
 .rating-stars .bi-star {
     transition: transform 0.15s ease, color 0.2s ease;
 }
@@ -254,7 +240,7 @@
     color: #e0e0e0;
 }
 
-/* Блок проблемы */
+
 #issueBlock {
     transition: all 0.3s ease;
 }
@@ -264,7 +250,7 @@
     transform: translateY(-10px);
 }
 
-/* Область загрузки */
+
 .upload-area {
     border-style: dashed !important;
     border-width: 2px !important;
@@ -275,7 +261,7 @@
     background: rgba(13, 110, 253, 0.03);
 }
 
-/* Превью вложений */
+
 #attachmentPreview img,
 #attachmentPreview video {
     border: 2px solid #e9ecef;
@@ -287,7 +273,7 @@
     border-color: #0d6efd;
 }
 
-/* Карточка отзыва */
+
 .review-item {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -296,7 +282,7 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Плюсы/Минусы */
+
 .bg-success-subtle {
     background-color: rgba(25, 135, 84, 0.1) !important;
 }
@@ -304,7 +290,7 @@
     background-color: rgba(220, 53, 69, 0.1) !important;
 }
 
-/* Адаптив */
+
 @media (max-width: 767.98px) {
     .rating-stars .bi-star {
         font-size: 1.5rem !important;
@@ -316,7 +302,7 @@
     }
 }
 
-/* Активные кнопки лайков/дизлайков */
+
 .vote-btn.active.btn-success {
     background-color: #198754 !important;
     border-color: #198754 !important;
@@ -329,7 +315,7 @@
     color: #fff !important;
 }
 
-/* Анимация при наведении */
+
 .vote-btn {
     transition: all 0.2s ease;
 }
@@ -341,7 +327,7 @@
 .vote-btn:active {
     transform: translateY(0);
 }
-/* Превью загружаемых файлов */
+
 .file-preview {
     position: relative;
     display: inline-block;
@@ -359,7 +345,7 @@
     border-color: #0d6efd;
 }
 
-/* Зона загрузки */
+
 .upload-area {
     transition: all 0.3s ease;
 }
@@ -375,7 +361,7 @@
     transform: scale(1.02);
 }
 
-/* Модальное окно */
+
 .modal-content.bg-dark {
     background-color: rgba(0, 0, 0, 0.95) !important;
 }
@@ -384,7 +370,7 @@
     min-height: 400px;
 }
 
-/* Кнопка удаления файла */
+
 .btn-close-file {
     position: absolute;
     top: -8px;
@@ -409,7 +395,7 @@
     background-color: #bb2d3b;
 }
 
-/* Стили для фильтров отзывов */
+
 #review-filter-form .form-check-label {
     cursor: pointer;
     padding: 4px 8px;
@@ -425,7 +411,7 @@
     font-weight: 600;
 }
 
-/* Для звёздочек */
+
 #review-filter-form .form-check-label i {
     transition: transform 0.2s;
 }

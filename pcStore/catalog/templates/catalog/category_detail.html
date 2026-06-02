@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="container py-5">
-    <!-- Хлебные крошки -->
+    
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
@@ -22,7 +22,7 @@
         {{ category.title }}
     </h1>
 
-    <!-- 🔥 ПОДКАТЕГОРИИ -->
+    
     {% if category.children.exists %}
     <div class="mb-5">
         <h2 class="h4 fw-bold mb-3">Подкатегории</h2>
@@ -43,10 +43,10 @@
     </div>
     {% endif %}
 
-    <!-- 🔥 ТОВАРЫ КАТЕГОРИИ -->
+    
     <div class="mb-4">
         <h2 class="h4 fw-bold mb-3">Товары в категории "{{ category.title }}"</h2>
-        <!-- Здесь можно вставить товары через include или просто показать ссылку -->
+        
         <a href="{% url 'catalog:category' category.slug %}?sort=popular" 
            class="btn btn-primary">
             Смотреть все товары ({{ category.products.count }})

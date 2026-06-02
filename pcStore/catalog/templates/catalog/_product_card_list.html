@@ -1,7 +1,7 @@
 ﻿<div class="card catalog-card mb-3 border-0 shadow-sm">
                 <div class="row g-0 align-items-center">
 
-                    <!-- 🔥 Изображение (с fallback) -->
+                    
                     <div class="col-3 col-md-2 p-3">
                         <a href="{% url 'catalog:product_detail' product.slug %}" class="d-block catalog-img-link">
                             {% if product.image %}
@@ -16,14 +16,14 @@
                         </a>
                     </div>
 
-                    <!-- Информация о товаре -->
+                    
                     <div class="col-9 col-md-6 p-3">
                         <a href="{% url 'catalog:product_detail' product.slug %}" class="text-decoration-none text-dark">
                             <h6 class="fw-medium mb-1 catalog-title">{{ product.title }}</h6>
                         </a>
                         <p class="text-muted small mb-2 catalog-specs">{{ product.info|truncatechars:140 }}</p>
 
-                        <!-- 🔥 Реальный рейтинг и отзывы -->
+                        
                         {% with review_count=product.reviews_count|default:0 %}
                         {% if review_count > 0 %}
                             {% with rating=product.avg_rating|default:0 %}
@@ -49,7 +49,7 @@
                         {% endif %}
                         {% endwith %}
 
-                        <!-- Категория и доставка -->
+                        
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                             {% if product.categories.first %}
                             <span class="badge bg-success-subtle text-success">
@@ -60,10 +60,10 @@
                         </div>
                     </div>
 
-                    <!-- Цена и кнопки -->
+                    
                     <div class="col-12 col-md-4 p-3 d-flex flex-column justify-content-center">
 
-                        <!-- 🔥 Цены с поддержкой скидки -->
+                        
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <span class="fs-5 fw-bold text-primary">{{ product.price }} ₽</span>
                             {% if product.old_price and product.old_price > product.price %}
@@ -72,7 +72,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- Кнопки -->
+                        
                         <div class="d-flex gap-2 mt-2">
                             {% if product.is_in_cart %}
                             <button type="button" class="btn btn-success btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}">

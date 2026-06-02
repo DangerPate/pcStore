@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{% static 'main/css/catalog.css' %}">
 
 <div class="container py-4">
-    <!-- Хлебные крошки -->
+    
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
@@ -16,11 +16,11 @@
     </nav>
 
     {% if items %}
-        <!-- 🔑 ЕСТЬ ТОВАРЫ: Показываем таблицу и сайдбар -->
+        
         <div class="row g-4">
-            <!-- Левая колонка: Список товаров -->
+            
             <div class="col-lg-8">
-                <!-- Верхняя панель -->
+                
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
                     <h2 class="fw-bold mb-0">Корзина <span class="fs-6 text-muted fw-normal" id="header-count">{{ total_count }} товаров</span></h2>
                     <div class="d-flex align-items-center gap-3">
@@ -99,7 +99,7 @@
                 </form>
             </div>
 
-            <!-- Правая колонка: Сайдбар оформления -->
+            
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm sticky-lg-top" style="top: 80px; z-index: 100;">
                     <div class="card-body p-4">
@@ -137,7 +137,7 @@
         </div>
 
     {% else %}
-        <!-- 🔑 КОРЗИНА ПУСТА: Показываем заглушку с кнопкой -->
+        
         <div class="text-center py-5">
             <div class="bg-white rounded-4 shadow-sm p-5 mx-auto" style="max-width: 500px;">
                 <i class="bi bi-cart-x fs-1 text-muted d-block mb-3"></i>
@@ -151,7 +151,7 @@
     {% endif %}
 </div>
 
-<!-- 🔑 СКРИПТ ЛОГИКИ КОРЗИНЫ -->
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // Если корзины нет (пустая), скрипт не должен падать

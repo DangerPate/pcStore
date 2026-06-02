@@ -1,4 +1,4 @@
-﻿// main/static/main/js/ecommerce.js
+﻿
 document.addEventListener('DOMContentLoaded', () => {
     function getCSRFToken() {
         const name = 'csrftoken';
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el) el.textContent = value;
     }
 
-    // 🔑 Обновляет ВСЕ кнопки с этим slug на всей странице
+
     function syncButtons(slug, type, isAdded, total = null) {
         const selector = `[data-slug="${slug}"]${type === 'cart' ? '.btn-add-cart' : '.btn-toggle-fav'}`;
         const buttons = document.querySelectorAll(selector);
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const spinner = btn.querySelector('.spinner-border');
             if (spinner) spinner.remove();
 
-            // Сброс стилей
+
             btn.style.backgroundColor = '';
             btn.style.color = '';
             btn.style.borderColor = '';
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (total !== null) updateBadge('.cart-count-badge', total);
                 } else {
                     btn.classList.remove('btn-success');
-                    btn.classList.add('btn-primary'); // Или btn-dark, в зависимости от твоего дизайна
+                    btn.classList.add('btn-primary');
                     btn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> В корзину';
                 }
             } else {
@@ -58,14 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.style.borderColor = '#dc3545';
                 } else {
                     btn.classList.remove('active');
-                    // Стили сбрасываются выше
+
                 }
                 btn.innerHTML = iconHTML;
 
                 if (total !== null) {
                     updateBadge('.fav-count-badge', total);
                 } else {
-                    // Если total не передан, пробуем вычислить локально
+
                     const favBadge = document.querySelector('.fav-count-badge');
                     let current = parseInt(favBadge?.textContent) || 0;
                     updateBadge('.fav-count-badge', isAdded ? current + 1 : Math.max(0, current - 1));
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const slug = btn.dataset.slug;
         if (!slug) return;
 
-        // 🔑 Для корзины: если уже добавлено → редирект
+
         if (type === 'cart' && (btn.classList.contains('btn-success') || btn.innerHTML.includes('В корзине'))) {
             window.location.href = '/cart/';
             return;
@@ -113,12 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (type === 'cart') {
                     syncButtons(slug, 'cart', true, data.total);
                 } else {
-                    // 🔑 Если удаляем из избранного НА СТРАНИЦЕ ИЗБРАННОГО → перезагружаем
+
                     if (!data.is_favorited && isFavoritesPage) {
                         window.location.reload();
                         return;
                     }
-                    // Для всех остальных случаев
+
                     syncButtons(slug, 'fav', data.is_favorited, data.total);
                 }
             }
@@ -138,25 +138,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 🔥 ГЛАВНЫЙ ОБРАБОТЧИК КЛИКОВ С ПРОВЕРКОЙ АВТОРИЗАЦИИ
+
     document.addEventListener('click', (e) => {
         const cartBtn = e.target.closest('.btn-add-cart');
         const favBtn = e.target.closest('.btn-toggle-fav');
 
         if (cartBtn || favBtn) {
-            // Проверяем статус авторизации. Если false или undefined - блокируем всё.
+
             if (window.IS_AUTHENTICATED !== true) {
-                e.preventDefault();      // Отменяем стандартное действие
-                e.stopPropagation();     // Останавливаем всплытие события
+                e.preventDefault();
+                e.stopPropagation();
 
                 const loginUrl = window.LOGIN_URL || '/auth/login/';
 
-                // Перенаправляем на страницу входа
+
                 window.location.href = loginUrl;
-                return; // ВАЖНО: выходим из функции, fetch НИКОГДА не запустится
+                return;
             }
 
-            // Если код дошел сюда, значит пользователь ТОЧНО авторизован
+
             if (cartBtn) handleAction(e, 'cart');
             if (favBtn) handleAction(e, 'fav');
         }
