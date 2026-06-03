@@ -28,12 +28,32 @@
             </a>
 
             <!-- Кнопка каталога -->
-            <button class="btn btn-outline-dark d-none d-lg-flex align-items-center me-3"
-                    type="button"
-                    id="catalogButton"
-                    aria-label="Открыть каталог">
-                <i class="bi bi-grid-3x3-gap me-2"></i> Каталог
-            </button>
+            <div class="dropdown d-none d-lg-block me-3">
+                <button class="btn btn-outline-dark dropdown-toggle d-flex align-items-center"
+                        type="button"
+                        id="catalogDropdown"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="bi bi-grid-3x3-gap me-2"></i> Каталог
+                </button>
+                <ul class="dropdown-menu catalog-dropdown p-3" aria-labelledby="catalogDropdown" style="min-width: 300px;">
+                    <li>
+                        <a href="{% url 'catalog:catalog_index' %}" class="dropdown-item fw-bold">
+                            <i class="bi bi-grid-3x3-gap me-2"></i> Весь каталог
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a href="{% url 'catalog:category' 'cpu' %}" class="dropdown-item"><i class="bi bi-cpu me-2"></i>Процессоры</a></li>
+                    <li><a href="{% url 'catalog:category' 'gpu' %}" class="dropdown-item"><i class="bi bi-gpu-card me-2"></i>Видеокарты</a></li>
+                    <li><a href="{% url 'catalog:category' 'ram' %}" class="dropdown-item"><i class="bi bi-memory me-2"></i>Память</a></li>
+                    <li><a href="{% url 'catalog:category' 'motherboard' %}" class="dropdown-item"><i class="bi bi-motherboard me-2"></i>Материнские платы</a></li>
+                    <li><a href="{% url 'catalog:category' 'psu' %}" class="dropdown-item"><i class="bi bi-plug me-2"></i>Блоки питания</a></li>
+                    <li><a href="{% url 'catalog:category' 'pc-case' %}" class="dropdown-item"><i class="bi bi-pc me-2"></i>Корпуса</a></li>
+                    <li><a href="{% url 'catalog:category' 'pc-cooling' %}" class="dropdown-item"><i class="bi bi-fan me-2"></i>Охлаждение</a></li>
+                    <li><a href="{% url 'catalog:category' 'hdd' %}" class="dropdown-item"><i class="bi bi-device-hdd me-2"></i>HDD</a></li>
+                    <li><a href="{% url 'catalog:category' 'ssd' %}" class="dropdown-item"><i class="bi bi-device-ssd me-2"></i>SSD</a></li>
+                </ul>
+            </div>
 
             <!-- Сворачиваемая часть -->
             <div class="collapse navbar-collapse" id="navbarMain">
@@ -145,86 +165,7 @@
         </div>
     </header>
 
-    <!-- === OFFCANVAS КАТАЛОГ === -->
-    <div class="offcanvas offcanvas-top no-overlap-header"
-         tabindex="-1"
-         id="catalogOffcanvas"
-         aria-labelledby="catalogOffcanvasLabel"
-         data-bs-backdrop="false"
-         data-bs-scroll="true">
-
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title fw-bold" id="catalogOffcanvasLabel">
-                <i class="bi bi-grid-3x3-gap me-2 "></i>Каталог
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
-        </div>
-
-        <div class="offcanvas-body py-4">
-            <div class="container">
-                <a href="{% url 'catalog:catalog_index' %}" class="btn btn-primary btn-lg w-100 mb-4">
-                    <i class="bi bi-grid-3x3-gap me-2"></i> Весь каталог
-                </a>
-
-                <div class="row g-3">
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'cpu' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3 ">
-                            <i class="bi bi-cpu fs-4 me-3 "></i>
-                            <span class="fw-medium">Процессоры</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'gpu' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
-                            <i class="bi bi-gpu-card fs-4 me-3 "></i>
-                            <span class="fw-medium">Видеокарты</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'ram' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
-                            <i class="bi bi-memory fs-4 me-3 "></i>
-                            <span class="fw-medium">Память</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'motherboard' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
-                            <i class="bi bi-motherboard fs-4 me-3 "></i>
-                            <span class="fw-medium">Материнские платы</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'psu' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
-                            <i class="bi bi-plug fs-4 me-3 "></i>
-                            <span class="fw-medium">Блоки питания</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'pc-case' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
-                            <i class="bi bi-pc fs-4 me-3 "></i>
-                            <span class="fw-medium">Корпуса</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'pc-cooling' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
-                            <i class="bi bi-fan fs-4 me-3 "></i>
-                            <span class="fw-medium">Охлаждение</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'hdd' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
-                            <i class="bi bi-device-hdd fs-4 me-3 "></i>
-                            <span class="fw-medium">HDD</span>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'ssd' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
-                            <i class="bi bi-device-ssd fs-4 me-3 "></i>
-                            <span class="fw-medium">SSD</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- === ОСНОВНОЙ КОНТЕНТ === -->
     <main>

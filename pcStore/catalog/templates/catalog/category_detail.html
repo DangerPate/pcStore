@@ -42,16 +42,7 @@
         </div>
     </div>
     {% endif %}
-
     
-    <div class="mb-4">
-        <h2 class="h4 fw-bold mb-3">Товары в категории "{{ category.title }}"</h2>
-        
-        <a href="{% url 'catalog:category' category.slug %}?sort=popular" 
-           class="btn btn-primary">
-            Смотреть все товары ({{ category.products.count }})
-        </a>
-    </div>
 </div>
 
 

@@ -29,6 +29,7 @@ main {
     flex: 1 0 auto;
     padding-bottom: 2rem;
     padding-top: 50px;
+    min-height: 930px;
 }
 
 main .container {

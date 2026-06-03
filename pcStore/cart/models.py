@@ -72,8 +72,8 @@ class Cart(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = 'Корзина (заглушка)'
-        verbose_name_plural = 'Корзины (заглушка)'
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзины'
 
     def __str__(self):
         return f"Cart of {self.user.email if self.user else 'Anonymous'}"

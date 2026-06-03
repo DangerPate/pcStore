@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         # 1. Безопасные изменения опций и удаление старого индекса
         migrations.AlterModelOptions(
             name='cart',
-            options={'verbose_name': 'Корзина (заглушка)', 'verbose_name_plural': 'Корзины (заглушка)'},
+            options={'verbose_name': 'Корзина', 'verbose_name_plural': 'Корзины'},
         ),
         migrations.AlterModelOptions(
             name='cartitem',
