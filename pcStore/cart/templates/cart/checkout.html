@@ -25,34 +25,34 @@
         <div class="row g-4">
             
             <div class="col-lg-8">
-                <div class="card border-0 shadow-sm mb-4">
+                <div class="card border-0  mb-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-3"><i class="bi bi-person me-2"></i>Контактные данные</h5>
                         
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label small text-muted">Имя *</label>
+                                <label class="form-label small ">Имя *</label>
                                 {{ form.first_name }}
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small text-muted">Телефон *</label>
+                                <label class="form-label small ">Телефон *</label>
                                 {{ form.phone }}
                             </div>
                             <div class="col-12">
-                                <label class="form-label small text-muted">Email</label>
+                                <label class="form-label small ">Email</label>
                                 {{ form.email }}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card border-0 shadow-sm mb-4">
+                <div class="card border-0  mb-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt me-2"></i>Доставка</h5>
-                        <label class="form-label small text-muted">Адрес доставки *</label>
+                        <label class="form-label small ">Адрес доставки *</label>
                         {{ form.address }}
                         
-                        <label class="form-label small text-muted mt-3">Комментарий к заказу</label>
+                        <label class="form-label small  mt-3">Комментарий к заказу</label>
                         {{ form.comment }}
                     </div>
                 </div>
@@ -60,7 +60,7 @@
 
             
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm sticky-lg-top" style="top: 100px; z-index: 100;">
+                <div class="card border-0  sticky-lg-top" style="top: 100px; z-index: 100;">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-3">Ваш заказ</h5>
                         
@@ -69,7 +69,7 @@
                             <div class="d-flex justify-content-between align-items-start mb-2 small">
                                 <div class="flex-grow-1 me-2">
                                     <div class="fw-medium">{{ item.product.title }}</div>
-                                    <div class="text-muted">{{ item.quantity }} шт. × {{ item.product.price }} ₽</div>
+                                    <div class="">{{ item.quantity }} шт. × {{ item.product.price }} ₽</div>
                                 </div>
                                 <div class="fw-bold">{{ item.get_total_price }} ₽</div>
                             </div>
@@ -79,7 +79,7 @@
                         <div class="border-top pt-3 mt-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fs-5 fw-bold">Итого:</span>
-                                <span class="fs-4 fw-bold text-primary">
+                                <span class="fs-4 fw-bold ">
                                     {% widthratio cart_items|length 1 1 as dummy %} {# Хак для суммы, лучше посчитать в view, но тут просто покажем #}
                                     {{ cart_items.0.order.total_price|default:"0" }} ₽ 
                                 </span>
@@ -89,7 +89,7 @@
                         <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 mt-4">
                             <i class="bi bi-check-circle me-2"></i> Подтвердить заказ
                         </button>
-                        <p class="text-center text-muted small mt-2 mb-0">
+                        <p class="text-center  small mt-2 mb-0">
                             Нажимая кнопку, вы соглашаетесь с условиями обработки персональных данных
                         </p>
                     </div>

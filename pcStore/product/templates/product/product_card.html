@@ -27,7 +27,7 @@
     <div class="row g-4 mb-5">
         
         <div class="col-lg-5">
-            <div class="product-gallery bg-white rounded-3 p-3">
+            <div class="product-gallery rounded-3 p-3">
                 <div class="product-main-image mb-3 text-center">
                     {% if images %}
                         <img src="{{ images.0 }}"
@@ -37,7 +37,7 @@
                              style="max-height: 450px; object-fit: contain; cursor: pointer;"
                              onclick="openProductImageModal(0)">
                     {% else %}
-                        <div class="d-flex flex-column align-items-center justify-content-center py-5 text-muted">
+                        <div class="d-flex flex-column align-items-center justify-content-center py-5 ">
                             <i class="bi bi-box-seam fs-1 mb-2"></i>
                             <span>Изображение отсутствует</span>
                         </div>
@@ -67,18 +67,18 @@
                             <i class="bi bi-star{% if forloop.counter <= avg_rating %}-fill{% else %}{% endif %}"></i>
                         {% endfor %}
                     </div>
-                    <a href="#reviews-section" class="text-decoration-none text-primary small">
+                    <a href="#reviews-section" class="number-of-reviews text-decoration-none  small">
                         {{ total_reviews }} отзывов
                     </a>
                     {% if avg_rating %}
-                        <span class="badge bg-light text-dark border">{{ avg_rating }}/5</span>
+                        <span class="badge  border">{{ avg_rating }}/5</span>
                     {% endif %}
                 </div>
 
                 <div class="mb-3">
-                    <span class="fs-2 fw-bold text-primary">{{ product.price }} ₽</span>
+                    <span class="fs-2 fw-bold price">{{ product.price }} ₽</span>
                     {% if product.old_price and product.old_price > product.price %}
-                        <del class="text-muted ms-2">{{ product.old_price }} ₽</del>
+                        <del class=" ms-2 past-price">{{ product.old_price }} ₽</del>
                         <span class="badge bg-danger ms-2">-{{ product.discount_percent }}%</span>
                     {% endif %}
                 </div>
@@ -95,7 +95,7 @@
                     </div>
                     {% if product.warranty %}
                     <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-shield-check text-primary"></i>
+                        <i class="bi bi-shield-check "></i>
                         <span>Гарантия: {{ product.warranty }}</span>
                     </div>
                     {% endif %}
@@ -105,11 +105,11 @@
                 <div class="d-flex gap-3 mb-4">
                     {% if is_in_cart %}
                     <button type="button" class="btn btn-success btn-lg px-4 btn-add-cart" data-slug="{{ product.slug }}">
-                        <i class="bi bi-check-lg me-2"></i> В корзине
+                        <i class="bi bi-check-lg me-2"></i> В КОРЗИНЕ
                     </button>
                     {% else %}
                     <button type="button" class="btn btn-primary btn-lg px-4 btn-add-cart" data-slug="{{ product.slug }}">
-                        <i class="bi bi-cart-plus me-2"></i> В корзину
+                        <i class="bi bi-cart-plus me-2"></i> КУПИТЬ
                     </button>
                     {% endif %}
                     <button type="button" class="btn btn-outline-danger btn-lg btn-toggle-fav {% if is_favorited %}active{% endif %}" data-slug="{{ product.slug }}">
@@ -120,7 +120,7 @@
                 
                 {% if variants %}
                 <div class="mb-4">
-                    <span class="small text-muted d-block mb-2">Доступные конфигурации:</span>
+                    <span class="small  d-block mb-2">Доступные конфигурации:</span>
                     <div class="d-flex flex-wrap gap-2">
                         
                         <span class="btn btn-sm btn-primary disabled" style="pointer-events: none; opacity: 1;">
@@ -142,7 +142,7 @@
                     <h6 class="fw-bold mb-3">Основные характеристики</h6>
                     <dl class="row mb-0 small">
                         {% for key, value in product.specifications.items|slice:":5" %}
-                        <dt class="col-sm-5 text-muted">{{ key|humanize_key }}</dt>
+                        <dt class="col-sm-5 ">{{ key|humanize_key }}</dt>
                         <dd class="col-sm-7">{{ value }}</dd>
                         {% endfor %}
                     </dl>
@@ -155,14 +155,14 @@
     
     <section class="mb-5">
         <h2 class="h4 fw-bold mb-3">Описание товара</h2>
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 ">
             <div class="card-body p-4">
                 {% if product.description %}
                     <div class="product-description">{{ product.description|linebreaks }}</div>
                 {% elif product.info %}
-                    <p class="text-muted">{{ product.info|linebreaks }}</p>
+                    <p class="">{{ product.info|linebreaks }}</p>
                 {% else %}
-                    <p class="text-muted">Описание товара пока не добавлено.</p>
+                    <p class="">Описание товара пока не добавлено.</p>
                 {% endif %}
             </div>
         </div>
@@ -172,12 +172,12 @@
     {% if product.specifications %}
     <section class="mb-5">
         <h2 class="h4 fw-bold mb-3">Характеристики</h2>
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 ">
             <div class="card-body p-4">
                 <div id="specs-short">
                     <dl class="row mb-0 small">
                         {% for key, value in product.specifications.items|slice:":8" %}
-                        <dt class="col-sm-4 col-md-3 text-muted mb-2">{{ key|humanize_key }}</dt>
+                        <dt class="col-sm-4 col-md-3  mb-2">{{ key|humanize_key }}</dt>
                         <dd class="col-sm-8 col-md-9 mb-2">{{ value }}</dd>
                         {% endfor %}
                     </dl>
@@ -186,27 +186,27 @@
                 <div id="specs-full" class="d-none">
                     <dl class="row mb-0 small">
                         {% for key, value in product.specifications.items %}
-                        <dt class="col-sm-4 col-md-3 text-muted mb-2">{{ key|humanize_key }}</dt>
+                        <dt class="col-sm-4 col-md-3  mb-2">{{ key|humanize_key }}</dt>
                         <dd class="col-sm-8 col-md-9 mb-2">{{ value }}</dd>
                         {% endfor %}
                         
-                        <dt class="col-sm-4 col-md-3 text-muted mb-2">Название</dt>
+                        <dt class="col-sm-4 col-md-3  mb-2">Название</dt>
                         <dd class="col-sm-8 col-md-9 mb-2">{{ product.title }}</dd>
-                        <dt class="col-sm-4 col-md-3 text-muted mb-2">Артикул</dt>
+                        <dt class="col-sm-4 col-md-3  mb-2">Артикул</dt>
                         <dd class="col-sm-8 col-md-9 mb-2">{{ product.sku|default:"—" }}</dd>
                         {% if product.brand %}
-                        <dt class="col-sm-4 col-md-3 text-muted mb-2">Бренд</dt>
+                        <dt class="col-sm-4 col-md-3  mb-2">Бренд</dt>
                         <dd class="col-sm-8 col-md-9 mb-2">{{ product.brand }}</dd>
                         {% endif %}
                         {% if product.weight %}
-                        <dt class="col-sm-4 col-md-3 text-muted mb-2">Вес</dt>
+                        <dt class="col-sm-4 col-md-3  mb-2">Вес</dt>
                         <dd class="col-sm-8 col-md-9 mb-2">{{ product.weight }} кг</dd>
                         {% endif %}
                     </dl>
                 </div>
 
                 {% if product.specifications.items|length > 8 %}
-                <button class="btn btn-link text-primary mt-3 p-0" id="toggle-specs" onclick="toggleSpecs()">
+                <button class="btn btn-link  mt-3 p-0" id="toggle-specs" onclick="toggleSpecs()">
                     Развернуть все характеристики
                 </button>
                 {% endif %}
@@ -222,7 +222,7 @@
         
         <div class="row g-4 mb-4">
             <div class="col-md-4">
-                <div class="card border-0 bg-light">
+                <div class="card border-0">
                     <div class="card-body text-center p-4">
                         <div class="display-4 fw-bold mb-2">{{ avg_rating|default:"0" }}</div>
                         <div class="d-flex justify-content-center text-warning mb-2">
@@ -230,21 +230,21 @@
                                 <i class="bi bi-star{% if forloop.counter <= avg_rating %}-fill{% else %}{% endif %}"></i>
                             {% endfor %}
                         </div>
-                        <div class="text-muted small">{{ total_reviews }} отзывов</div>
+                        <div class=" small">{{ total_reviews }} отзывов</div>
                     </div>
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="card border-0 bg-light h-100">
+                <div class="card border-0 h-100">
                     <div class="card-body p-4">
                         <h6 class="fw-bold mb-3">Распределение оценок</h6>
                         {% for item in rating_dist %}
                         <div class="d-flex align-items-center mb-2">
                             <span class="me-2 small">{{ item.rating }}</span>
-                            <div class="flex-grow-1 bg-white rounded-2" style="height: 8px;">
+                            <div class="flex-grow-1 rounded-2" style="height: 8px;">
                                 <div class="bg-warning rounded-2" style="width: {{ item.percent }}%; height: 100%;"></div>
                             </div>
-                            <span class="ms-2 text-muted small">{{ item.count }}</span>
+                            <span class="ms-2  small">{{ item.count }}</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -263,7 +263,7 @@
                 
         <div class="collapse mb-4" id="reviewFormCollapse">
             {% if user.is_authenticated %}
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 ">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-4">Оставить отзыв</h5>
                     <form method="post" action="{% url 'catalog:add_review' product.slug %}" enctype="multipart/form-data" id="reviewForm">
@@ -294,13 +294,13 @@
                             </div>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label small text-muted">Прикрепить фото/видео (макс. 5 файлов, до 50МБ)</label>
-                            <div class="upload-area p-4 border border-2 border-dashed rounded-3 text-center bg-light"
+                            <label class="form-label small ">Прикрепить фото/видео (макс. 5 файлов, до 50МБ)</label>
+                            <div class="upload-area p-4 border border-2 border-dashed rounded-3 text-center"
                                  id="dropZone"
                                  style="cursor: pointer; transition: all 0.3s;">
-                                <i class="bi bi-cloud-upload fs-1 text-muted mb-2 d-block"></i>
+                                <i class="bi bi-cloud-upload fs-1  mb-2 d-block"></i>
                                 <p class="mb-1 fw-medium">Перетащите файлы сюда или нажмите для выбора</p>
-                                <p class="mb-0 small text-muted">JPG, PNG, MP4</p>
+                                <p class="mb-0 small ">JPG, PNG, MP4</p>
                                 <input type="file"
                                        name="attachments"
                                        id="attachmentInput"
@@ -318,11 +318,11 @@
 
             {% else %}
             
-            <div class="card border-0 shadow-sm bg-light">
+            <div class="card border-0  ">
                 <div class="card-body p-4 text-center">
-                    <i class="bi bi-chat-square-text fs-1 text-muted mb-2 d-block"></i>
+                    <i class="bi bi-chat-square-text fs-1  mb-2 d-block"></i>
                     <h5 class="fw-bold mb-2">Оставьте свой отзыв</h5>
-                    <p class="text-muted mb-3">Чтобы поделиться мнением о товаре, необходимо авторизоваться</p>
+                    <p class=" mb-3">Чтобы поделиться мнением о товаре, необходимо авторизоваться</p>
                     <a href="/auth/login/" class="btn btn-primary px-4">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Войти в аккаунт
                     </a>
@@ -332,11 +332,11 @@
         </div>
 
         
-        <form method="get" action="" id="review-filter-form" class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 p-3 bg-light rounded-3">
+        <form method="get" action="" id="review-filter-form" class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 p-3 rounded-3">
             
             <div class="d-flex flex-wrap align-items-center gap-3">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="small fw-semibold text-muted">Тип:</span>
+                    <span class="small fw-semibold ">Тип:</span>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="filter_photos" value="on" id="filter_photos" {% if current_filter_photos %}checked{% endif %}>
                         <label class="form-check-label small" for="filter_photos"><i class="bi bi-image me-1"></i>С фото</label>
@@ -351,7 +351,7 @@
 
                 
                 <div class="d-flex align-items-center gap-2">
-                    <span class="small fw-semibold text-muted">Оценка:</span>
+                    <span class="small fw-semibold ">Оценка:</span>
                     {% for i in "54321"|make_list %}
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="filter_rating" value="{{ i }}" id="filter_rating_{{ i }}" {% if i in current_filter_ratings %}checked{% endif %}>
@@ -416,7 +416,7 @@
         {% endif %}
 
         {% else %}
-        <div class="text-center py-5 text-muted">
+        <div class="text-center py-5 ">
             <i class="bi bi-chat-square-text fs-1 mb-3 d-block"></i>
             <p>Отзывов пока нет. Будьте первым!</p>
         </div>

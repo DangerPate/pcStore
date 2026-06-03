@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container py-5">
     <h1 class="fw-bold mb-4">Возврат и обмен товара</h1>
-    <p class="text-muted mb-4">Порядок возврата комплектующих для ПК, купленных в pcStore.</p>
+    <p class=" mb-4">Порядок возврата комплектующих для ПК, купленных в pcStore.</p>
 
     
     <div class="alert alert-danger rounded-4 mb-5" role="alert">
@@ -12,14 +12,14 @@
 
     <div class="row g-4 mb-5">
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100 p-4">
+            <div class="card border-0  h-100 p-4">
                 <h5 class="fw-bold">✅ Товар надлежащего качества (без дефектов)</h5>
                 <p class="mt-2">Если комплектующее исправно, но вам не подошло (например, несовместимость или просто передумали), то <strong>вернуть или обменять его нельзя</strong>, так как это технически сложный товар.</p>
-                <p class="mb-0 small text-muted">Исключение составляют товары, не входящие в перечень № 924 (например, кабели, переходники, термопаста, салфетки, крепёж). Их можно вернуть в течение <strong>7 дней</strong> при сохранении упаковки и товарного вида. Но в нашем ассортименте таких позиций очень мало.</p>
+                <p class="mb-0 small ">Исключение составляют товары, не входящие в перечень № 924 (например, кабели, переходники, термопаста, салфетки, крепёж). Их можно вернуть в течение <strong>7 дней</strong> при сохранении упаковки и товарного вида. Но в нашем ассортименте таких позиций очень мало.</p>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100 p-4">
+            <div class="card border-0  h-100 p-4">
                 <h5 class="fw-bold">🔧 Товар ненадлежащего качества (брак / недостаток)</h5>
                 <p class="mt-2">Если в комплектующем обнаружен производственный дефект, вы имеете право предъявить одно из требований по ст. 18 Закона «О защите прав потребителей»:</p>
                 <ul>
@@ -33,7 +33,7 @@
     </div>
 
     <h3 class="fw-bold mb-3">📅 Сроки возврата бракованного товара</h3>
-    <div class="bg-light rounded-4 p-4 mb-4">
+    <div class="rounded-4 p-4 mb-4">
         <div class="row">
             <div class="col-md-6">
                 <h5 class="fw-bold">В течение 15 календарных дней с даты покупки</h5>
@@ -52,29 +52,29 @@
         <p class="small mt-2 mb-0">*Подробнее — в гарантийной странице (сроки ремонта до 45 дней после 15 дней с момента покупки).</p>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4 p-4">
+    <div class="card border-0  mb-4 p-4">
         <h3 class="fw-bold mb-3">🔄 Как вернуть бракованный товар (пошаговая инструкция)</h3>
         <div class="row g-4">
             <div class="col-md-3 text-center">
-                <div class="fw-bold fs-2 text-primary">1</div>
+                <div class="fw-bold fs-2 ">1</div>
                 <p class="small">Свяжитесь с нами: позвоните или напишите на <strong>info@pcstore.ru</strong> с номером заказа.</p>
             </div>
             <div class="col-md-3 text-center">
-                <div class="fw-bold fs-2 text-primary">2</div>
+                <div class="fw-bold fs-2 ">2</div>
                 <p class="small">Привезите товар (или пришлите курьером) в наш магазин/сервисный центр по адресу: <strong>Киров, ул. Воровского, 77, Вятка-ЦУМ, 2-й этаж</strong>.</p>
             </div>
             <div class="col-md-3 text-center">
-                <div class="fw-bold fs-2 text-primary">3</div>
+                <div class="fw-bold fs-2 ">3</div>
                 <p class="small">Предоставьте чек или назовите номер заказа / телефон покупателя (для проверки). При себе иметь паспорт.</p>
             </div>
             <div class="col-md-3 text-center">
-                <div class="fw-bold fs-2 text-primary">4</div>
+                <div class="fw-bold fs-2 ">4</div>
                 <p class="small">Продавец проводит <strong>проверку качества</strong> (до 20 дней, если с момента покупки прошло менее 15 дней; до 45 дней — если более). При несогласии с результатами вы вправе заказать независимую экспертизу.</p>
             </div>
         </div>
     </div>
 
-    <div class="bg-white rounded-4 p-4 mb-4 shadow-sm">
+    <div class="rounded-4 p-4 mb-4 ">
         <h5 class="fw-bold">📌 Что взять с собой для возврата / обмена</h5>
         <ul class="mb-0">
             <li>Товар <strong>в полной комплектации</strong> (коробка, все кабели, заглушки, переходники).</li>
@@ -89,13 +89,13 @@
     </div>
 
     
-    <div class="bg-light rounded-4 p-4 mb-4">
+    <div class="rounded-4 p-4 mb-4">
         <p class="mb-0">📖 Подробнее о <strong>гарантийном ремонте</strong>, сроках и условиях читайте на странице <a href="{% url 'warranty' %}" class="text-decoration-none">«Гарантия»</a>. Также у нас есть свой сервисный центр в Кирове.</p>
     </div>
 
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <a href="{% url 'home' %}" class="btn btn-outline-secondary">← На главную</a>
-        <p class="mb-0 small text-muted">Вопросы по возврату: <strong>+7 (999) 999-99-99</strong> (доб. 444) или <strong>returns@pcstore.ru</strong></p>
+        <p class="mb-0 small ">Вопросы по возврату: <strong>+7 (999) 999-99-99</strong> (доб. 444) или <strong>returns@pcstore.ru</strong></p>
     </div>
 </div>
 {% endblock %}

@@ -1,6 +1,6 @@
 ﻿{% load catalog_extras %}
 
-<div class="review-item card border-0 shadow-sm mb-3" data-review-index="{{ review_index }}">
+<div class="review-item card border-0  mb-3" data-review-index="{{ review_index }}">
     <div class="card-body p-4">
         <div class="d-flex justify-content-between align-items-start mb-3">
             <div>
@@ -9,7 +9,7 @@
                     <span class="badge bg-success-subtle text-success ms-2 small">Проверенный покупатель</span>
                 {% endif %}
             </div>
-            <div class="text-muted small">{{ review.created_at|date:"d.m.Y" }}</div>
+            <div class=" small">{{ review.created_at|date:"d.m.Y" }}</div>
         </div>
 
         <div class="d-flex text-warning mb-3">
@@ -22,7 +22,7 @@
         <div class="row g-2 mb-3">
             {% if review.pros %}
             <div class="col-md-6">
-                <div class="p-3 bg-light rounded-3">
+                <div class="p-3 rounded-3">
                     <small class="fw-semibold text-success d-block mb-1">✓ Достоинства</small>
                     <p class="mb-0 small">{{ review.pros|linebreaksbr }}</p>
                 </div>
@@ -30,7 +30,7 @@
             {% endif %}
             {% if review.cons %}
             <div class="col-md-6">
-                <div class="p-3 bg-light rounded-3">
+                <div class="p-3 rounded-3">
                     <small class="fw-semibold text-danger d-block mb-1">✗ Недостатки</small>
                     <p class="mb-0 small">{{ review.cons|linebreaksbr }}</p>
                 </div>
@@ -39,7 +39,7 @@
         </div>
         {% endif %}
 
-        <p class="text-muted mb-3">{{ review.comment|linebreaksbr }}</p>
+        <p class=" mb-3">{{ review.comment|linebreaksbr }}</p>
 
         
         {% if review.has_issue and review.issue_description %}
@@ -73,7 +73,7 @@
         {% endif %}
 
         
-        <div class="d-flex align-items-center justify-content-end gap-3 mt-3 pt-3 border-top">
+        <div class="d-flex align-items-center justify-content-end gap-3 mt-3 pt-3">
             <button class="btn btn-sm {% if user_votes|get_item:review.id == 1 %}btn-success active{% else %}btn-outline-success{% endif %} vote-btn"
                     data-id="{{ review.id }}"
                     data-vote="1"
@@ -91,11 +91,11 @@
         </div>
 
         
-        <div class="border-top mt-3 pt-3">
+        <div class="mt-3 pt-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="small fw-bold mb-0">Комментарии ({{ review.comments.count }})</h6>
                 {% if review.comments.count > 0 %}
-                <button class="btn btn-link btn-sm text-primary p-0" type="button"
+                <button class="btn btn-link btn-sm  p-0" type="button"
                         data-bs-toggle="collapse" data-bs-target="#comments-{{ review.id }}"
                         aria-expanded="false">
                     Показать комментарии
@@ -107,7 +107,7 @@
                 {% for c in review.comments.all %}
                 <div class="d-flex gap-2 mb-2 small">
                     <strong>{{ c.user.get_display_name }}:</strong>
-                    <span class="text-muted">{{ c.text }}</span>
+                    <span class="">{{ c.text }}</span>
                 </div>
                 {% endfor %}
             </div>

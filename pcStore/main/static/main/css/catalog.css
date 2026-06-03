@@ -1,155 +1,190 @@
-﻿
-
-
-.catalog-card {
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-  background: #fff;
-  transition: all 0.2s ease;
+﻿.catalog-card {
+    border-radius: 6px;
+    border: 1px solid transparent !important;
+    background: rgb(13, 13, 13);
+    transition: all 0.2s ease;
 }
 
 .catalog-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-  border-color: #ddd;
+    box-shadow: 0 0 25px rgba(130, 130, 130, 0.2) !important;
+    transform: translateY(-2px);
+    border-color: transparent !important;
 }
 
-
 .catalog-img-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 120px;
-  background: #fafafa;
-  border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    background: rgb(9, 9, 9);
+    border-radius: 6px;
 }
 
 .catalog-img-link img {
-  max-height: 100%;
-  max-width: 100%;
-  object-fit: contain;
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
 }
 
+.catalog-img-link .bi-box-seam {
+    color: rgb(80, 80, 80) !important;
+    font-size: 3rem;
+    opacity: 0.5;
+}
 
 .catalog-title {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #000;
-  margin-bottom: 0.25rem;
-  text-decoration: none;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgb(240, 240, 240) !important;
+    margin-bottom: 0.25rem;
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .catalog-title:hover {
-  color: #0d6efd;
+    color: rgb(127, 181, 181);
 }
 
 .catalog-specs {
-  font-size: 0.8rem;
-  color: #6c757d;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: rgb(180, 180, 180);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
 }
 
+/* Цена в карточках каталога — акцентный цвет */
+.catalog-card .price,
+.catalog-card .product-price,
+.catalog-card [class*="price"] {
+    color: rgb(127, 181, 181) !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* Кол-во отзывов — серый, не синий */
+.catalog-card .review-count,
+.catalog-card .reviews-count {
+    color: rgb(150, 150, 150) !important;
+    font-size: 0.8rem;
+}
 
 .btn-add-cart.btn-dark {
-  background: #000;
-  border-color: #000;
-  color: #fff;
+    background: rgb(127, 181, 181);
+    border-color: rgb(127, 181, 181);
+    color: rgb(3, 3, 3);
+    border-radius: 6px;
 }
 
 .btn-add-cart.btn-dark:hover {
-  background: #333;
-  border-color: #333;
+    background: rgb(109, 155, 155);
+    border-color: rgb(109, 155, 155);
 }
 
 .btn-add-cart.btn-success {
-  background: #198754;
-  border-color: #198754;
-  color: #fff;
+    background: transparent;
+    border-color: rgb(127, 181, 181);
+    color: rgb(127, 181, 181);
+    border-radius: 6px;
+}
+
+.btn-add-cart.btn-success:hover {
+    background: rgb(127, 181, 181);
+    color: rgb(3, 3, 3);
 }
 
 .btn-toggle-fav {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #dee2e6;
-  color: #6c757d;
-  padding: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    padding: 0;
+    background: transparent;
+    transition: all 0.2s ease;
 }
 
-.btn-toggle-fav:hover,
+.btn-toggle-fav:hover {
+    background: rgb(255, 71, 87);
+    border-color: rgb(255, 71, 87);
+    color: #fff;
+}
+
 .btn-toggle-fav.active {
-  background: #dc3545;
-  border-color: #dc3545;
-  color: #fff;
+    background: rgb(255, 71, 87);
+    border-color: rgb(255, 71, 87);
+    color: #fff;
 }
-
 
 .sticky-filter {
-  position: sticky;
-  top: 90px;
-  z-index: 100;
-  border-radius: 12px;
+    position: sticky;
+    top: 90px;
+    z-index: 100;
+    border-radius: 6px;
+    background: rgb(13, 13, 13) !important;
+    border: 1px solid rgb(30, 30, 30) !important;
 }
 
-
 .pagination {
-  margin: 2rem 0 1rem;
+    margin: 2rem 0 1rem;
 }
 
 .pagination .page-link {
-  border-radius: 8px;
-  margin: 0 4px;
-  border: 1px solid #e9ecef;
-  color: #333;
-  font-weight: 500;
+    border-radius: 6px;
+    margin: 0 4px;
+    border: 1px solid rgb(30, 30, 30);
+    color: rgb(240, 240, 240);
+    font-weight: 500;
+    background: rgb(13, 13, 13);
 }
 
 .pagination .page-item.active .page-link {
-  background: #000;
-  border-color: #000;
-  color: #fff;
+    background: rgb(127, 181, 181);
+    border-color: rgb(127, 181, 181);
+    color: rgb(3, 3, 3);
 }
 
+.pagination .page-link:hover {
+    background: rgb(9, 9, 9);
+    color: rgb(127, 181, 181);
+}
 
 @media (max-width: 767.98px) {
-  .catalog-img-link {
-    height: 100px;
-  }
+    .catalog-img-link {
+        height: 100px;
+    }
 
-  .sticky-filter {
-    position: static;
-    margin-bottom: 1rem;
-  }
+    .sticky-filter {
+        position: static;
+        margin-bottom: 1rem;
+    }
 
-  .catalog-card .col-3,
-  .catalog-card .col-9,
-  .catalog-card .col-12 {
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 0.75rem;
-    margin-bottom: 0.75rem;
-  }
+    .catalog-card .col-3,
+    .catalog-card .col-9,
+    .catalog-card .col-12 {
+        border-bottom: 1px solid rgb(30, 30, 30);
+        padding-bottom: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
 
-  .catalog-card .col-12:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
+    .catalog-card .col-12:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
 }
 
-
 .filter-section {
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid rgb(30, 30, 30);
+    background: rgb(13, 13, 13) !important;
 }
 
 .filter-section:last-child {
@@ -157,16 +192,19 @@
 }
 
 .filter-section .form-check.p-2 {
-    padding-left: 10px !important;  
+    padding-left: 10px !important;
 }
 
 .filter-header {
     transition: background 0.2s;
     user-select: none;
+    color: rgb(240, 240, 240) !important;
+    border-radius: 6px;
+    /* inline стиль #f8f9fa перекрывается !important из theme.css */
 }
 
 .filter-header:hover {
-    background: #e9ecef !important;
+    background: rgb(9, 9, 9) !important;
 }
 
 .filter-content {
@@ -181,38 +219,36 @@
 .filter-option {
     transition: background 0.15s;
     padding: 2px 0;
-}
-
-.filter-option:hover {
-    background: #f8f9fa;
+    color: rgb(240, 240, 240) !important;
     border-radius: 4px;
 }
 
+.filter-option:hover {
+    background: rgb(9, 9, 9);
+}
 
 .filter-options::-webkit-scrollbar {
     width: 6px;
 }
 
 .filter-options::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: rgb(9, 9, 9);
     border-radius: 3px;
 }
 
 .filter-options::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
+    background: rgb(30, 30, 30);
     border-radius: 3px;
 }
 
 .filter-options::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    background: rgb(127, 181, 181);
 }
-
 
 .form-check-input:checked {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    background-color: rgb(127, 181, 181);
+    border-color: rgb(127, 181, 181);
 }
-
 
 @media (max-width: 991.98px) {
     .sticky-filter {
@@ -220,9 +256,8 @@
     }
 }
 
-
 .hover-shadow:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(130, 130, 130, 0.2);
     transform: translateY(-2px);
 }
 

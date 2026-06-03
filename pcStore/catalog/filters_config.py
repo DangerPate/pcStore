@@ -229,45 +229,6 @@ FILTERS_CONFIG = {
             'options': ['Нет Wi-Fi', 'Wi-Fi 5 (802.11ac)', 'Wi-Fi 6 (802.11ax)', 'Wi-Fi 6E', 'Wi-Fi 7 (802.11be)']
         }
     },
-
-    'ssd': {
-        'capacity': {
-            'label': 'Объём',
-            'type': 'select',
-            'options': ['120GB', '240GB', '480GB', '500GB', '1TB', '2TB', '4TB'],
-        },
-        'interface': {
-            'label': 'Интерфейс',
-            'type': 'select',
-            'options': ['SATA III', 'M.2 NVMe', 'M.2 SATA', 'PCIe 4.0', 'PCIe 5.0'],
-        },
-        'form_factor': {
-            'label': 'Форм-фактор',
-            'type': 'select',
-            'options': ['2.5"', 'M.2 2280', 'M.2 2242'],
-        },
-    },
-
-    'psu': {
-        'wattage': {
-            'label': 'Мощность (Вт)',
-            'type': 'range',
-            'min': 300,
-            'max': 1600,
-            'step': 50,
-        },
-        'certification': {
-            'label': 'Сертификат',
-            'type': 'select',
-            'options': ['80 Plus', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Titanium'],
-        },
-        'modular': {
-            'label': 'Модульность',
-            'type': 'select',
-            'options': ['Не модульный', 'Полумодульный', 'Полностью модульный'],
-        },
-    },
-
     'ram': {
         'memory_type': {
             'label': 'Тип памяти',
@@ -315,7 +276,6 @@ FILTERS_CONFIG = {
             'options': ['Есть', 'Нет']
         }
     },
-
     'psu': {
         'wattage': {
             'label': 'Мощность (Вт)',
@@ -444,72 +404,658 @@ FILTERS_CONFIG = {
             'options': ['Есть', 'Нет']
         }
     },
-
-    'pc-cooling': {
-        'socket': {
-            'label': 'Сокет',
+    'case-fan': {
+        'size': {
+            'label': 'Размер вентилятора',
             'type': 'select',
             'options': [
-                'LGA1851', 'LGA1700', 'LGA1200', 'LGA115x (1150/1151/1155)', 'LGA2066',
-                'AM5', 'AM4', 'AM3+', 'TR4 / sTRX4', 'SP3 / SP5', 'Универсальный'
-            ]
+                '40x40 мм', '50x50 мм', '60x60 мм', '70x70 мм',
+                '80x80 мм', '92x92 мм', '120x120 мм', '140x140 мм',
+                '180x180 мм', '200x200 мм', '220x220 мм', '230x230 мм',
+                '250x250 мм', '280x280 мм', '360x360 мм'
+            ],
+        },
+        'lighting': {
+            'label': 'Тип подсветки',
+            'type': 'select',
+            'options': [
+                'Без подсветки', 'ARGB (5V 3-pin)', 'RGB (12V 4-pin)',
+                'Фиксированный цвет (LED)', 'Белая LED', 'Красная LED',
+                'Синяя LED', 'Зелёная LED', 'UV (ультрафиолет)',
+                'D-RGB (адресуемая)', 'Halo / кольцевая подсветка',
+                'Боковая подсветка (edge-lit)'
+            ],
+        },
+        'fan_count': {
+            'label': 'Количество вентиляторов в комплекте',
+            'type': 'select',
+            'options': ['1', '2', '3', '4', '5', '6', 'Комплект (набор)'],
+        },
+        'power_connector': {
+            'label': 'Тип разъёма питания',
+            'type': 'select',
+            'options': [
+                '2-pin', '3-pin', '4-pin PWM', '3-pin + Molex',
+                '4-pin PWM + Molex', 'Molex (только)', 'SATA (для контроллера)',
+                'Комбинированный (3-pin/4-pin)', ' proprietary (фирменный)'
+            ],
+        },
+        'color': {
+            'label': 'Цвет',
+            'type': 'select',
+            'options': [
+                'Чёрный', 'Белый', 'Серый', 'Прозрачный',
+                'Дымчатый (smoke)', 'RGB-подсветка', 'ARGB-подсветка',
+                'Красный', 'Синий', 'Зелёный', 'Жёлтый', 'Розовый',
+                'Фиолетовый', 'Многоцветный'
+            ],
+        },
+        'type': {
+            'label': 'Тип',
+            'type': 'select',
+            'options': [
+                'Одиночный вентилятор', 'Комплект вентиляторов',
+                'Вентилятор для корпуса', 'Вентилятор для радиатора',
+                'Вентилятор для блока питания', 'Серверный вентилятор',
+                'Промышленный вентилятор', 'Вентилятор с рамкой',
+                'Вентилятор без рамки (open-frame)', 'Турбинный вентилятор'
+            ],
+        },
+        'speed_control': {
+            'label': 'Регулировка оборотов',
+            'type': 'select',
+            'options': [
+                'Нет (фиксированная скорость)', 'Ручная (резистор/кабель)',
+                'Автоматическая (PWM)', 'Автоматическая (DC/voltage)',
+                'PWM + DC (гибридная)', 'Через контроллер/хаб',
+                'Через материнскую плату', 'Программная (через ПО)'
+            ],
+        },
+        'bearing_type': {
+            'label': 'Тип подшипника',
+            'type': 'select',
+            'options': [
+                'Подшипник скольжения (Sleeve)', 'Подшипник качения (Ball)',
+                'Гидродинамический (FDB / HDB)', 'Магнитно-levitation (MagLev)',
+                'Двойной шарикоподшипник (Dual Ball)', 'Rifle Bearing',
+                'SSO Bearing (Noctua)', 'SSO2 Bearing (Noctua)',
+                'Rifle Bearing (Corsair)', 'Fluid Dynamic Bearing (FDB)',
+                'Hydro Dynamic Bearing (HDB)', 'Rifle Bearing',
+                'Ceramic Bearing', 'Направляющий подшипник (Rifle)'
+            ],
+        },
+        'noise_level': {
+            'label': 'Максимальный уровень шума (дБ)',
+            'type': 'range',
+            'min': 0,
+            'max': 50,
+            'step': 1,
+        },
+        'max_speed': {
+            'label': 'Максимальная скорость вращения (об/мин)',
+            'type': 'range',
+            'min': 300,
+            'max': 3000,
+            'step': 50,
+        },
+        'airflow': {
+            'label': 'Воздушный поток на максимальной скорости (CFM)',
+            'type': 'range',
+            'min': 10,
+            'max': 150,
+            'step': 5,
+        },
+    },
+    'cpu-cooler': {
+        'socket': {
+            'label': 'Сокет процессора',
+            'type': 'select',
+            'options': [
+                'LGA1851', 'LGA1700', 'LGA1200', 'LGA115x (1150/1151/1155)',
+                'LGA2066', 'LGA3647', 'LGA4189',
+                'AM5', 'AM4', 'AM3+', 'AM2+', 'FM2+',
+                'TR5 (sTR5)', 'TR4 (sTRX4)', 'sWRX8', 'SP3', 'SP5',
+                'Универсальный (мульти-сокет)'
+            ],
         },
         'tdp_rating': {
             'label': 'Рассеиваемая мощность (TDP, Вт)',
             'type': 'range',
             'min': 50,
             'max': 400,
-            'step': 5
+            'step': 5,
         },
         'construction_type': {
             'label': 'Тип конструкции',
             'type': 'select',
-            'options': ['Башенный (Single Tower)', 'Двухбашенный (Dual Tower)', 'Низкопрофильный (Low Profile)',
-                        'Пассивный (без вентиляторов)', 'Супербашня (3+ вентилятора)', 'Компактный / Slim']
+            'options': [
+                'Башенный (Single Tower)', 'Двухбашенный (Dual Tower)',
+                'Низкопрофильный (Low Profile)', 'Пассивный (без вентиляторов)',
+                'Супер-башня (3+ вентилятора)', 'Top-Flow (горизонтальный)',
+                'Компактный / Slim', 'С жидкометаллическим охлаждением'
+            ],
         },
         'heatpipes': {
             'label': 'Количество тепловых трубок',
             'type': 'select',
-            'options': ['2', '3', '4', '5', '6', '7', '8', '9', '10+']
+            'options': [
+                '0 (пассивный)', '2', '3', '4', '5', '6', '7', '8', '9', '10 и более'
+            ],
         },
         'height': {
             'label': 'Высота кулера (мм)',
             'type': 'range',
             'min': 30,
             'max': 185,
-            'step': 5
+            'step': 5,
         },
         'rgb_type': {
             'label': 'Тип подсветки',
             'type': 'select',
-            'options': ['Без подсветки', 'ARGB (5V 3-pin)', 'RGB (12V 4-pin)', 'Фиксированный цвет',
-                        'Синхронизация с материнской платой']
+            'options': [
+                'Без подсветки', 'Статичная LED (однотонная)',
+                'ARGB (5V 3-pin)', 'RGB (12V 4-pin)',
+                'Синхронизация с материнской платой', 'Адресуемая (Addressable RGB)',
+                'Фиксированный цвет (красный, синий, белый)'
+            ],
         },
         'fan_sizes': {
             'label': 'Размеры комплектных вентиляторов',
             'type': 'select',
-            'options': ['80 мм', '92 мм', '120 мм', '140 мм', '2x 120 мм', '2x 140 мм', '3x 120 мм', '3x 140 мм',
-                        '1x 120 + 1x 140 мм']
+            'options': [
+                '80 мм', '92 мм', '102 мм', '120 мм', '135 мм', '140 мм',
+                '2x 120 мм', '2x 140 мм', '3x 120 мм', '3x 140 мм',
+                '1x 120 + 1x 140 мм', 'Вентиляторы не прилагаются'
+            ],
         },
         'fan_count': {
             'label': 'Количество вентиляторов в комплекте',
             'type': 'select',
-            'options': ['0', '1', '2', '3']
-        },
-        'fan_connector': {
-            'label': 'Разъем подключения вентиляторов',
-            'type': 'select',
-            'options': ['3-pin DC', '4-pin PWM', 'ARGB (5V)', 'RGB (12V)', 'Molex', 'Комбинированный (PWM + RGB)']
+            'options': ['0', '1', '2', '3', '4', '5'],
         },
         'noise_level': {
-            'label': 'Макс. уровень шума (дБ)',
+            'label': 'Максимальный уровень шума (дБ)',
             'type': 'range',
             'min': 10,
-            'max': 45,
-            'step': 1
-        }
+            'max': 50,
+            'step': 1,
+        },
+        'fan_connector': {
+            'label': 'Разъем для подключения вентиляторов',
+            'type': 'select',
+            'options': [
+                '3-pin DC', '4-pin PWM', 'ARGB (5V 3-pin)', 'RGB (12V 4-pin)',
+                'Molex', 'Y-кабель (разветвитель)', 'Встроенный хаб/контроллер',
+                'Комбинированный (PWM + RGB)'
+            ],
+        },
+        'speed_control': {
+            'label': 'Регулировка скорости вращения',
+            'type': 'select',
+            'options': [
+                'Нет (фиксированная скорость)', 'Ручная (кабель-резистор)',
+                'Автоматическая (PWM)', 'Автоматическая (DC / Voltage)',
+                'Гибридная (PWM/DC)', 'Через материнскую плату',
+                'Через внешний контроллер/хаб', 'Программная (через ПО)'
+            ],
+        },
     },
-
+    'liquid-cooling': {
+        'socket': {
+            'label': 'Сокет процессора',
+            'type': 'select',
+            'options': [
+                'LGA1851', 'LGA1700', 'LGA1200', 'LGA115x (1150/1151/1155)',
+                'LGA2066', 'LGA3647', 'LGA4189',
+                'AM5', 'AM4', 'AM3+', 'AM2+', 'FM2+',
+                'TR5 (sTR5)', 'TR4 (sTRX4)', 'sWRX8', 'SP3', 'SP5',
+                'Универсальный (мульти-сокет)'
+            ],
+        },
+        'fan_count': {
+            'label': 'Количество вентиляторов в комплекте',
+            'type': 'select',
+            'options': ['0', '1', '2', '3', '4', '5', '6'],
+        },
+        'radiator_size': {
+            'label': 'Монтажный размер радиатора',
+            'type': 'select',
+            'options': [
+                '120 мм (1 секция)', '180 мм', '240 мм (2 секции)',
+                '280 мм', '360 мм (3 секции)', '420 мм', '480 мм (4 секции)',
+                '560 мм', 'Custom (под заказ)'
+            ],
+        },
+        'color': {
+            'label': 'Цвет',
+            'type': 'select',
+            'options': [
+                'Чёрный', 'Белый', 'Серебристый', 'Серый',
+                'Чёрный / Белый', 'RGB-подсветка', 'Прозрачный',
+                'Красный', 'Синий', 'Зелёный', 'Многоцветный'
+            ],
+        },
+        'lcd_display': {
+            'label': 'LCD дисплей',
+            'type': 'select',
+            'options': [
+                'Нет', 'Есть (монохромный)', 'Есть (цветной IPS)',
+                'Есть (круглый, 1.7")', 'Есть (квадратный, 2.1")',
+                'Есть (сенсорный)', 'С поддержкой GIF/видео'
+            ],
+        },
+        'tdp_rating': {
+            'label': 'Рассеиваемая мощность (TDP, Вт)',
+            'type': 'range',
+            'min': 100,
+            'max': 500,
+            'step': 10,
+        },
+        'rgb_type': {
+            'label': 'Тип подсветки',
+            'type': 'select',
+            'options': [
+                'Без подсветки', 'Статичная LED (однотонная)',
+                'ARGB (5V 3-pin)', 'RGB (12V 4-pin)',
+                'Синхронизация с материнской платой (Aura Sync, Mystic Light, RGB Fusion и т.д.)',
+                'Адресуемая (Addressable RGB)',
+                'Фиксированный цвет (красный, синий, белый)',
+                'Встроенный контроллер с пультом ДУ'
+            ],
+        },
+        'fan_sizes': {
+            'label': 'Размеры вентиляторов',
+            'type': 'select',
+            'options': [
+                '120 мм', '140 мм', '180 мм', '240 мм', '280 мм',
+                '2x 120 мм', '2x 140 мм', '3x 120 мм', '3x 140 мм',
+                '4x 120 мм', '4x 140 мм', 'Вентиляторы не прилагаются'
+            ],
+        },
+        'maintenance_type': {
+            'label': 'Обслуживаемая СЖО',
+            'type': 'select',
+            'options': [
+                'Нет (AIO — необслуживаемая, готовая)',
+                'Да (Custom Loop — пользовательская сборка)',
+                'Полуобслуживаемая (дозаправка без замены контура)'
+            ],
+        },
+        'noise_level': {
+            'label': 'Максимальный уровень шума (дБ)',
+            'type': 'range',
+            'min': 15,
+            'max': 50,
+            'step': 1,
+        },
+        'pump_connector': {
+            'label': 'Разъем подключения помпы',
+            'type': 'select',
+            'options': [
+                '3-pin DC', '4-pin PWM', 'SATA (питание) + 3-pin/4-pin (управление)',
+                'Molex (только питание)', '2x 3-pin (Y-кабель)',
+                'Встроенный хаб/контроллер', 'USB 2.0 (для RGB/дисплея)',
+                ' proprietary (фирменный разъём)'
+            ],
+        },
+    },
+    'ssd-25': {
+        'capacity': {
+            'label': 'Объём накопителя (ГБ)',
+            'type': 'range',
+            'min': 60,
+            'max': 8000,
+            'step': 100,
+        },
+        'interface': {
+            'label': 'Разъем подключения / Интерфейс',
+            'type': 'select',
+            'options': [
+                'SATA III (6 Гбит/с)', 'SATA II (3 Гбит/с)',
+                'SAS 12 Гбит/с', 'SAS 6 Гбит/с', 'U.2 (SFF-8639)'
+            ],
+        },
+        'tbw': {
+            'label': 'Максимальный ресурс записи (TBW, ТБ)',
+            'type': 'range',
+            'min': 30,
+            'max': 144000,
+            'step': 50,
+        },
+        'dram_cache': {
+            'label': 'DRAM-буфер',
+            'type': 'select',
+            'options': [
+                'Есть', 'Нет (DRAM-less)', 'HMB (Host Memory Buffer)',
+                'SLC-кэширование (псевдо-SLC)'
+            ],
+        },
+        'read_speed': {
+            'label': 'Макс. скорость последовательного чтения (МБ/с)',
+            'type': 'range',
+            'min': 100,
+            'max': 1100,
+            'step': 10,
+        },
+        'nand_type': {
+            'label': 'Количество бит на ячейку (Тип NAND)',
+            'type': 'select',
+            'options': [
+                'SLC (1 бит)', 'MLC (2 бита)', '3D MLC (2 бита)',
+                'TLC (3 бита)', '3D TLC (3 бита)',
+                'QLC (4 бита)', '3D QLC (4 бита)', 'PLC (5 бит)'
+            ],
+        },
+        'write_speed': {
+            'label': 'Макс. скорость последовательной записи (МБ/с)',
+            'type': 'range',
+            'min': 50,
+            'max': 1000,
+            'step': 10,
+        },
+        'nand_structure': {
+            'label': 'Структура памяти (Слоистость NAND)',
+            'type': 'select',
+            'options': [
+                '2D NAND (Planar / плоская)', '3D NAND (до 64 слоев)',
+                '3D NAND (96–128 слоев)', '3D NAND (144–176 слоев)',
+                '3D NAND (232+ слоя)', 'Samsung V-NAND (4-5 поколение)',
+                'Samsung V-NAND (6-7 поколение)', 'SK Hynix 4D NAND',
+                'Micron 3D NAND (Gen3/Gen4)', 'Kioxia BiCS FLASH (5-6 поколение)'
+            ],
+        },
+        'dwpd': {
+            'label': 'DWPD (Drive Writes Per Day)',
+            'type': 'select',
+            'options': [
+                'Не указано (Потребительский)', '0.3 (Read Intensive)',
+                '1 (Mixed Use)', '3 (Write Intensive)', '10 (Endurance)'
+            ],
+        },
+        'controller': {
+            'label': 'Контроллер',
+            'type': 'select',
+            'options': [
+                'Phison S11', 'Phison S12 / S12DC', 'Phison E12 / E12S',
+                'Phison E16', 'Phison E18', 'Phison E21T', 'Phison E25 / E25T',
+                'Phison E31T', 'Marvell 88SS1074', 'Marvell 88SS1372',
+                'Silicon Motion SM2246', 'Silicon Motion SM2258 / SM2259',
+                'Silicon Motion SM2262 / SM2263', 'Silicon Motion SM2267 / SM2267XT',
+                'Silicon Motion SM2281', 'Samsung MJX / MKX / MEX',
+                'WD / SanDisk (собственный)', 'Micron (собственный)',
+                'Realtek RTS5763', 'Неизвестный / Другой'
+            ],
+        },
+    },
+    'ssd-m2': {
+        'capacity': {
+            'label': 'Объём накопителя (ГБ)',
+            'type': 'range',
+            'min': 64,
+            'max': 8192,
+            'step': 64,
+        },
+        'has_nvme': {
+            'label': 'Поддержка NVMe',
+            'type': 'select',
+            'options': ['Да (NVMe)', 'Нет (SATA M.2)'],
+        },
+        'interface': {
+            'label': 'Физический интерфейс',
+            'type': 'select',
+            'options': [
+                'PCIe 3.0 x4', 'PCIe 4.0 x4', 'PCIe 5.0 x4',
+                'PCIe 3.0 x2', 'PCIe 2.0 x2', 'SATA III (6 Гбит/с)',
+                'U.2 (SFF-8639)', 'E1.S (EDSFF)'
+            ],
+        },
+        'form_factor': {
+            'label': 'Форм-фактор (размер)',
+            'type': 'select',
+            'options': [
+                '2230', '2242', '2260', '2280', '22110',
+                '2230 (Short)', '2242 (Medium)', '2280 (Стандарт)', '22110 (Long)'
+            ],
+        },
+        'has_dram': {
+            'label': 'DRAM-буфер',
+            'type': 'select',
+            'options': [
+                'Есть', 'Нет (DRAM-less)',
+                'HMB (Host Memory Buffer)', 'SLC-кэширование (псевдо-SLC)'
+            ],
+        },
+        'read_speed': {
+            'label': 'Макс. скорость последовательного чтения (МБ/с)',
+            'type': 'range',
+            'min': 500,
+            'max': 14500,
+            'step': 100,
+        },
+        'tbw': {
+            'label': 'Максимальный ресурс записи (TBW, ТБ)',
+            'type': 'range',
+            'min': 40,
+            'max': 144000,
+            'step': 100,
+        },
+        'write_speed': {
+            'label': 'Макс. скорость последовательной записи (МБ/с)',
+            'type': 'range',
+            'min': 300,
+            'max': 13000,
+            'step': 100,
+        },
+        'has_heatsink': {
+            'label': 'Радиатор в комплекте',
+            'type': 'select',
+            'options': [
+                'Есть (в комплекте)', 'Нет',
+                'Опционально / Съемный', 'Графеновый / ультратонкий'
+            ],
+        },
+        'nand_type': {
+            'label': 'Количество бит на ячейку (Тип NAND)',
+            'type': 'select',
+            'options': [
+                'SLC (1 бит)', 'MLC (2 бита)', '3D MLC (2 бита)',
+                'TLC (3 бита)', '3D TLC (3 бита)',
+                'QLC (4 бита)', '3D QLC (4 бита)', 'PLC (5 бит)'
+            ],
+        },
+        'm_key': {
+            'label': 'Ключ разъема M.2',
+            'type': 'select',
+            'options': [
+                'M-Key (PCIe NVMe / SATA)', 'B-Key (SATA / PCIe x2)',
+                'B+M Key (SATA)', 'E-Key (Wi-Fi / Bluetooth)',
+                'A+E-Key (Wi-Fi / Bluetooth)', 'Нет данных'
+            ],
+        },
+        # Дополнительные полезные поля (можешь оставить или удалить):
+        'pcie_lanes': {
+            'label': 'Количество линий PCIe',
+            'type': 'select',
+            'options': ['x2', 'x4', 'x8', 'x16'],
+        },
+        'controller': {
+            'label': 'Контроллер',
+            'type': 'select',
+            'options': [
+                'Phison E18', 'Phison E21T', 'Phison E25 / E25T', 'Phison E31T',
+                'Silicon Motion SM2264', 'Silicon Motion SM2267 / SM2267XT',
+                'Silicon Motion SM2281', 'WD / SanDisk (собственный)',
+                'Samsung (собственный)', 'Micron (собственный)', 'Realtek RTS5771DL'
+            ],
+        },
+    },
+    'hdd-35': {
+        'capacity': {
+            'label': 'Объём накопителя (ТБ)',
+            'type': 'range',
+            'min': 0.5,
+            'max': 24,
+            'step': 0.5,
+        },
+        'purpose': {
+            'label': 'Назначение',
+            'type': 'select',
+            'options': [
+                'Для настольных ПК (Desktop)',
+                'Для NAS (сетевых хранилищ)',
+                'Для серверов (Enterprise / Data Center)',
+                'Для видеонаблюдения (Surveillance)',
+                'Для внешних накопителей (External)',
+                'Универсальный'
+            ],
+        },
+        'rpm': {
+            'label': 'Скорость вращения шпинделя (об/мин)',
+            'type': 'select',
+            'options': [
+                '4200 RPM', '4500 RPM', '5400 RPM', '5700 RPM',
+                '5900 RPM', '6400 RPM', '7200 RPM',
+                '10000 RPM', '15000 RPM'
+            ],
+        },
+        'recording_technology': {
+            'label': 'Технология записи',
+            'type': 'select',
+            'options': [
+                'CMR (Conventional Magnetic Recording)',
+                'SMR (Shingled Magnetic Recording)',
+                'HAMR (Heat-Assisted Magnetic Recording)',
+                'MAMR (Microwave-Assisted Magnetic Recording)',
+                'PMR (Perpendicular Magnetic Recording)',
+                'EAMR (Energy-Assisted Magnetic Recording)'
+            ],
+        },
+        'cache_size': {
+            'label': 'Объём кэш-памяти',
+            'type': 'select',
+            'options': [
+                '32 МБ', '64 МБ', '128 МБ', '256 МБ', '512 МБ'
+            ],
+        },
+        'raid_optimized': {
+            'label': 'Оптимизация под RAID-массивы',
+            'type': 'select',
+            'options': [
+                'Есть (поддержка TLER / ERC / CCTL)',
+                'Нет (стандартный режим)'
+            ],
+        },
+        'helium_filled': {
+            'label': 'Гелиевое наполнение',
+            'type': 'select',
+            'options': [
+                'Да (гелиевый корпус)',
+                'Нет (воздушный корпус)'
+            ],
+        },
+        'load_unload_cycles': {
+            'label': 'Число циклов позиционирования-парковки (Load/Unload Cycles)',
+            'type': 'range',
+            'min': 300000,
+            'max': 600000,
+            'step': 50000,
+        },
+        'noise_level': {
+            'label': 'Уровень шума во время работы (дБ)',
+            'type': 'range',
+            'min': 15,
+            'max': 45,
+            'step': 1,
+        },
+        'thickness': {
+            'label': 'Толщина накопителя (мм)',
+            'type': 'range',
+            'min': 20,
+            'max': 30,
+            'step': 1,
+        },
+    },
+    'hdd-25': {
+        'capacity': {
+            'label': 'Объём накопителя (ТБ)',
+            'type': 'range',
+            'min': 0.125,
+            'max': 5,
+            'step': 0.125,
+        },
+        'interface': {
+            'label': 'Интерфейс подключения',
+            'type': 'select',
+            'options': [
+                'SATA III (6 Гбит/с)', 'SATA II (3 Гбит/с)', 'SATA I (1.5 Гбит/с)',
+                'SAS 12 Гбит/с', 'SAS 6 Гбит/с', 'SAS 3 Гбит/с',
+                'USB 3.0 (внешний)', 'USB 3.1 (внешний)', 'USB-C (внешний)'
+            ],
+        },
+        'rpm': {
+            'label': 'Скорость вращения шпинделя (об/мин)',
+            'type': 'select',
+            'options': [
+                '4200 RPM', '4500 RPM', '5200 RPM', '5400 RPM',
+                '5700 RPM', '5900 RPM', '7200 RPM', '10000 RPM'
+            ],
+        },
+        'recording_technology': {
+            'label': 'Технология записи',
+            'type': 'select',
+            'options': [
+                'CMR (Conventional Magnetic Recording)',
+                'SMR (Shingled Magnetic Recording)',
+                'PMR (Perpendicular Magnetic Recording)',
+                'HAMR (Heat-Assisted Magnetic Recording)',
+                'MAMR (Microwave-Assisted Magnetic Recording)'
+            ],
+        },
+        'cache_size': {
+            'label': 'Объём буфера (кэш-памяти)',
+            'type': 'select',
+            'options': [
+                '8 МБ', '16 МБ', '32 МБ', '64 МБ', '128 МБ', '256 МБ'
+            ],
+        },
+        'thickness': {
+            'label': 'Стандартная толщина',
+            'type': 'select',
+            'options': [
+                '5 мм (ультратонкий)', '7 мм (стандартный для ноутбуков)',
+                '9.5 мм (стандартный)', '12.5 мм (увеличенный)',
+                '15 мм (серверный/enterprise)'
+            ],
+        },
+        'noise_level_active': {
+            'label': 'Уровень шума во время работы (дБ)',
+            'type': 'range',
+            'min': 18,
+            'max': 36,
+            'step': 1,
+        },
+        'data_transfer_rate': {
+            'label': 'Скорость обмена данными (МБ/с)',
+            'type': 'range',
+            'min': 50,
+            'max': 280,
+            'step': 5,
+        },
+        'noise_level_idle': {
+            'label': 'Уровень шума в простое (дБ)',
+            'type': 'range',
+            'min': 15,
+            'max': 30,
+            'step': 1,
+        },
+        'load_unload_cycles': {
+            'label': 'Число циклов позиционирования-парковки',
+            'type': 'range',
+            'min': 300000,
+            'max': 600000,
+            'step': 50000,
+        },
+    },
     '_common': {
         'brand': {
             'label': 'Бренд',

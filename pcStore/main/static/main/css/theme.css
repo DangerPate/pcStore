@@ -1,0 +1,734 @@
+﻿/* =========================================
+   ТЕМНАЯ ТЕМА - ОСНОВНЫЕ СТИЛИ
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg-primary: rgb(3, 3, 3);
+    --bg-secondary: rgb(13, 13, 13);
+    --bg-tertiary: rgb(9, 9, 9);
+    --bg-light-alt: rgb(20, 20, 20);
+
+    --text-primary: rgb(240, 240, 240);
+    --text-secondary: rgb(180, 180, 180);
+    --text-muted: rgb(150, 150, 150);
+
+    --border-color: rgb(30, 30, 30);
+    --accent-color: rgb(127, 181, 181);
+    --accent-hover: rgb(109, 155, 155);
+
+    --radius-outer: 6px;
+    --radius-inner: 4px;
+}
+
+* {
+    font-family: "Roboto Mono", monospace !important;
+    font-weight: 500 !important;
+}
+
+body {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    margin: 0;
+}
+
+/* === ГЛОБАЛЬНЫЕ ПЕРЕОПРЕДЕЛЕНИЯ === */
+.bg-white,
+.bg-light,
+.bg-body,
+.bg-body-secondary,
+.bg-body-tertiary {
+    background-color: var(--bg-secondary) !important;
+}
+
+.bg-primary {
+    background-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.bg-success {
+    background-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.bg-danger {
+    background-color: rgb(255, 71, 87) !important;
+    color: #fff !important;
+}
+
+.bg-warning {
+    background-color: rgb(255, 193, 7) !important;
+    color: var(--bg-primary) !important;
+}
+
+.bg-info {
+    background-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.bg-dark {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.shadow-sm,
+.shadow,
+.shadow-lg {
+    box-shadow: none !important;
+}
+
+.text-dark {
+    color: var(--text-primary) !important;
+}
+
+.text-primary {
+    color: var(--accent-color) !important;
+}
+
+.text-success {
+    color: var(--accent-color) !important;
+}
+
+.text-danger {
+    color: rgb(255, 71, 87) !important;
+}
+
+.text-warning {
+    color: rgb(255, 193, 7) !important;
+}
+
+.text-info {
+    color: var(--accent-color) !important;
+}
+
+/* === НАВБАР === */
+header.navbar,
+.navbar {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.navbar-brand,
+.navbar-brand span {
+    color: var(--text-primary) !important;
+}
+
+.navbar-brand:hover {
+    color: var(--accent-color) !important;
+}
+
+.navbar-brand img {
+    filter: invert(1) !important;
+}
+
+.nav-link {
+    color: var(--text-secondary) !important;
+}
+
+.nav-link:hover {
+    color: var(--accent-color) !important;
+}
+
+.navbar .btn-outline-dark {
+    background: transparent !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-outer) !important;
+}
+
+.navbar .btn-outline-dark:hover {
+    background: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+/* === ПОИСК === */
+.navbar .form-control,
+.navbar .input-group .form-control {
+    background-color: var(--bg-tertiary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-inner) !important;
+}
+
+.navbar .form-control:focus {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(127, 181, 181, 0.2) !important;
+}
+
+.navbar .form-control::placeholder {
+    color: var(--text-muted) !important;
+}
+
+.navbar .input-group .btn {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    border-radius: var(--radius-inner) !important;
+}
+
+.navbar .input-group .btn:hover {
+    background-color: var(--accent-color) !important;
+}
+
+.navbar .input-group .btn i {
+    color: var(--text-secondary) !important;
+}
+
+/* === КАРТОЧКИ === */
+.card {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid transparent !important;
+    border-radius: var(--radius-outer) !important;
+    box-shadow: none !important;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: transparent !important;
+    box-shadow: 0 0 25px rgba(130, 130, 130, 0.2) !important;
+}
+
+.card-body {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.card-header {
+    background-color: var(--bg-tertiary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-outer) var(--radius-outer) 0 0 !important;
+}
+
+.card-footer {
+    background-color: var(--bg-tertiary) !important;
+    border-top: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: 0 0 var(--radius-outer) var(--radius-outer) !important;
+}
+
+/* === ФИЛЬТРЫ === */
+.filter-section {
+    background: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.filter-header {
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    transition: background 0.2s;
+    user-select: none;
+    border-radius: var(--radius-outer) !important;
+}
+
+.filter-header:hover {
+    background: var(--bg-tertiary) !important;
+}
+
+.filter-content {
+    background: var(--bg-secondary) !important;
+}
+
+.filter-option {
+    color: var(--text-secondary) !important;
+    border-radius: var(--radius-inner);
+}
+
+.filter-option:hover {
+    background: var(--bg-tertiary);
+}
+
+/* === ФОРМЫ === */
+.form-control,
+.form-select {
+    background-color: var(--bg-tertiary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-inner) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(127, 181, 181, 0.2) !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+}
+
+.form-label {
+    color: var(--text-primary) !important;
+}
+
+.form-check-input {
+    background-color: var(--bg-tertiary) !important;
+    border-color: rgb(240, 240, 240) !important;
+    border-radius: var(--radius-inner) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+}
+
+.form-check-input:focus {
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(127, 181, 181, 0.2) !important;
+}
+
+.form-check-label {
+    color: var(--text-primary) !important;
+}
+
+.input-group-text {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* === ACCORDION === */
+.accordion-item {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-outer) !important;
+    margin-bottom: 8px;
+}
+
+.accordion-button {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: var(--radius-outer) !important;
+}
+
+.accordion-button:hover {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--accent-color) !important;
+    box-shadow: none !important;
+}
+
+.accordion-button::after {
+    filter: invert(1) !important;
+}
+
+.accordion-body {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* === ТАБЛИЦЫ === */
+.table-responsive {
+    background-color: var(--bg-secondary) !important;
+    border-radius: var(--radius-outer) !important;
+}
+
+.table {
+    color: var(--text-primary) !important;
+    background-color: transparent !important;
+}
+
+.table thead {
+    background-color: var(--bg-tertiary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.table thead th {
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+    background-color: var(--bg-tertiary) !important;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.table tbody tr:hover {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.table tbody td,
+.table tbody th {
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+    background-color: transparent !important;
+}
+
+.table-borderless td,
+.table-borderless th {
+    border: none !important;
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+}
+
+/* === ФУТЕР === */
+footer {
+    background-color: var(--bg-secondary) !important;
+    border-top: 1px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+footer h5, footer h6 {
+    color: var(--text-primary) !important;
+}
+
+footer .text-muted,
+footer .small,
+footer p,
+footer li {
+    color: var(--text-secondary) !important;
+}
+
+footer a {
+    color: var(--text-secondary) !important;
+}
+
+footer a:hover {
+    color: var(--accent-color) !important;
+}
+
+footer .social-links a {
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    border-radius: 50% !important;
+}
+
+footer .social-links a:hover {
+    background: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+    border-color: var(--accent-color) !important;
+}
+
+footer .newsletter-form .form-control {
+    background: var(--bg-tertiary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+footer .newsletter-form .btn {
+    background: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+    border: 1px solid var(--accent-color) !important;
+}
+
+footer .footer-bottom {
+    border-top: 1px solid var(--border-color) !important;
+    color: var(--text-muted) !important;
+}
+
+footer .payment-badge {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* === OFFCANVAS === */
+.offcanvas {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-outer) !important;
+}
+
+.offcanvas-header {
+    background-color: var(--bg-tertiary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.offcanvas-title {
+    color: var(--text-primary) !important;
+}
+
+.offcanvas .btn-close {
+    filter: invert(1) !important;
+}
+
+/* === DROPDOWN === */
+.dropdown-menu {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-outer) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dropdown-item {
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-inner) !important;
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--accent-color) !important;
+}
+
+.dropdown-divider {
+    border-color: var(--border-color) !important;
+}
+
+/* === КНОПКИ === */
+.btn {
+    border-radius: var(--radius-outer) !important;
+    transition: all 0.2s ease;
+}
+
+.btn-dark {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.btn-dark:hover {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
+    color: var(--bg-primary) !important;
+}
+
+.btn-outline-primary {
+    background-color: transparent !important;
+    border: 2px solid var(--accent-color) !important;
+    color: var(--accent-color) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.btn-outline-secondary {
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.btn-success {
+    background-color: transparent !important;
+    border-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
+}
+
+.btn-success:hover {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.btn-link {
+    color: var(--accent-color) !important;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: var(--accent-hover) !important;
+    text-decoration: underline;
+}
+
+/* === СКРОЛЛБАР === */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
+
+/* === ВЫДЕЛЕНИЕ === */
+::selection {
+    background-color: var(--accent-color);
+    color: var(--bg-primary);
+}
+
+/* === МОДАЛЬНЫЕ ОКНА === */
+.modal-content {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-outer) !important;
+}
+
+.modal-header {
+    background-color: var(--bg-tertiary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.modal-footer {
+    background-color: var(--bg-tertiary) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+.modal-title {
+    color: var(--text-primary) !important;
+}
+
+.modal-body {
+    color: var(--text-primary) !important;
+}
+
+/* === BREADCRUMBS === */
+.breadcrumb-item a {
+    color: var(--text-secondary) !important;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-primary) !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--text-muted) !important;
+}
+
+/* === PAGINATION === */
+.page-item .page-link {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-outer) !important;
+}
+
+.page-item.active .page-link {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.page-item .page-link:hover {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--accent-color) !important;
+}
+
+/* === ALERTS === */
+.alert-info,
+.alert-secondary {
+    background-color: rgba(127, 181, 181, 0.1) !important;
+    border-color: rgba(127, 181, 181, 0.3) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-outer) !important;
+}
+
+/* === LIST GROUP === */
+.list-group-item {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.list-group-item:hover {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.list-group-item.active {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+/* === HR / DIVIDER === */
+hr {
+    border-color: var(--border-color) !important;
+}
+
+/* === ROUNDED === */
+.rounded-2, .rounded-3, .rounded-4 {
+    border-radius: var(--radius-outer) !important;
+}
+
+.rounded {
+    border-radius: var(--radius-inner) !important;
+}
+
+/* === BADGE === */
+.badge {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-inner) !important;
+}
+
+.badge.bg-success {
+    background-color: rgba(127, 181, 181, 0.2) !important;
+    color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+}
+
+.badge.bg-danger {
+    background-color: rgba(255, 71, 87, 0.2) !important;
+    color: rgb(255, 71, 87) !important;
+    border-color: rgb(255, 71, 87) !important;
+}
+
+.badge.bg-primary {
+    background-color: rgba(127, 181, 181, 0.2) !important;
+    color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+}
+
+/* === ЗАГОЛОВКИ === */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary) !important;
+}
+
+/* === ССЫЛКИ === */
+a {
+    color: var(--accent-color);
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+/* === NAV TABS === */
+.nav-tabs .nav-link {
+    color: var(--text-secondary) !important;
+    background: transparent !important;
+    border-color: var(--border-color) !important;
+    border-radius: var(--radius-outer) var(--radius-outer) 0 0 !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--accent-color) !important;
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* === PROGRESS BAR === */
+.progress {
+    background-color: var(--bg-tertiary) !important;
+    border-radius: var(--radius-inner) !important;
+}
+
+.progress-bar {
+    background-color: var(--accent-color) !important;
+}

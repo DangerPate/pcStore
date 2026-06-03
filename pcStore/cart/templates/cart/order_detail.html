@@ -22,20 +22,20 @@
         </a>
     </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom py-3">
+    <div class="card border-0 ">
+        <div class="card-header border-bottom py-3">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
                     <h3 class="h5 fw-bold mb-1">Статус заказа</h3>
-                    <small class="text-muted">
+                    <small class="">
                         <i class="bi bi-calendar3 me-1"></i>Оформлен: {{ order.created_at|date:"d.m.Y H:i" }}
                     </small>
                 </div>
                 <div>
                     {% if order.status == 'new' %}
-                        <span class="badge bg-primary fs-6">Новый</span>
+                        <span class="badge fs-6">Новый</span>
                     {% elif order.status == 'processing' %}
-                        <span class="badge bg-warning text-dark fs-6">В обработке</span>
+                        <span class="badge bg-warning  fs-6">В обработке</span>
                     {% elif order.status == 'completed' %}
                         <span class="badge bg-success fs-6">Выполнен</span>
                     {% elif order.status == 'cancelled' %}
@@ -50,7 +50,7 @@
             <h4 class="h6 fw-bold mb-3">Состав заказа:</h4>
             <div class="table-responsive mb-4">
                 <table class="table table-borderless align-middle">
-                    <thead class="table-light">
+                    <thead class="">
                         <tr>
                             <th>Товар</th>
                             <th class="text-center">Цена</th>
@@ -69,14 +69,14 @@
                                          class="rounded" 
                                          style="width: 60px; height: 60px; object-fit: cover;">
                                     {% else %}
-                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                    <div class="rounded d-flex align-items-center justify-content-center"
                                          style="width: 60px; height: 60px;">
-                                        <i class="bi bi-box-seam text-muted"></i>
+                                        <i class="bi bi-box-seam "></i>
                                     </div>
                                     {% endif %}
                                     <div>
                                         <div class="fw-medium">{{ item.product.title }}</div>
-                                        <small class="text-muted">{{ item.product.sku|default:"Артикул не указан" }}</small>
+                                        <small class="">{{ item.product.sku|default:"Артикул не указан" }}</small>
                                     </div>
                                 </div>
                             </td>
@@ -92,7 +92,7 @@
             <div class="row g-4">
                 
                 <div class="col-md-6">
-                    <div class="p-3 bg-light rounded-3 h-100">
+                    <div class="p-3 rounded-3 h-100">
                         <h4 class="h6 fw-bold mb-3"><i class="bi bi-geo-alt me-2"></i>Информация о доставке</h4>
                         <p class="mb-2"><strong>Получатель:</strong> {{ order.first_name }}</p>
                         <p class="mb-2"><strong>Телефон:</strong> {{ order.phone }}</p>
@@ -105,20 +105,20 @@
                 
                 
                 <div class="col-md-6">
-                    <div class="p-3 bg-light rounded-3 h-100 d-flex flex-column justify-content-between">
+                    <div class="p-3 rounded-3 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <h4 class="h6 fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Дополнительно</h4>
                             {% if order.comment %}
                             <p class="mb-2"><strong>Комментарий:</strong> {{ order.comment }}</p>
                             {% else %}
-                            <p class="mb-2 text-muted">Комментариев нет</p>
+                            <p class="mb-2 ">Комментариев нет</p>
                             {% endif %}
                         </div>
                         
                         <div class="border-top pt-3 mt-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fs-5 fw-bold">Итого к оплате:</span>
-                                <span class="fs-3 fw-bold text-primary">{{ order.total_price }} ₽</span>
+                                <span class="fs-3 fw-bold ">{{ order.total_price }} ₽</span>
                             </div>
                         </div>
                     </div>
@@ -126,8 +126,8 @@
             </div>
         </div>
         
-        <div class="card-footer bg-white border-top py-3">
-            <small class="text-muted">
+        <div class="card-footer border-top py-3">
+            <small class="">
                 {% if order.status == 'new' %}
                     <i class="bi bi-info-circle me-1"></i>Ваш заказ принят и ожидает обработки. Мы свяжемся с вами для подтверждения.
                 {% elif order.status == 'processing' %}

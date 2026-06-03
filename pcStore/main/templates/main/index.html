@@ -9,11 +9,11 @@
     <div class="container-fluid px-3 px-md-4">
 
         
-        <div class="swiper promoSwiper rounded-4 shadow-sm">
+        <div class="swiper promoSwiper rounded-4 ">
             <div class="swiper-wrapper">
                 {% for promotion in promotions %}
                 <div class="swiper-slide">
-                    <div class="slide-content row g-0 bg-white rounded-4 overflow-hidden h-100">
+                    <div class="slide-content row g-0 rounded-4 overflow-hidden h-100">
 
                         
                         <div class="col-lg-4 position-relative banner-wrapper">
@@ -34,11 +34,11 @@
                                      style="background: rgba(0,0,0,0.3); pointer-events: none;"></div>
 
                                 <div class="banner-content position-absolute top-50 start-50 translate-middle text-center w-100 px-4">
-                                    <h2 class="fw-bold mb-3 text-white" style="font-size: 2rem; text-shadow: 0 2px 6px rgba(0,0,0,0.5);">
+                                    <h2 class="fw-bold mb-3 text-white" style="font-size: 2rem;">
                                         {{ promotion.title }}
                                     </h2>
                                     {% if promotion.discount_percent %}
-                                    <span class="badge bg-warning text-dark fs-5 mb-3">
+                                    <span class="badge bg-warning  fs-5 mb-3">
                                         Скидка до {{ promotion.discount_percent }}%
                                     </span>
                                     <br>
@@ -60,7 +60,7 @@
                                     </div>
                                 </div>
                                 {% empty %}
-                                <div class="col-12 d-flex align-items-center justify-content-center text-muted p-4">
+                                <div class="col-12 d-flex align-items-center justify-content-center  p-4">
                                     <p class="mb-0">В этой акции пока нет товаров.</p>
                                 </div>
                                 {% endfor %}

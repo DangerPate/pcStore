@@ -1,4 +1,4 @@
-﻿<div class="card catalog-card mb-3 border-0 shadow-sm">
+﻿<div class="card catalog-card mb-3 border-0 ">
                 <div class="row g-0 align-items-center">
 
                     
@@ -9,8 +9,8 @@
                             {% elif product.images.exists %}
                                 <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}" class="img-fluid">
                             {% else %}
-                                <div class="d-flex align-items-center justify-content-center h-100 bg-light rounded">
-                                    <i class="bi bi-box-seam text-muted fs-3"></i>
+                                <div class="d-flex align-items-center justify-content-center h-100 rounded">
+                                    <i class="bi bi-box-seam  fs-3"></i>
                                 </div>
                             {% endif %}
                         </a>
@@ -18,10 +18,10 @@
 
                     
                     <div class="col-9 col-md-6 p-3">
-                        <a href="{% url 'catalog:product_detail' product.slug %}" class="text-decoration-none text-dark">
+                        <a href="{% url 'catalog:product_detail' product.slug %}" class="text-decoration-none ">
                             <h6 class="fw-medium mb-1 catalog-title">{{ product.title }}</h6>
                         </a>
-                        <p class="text-muted small mb-2 catalog-specs">{{ product.info|truncatechars:140 }}</p>
+                        <p class=" small mb-2 catalog-specs">{{ product.info|truncatechars:140 }}</p>
 
                         
                         {% with review_count=product.reviews_count|default:0 %}
@@ -39,24 +39,19 @@
                                         {% endif %}
                                     {% endfor %}
                                 </div>
-                                <span class="text-muted small">({{ review_count }})</span>
+                                <span class="small number-of-reviews">({{ review_count }})</span>
                             </div>
                             {% endwith %}
                         {% else %}
                             <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                                <span class="text-muted small">Нет отзывов</span>
+                                <span class="small">Нет отзывов</span>
                             </div>
                         {% endif %}
                         {% endwith %}
 
                         
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                            {% if product.categories.first %}
-                            <span class="badge bg-success-subtle text-success">
-                                <i class="bi bi-check-circle"></i> {{ product.categories.first.title }}
-                            </span>
-                            {% endif %}
-                            <span class="text-muted small"><i class="bi bi-truck"></i> Доставка завтра</span>
+                            <span class="small delivery"><i class="bi bi-truck"></i> Доставка завтра</span>
                         </div>
                     </div>
 
@@ -65,9 +60,9 @@
 
                         
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="fs-5 fw-bold text-primary">{{ product.price }} ₽</span>
+                            <span class="fs-5 fw-bold">{{ product.price }} ₽</span>
                             {% if product.old_price and product.old_price > product.price %}
-                                <span class="text-muted small text-decoration-line-through">{{ product.old_price }} ₽</span>
+                                <span class=" small text-decoration-line-through past-price">{{ product.old_price }} ₽</span>
                                 <span class="badge bg-danger">{{ product.discount_percent }}%</span>
                             {% endif %}
                         </div>
@@ -76,11 +71,11 @@
                         <div class="d-flex gap-2 mt-2">
                             {% if product.is_in_cart %}
                             <button type="button" class="btn btn-success btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}">
-                                <i class="bi bi-check-lg me-1"></i> В корзине
+                                <i class="bi bi-check-lg me-1"></i> В КОРЗИНЕ
                             </button>
                             {% else %}
                             <button type="button" class="btn btn-dark btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}">
-                                <i class="bi bi-cart-plus me-1"></i> Купить
+                                <i class="bi bi-cart-plus me-1"></i> КУПИТЬ
                             </button>
                             {% endif %}
                             <button type="button" class="btn btn-outline-danger btn-sm btn-toggle-fav {% if product.is_favorited %}active{% endif %}" data-slug="{{ product.slug }}">

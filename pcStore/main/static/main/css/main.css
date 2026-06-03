@@ -1,264 +1,257 @@
-﻿
-:root {
-  --navbar-height: 72px;
+﻿:root {
+    --navbar-height: 72px;
+    --bg-primary: rgb(3, 3, 3);
+    --bg-secondary: rgb(13, 13, 13);
+    --bg-tertiary: rgb(9, 9, 9);
+    --text-primary: rgb(240, 240, 240);
+    --text-secondary: rgb(180, 180, 180);
+    --border-color: rgb(30, 30, 30);
+    --accent-color: rgb(127, 181, 181);
 }
 
-
 html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: #fff;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: var(--bg-primary);
 }
 
 body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: "Roboto Mono", monospace;
+    font-weight: 500;
+    color: var(--text-primary);
 }
-
-
 
 main {
-  flex: 1 0 auto;
-  
-  padding-bottom: 2rem;
-  padding-top: 50px;
+    flex: 1 0 auto;
+    padding-bottom: 2rem;
+    padding-top: 50px;
 }
-
 
 main .container {
-  padding-top: 0;
-  margin-top: 0 !important;
+    padding-top: 0;
+    margin-top: 0 !important;
 }
-
 
 footer {
-  flex-shrink: 0;
-  margin-top: auto;
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
-
 header {
-  background-color: #fff;
-  z-index: 1050; 
+    background-color: var(--bg-secondary) !important;
+    z-index: 1050;
+}
+
+header.navbar {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
 }
 
 .offcanvas-top.no-overlap-header {
-  top: var(--navbar-height) !important;
-  height: calc(100vh - var(--navbar-height)) !important;
-  z-index: 1045;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-
-  
-  transform: translateY(calc(-1 * var(--navbar-height))) !important;
-  transition: none !important;  
+    top: var(--navbar-height) !important;
+    height: calc(100vh - var(--navbar-height)) !important;
+    z-index: 1045;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(calc(-1 * var(--navbar-height))) !important;
+    transition: none !important;
+    background-color: var(--bg-secondary) !important;
 }
-
 
 .offcanvas-top.no-overlap-header.showing,
 .offcanvas-top.no-overlap-header.hiding,
 .offcanvas-top.no-overlap-header.show {
-  transform: translateY(0) !important;
-  transition: none !important;
+    transform: translateY(0) !important;
+    transition: none !important;
 }
 
 .offcanvas-top.no-overlap-header.show {
-  transform: translateY(0) !important;
+    transform: translateY(0) !important;
 }
 
 .hover-primary:hover {
-    color: #0d6efd !important;
+    color: var(--accent-color) !important;
     text-decoration: none;
 }
 
-
 .catalog-category {
-  padding: 0.75rem 1.25rem;
-  transition: all 0.2s ease;
-  border-radius: 8px;
-  margin: 0.25rem 0;
+    padding: 0.75rem 1.25rem;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    margin: 0.25rem 0;
+    color: var(--text-primary) !important;
 }
 
 .catalog-category:hover {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  transform: translateX(4px);
-  text-decoration: none;
-  color: #0d6efd !important;
+    background: var(--bg-tertiary) !important;
+    transform: translateX(4px);
+    text-decoration: none;
+    color: var(--accent-color) !important;
 }
 
 .catalog-category i {
-  width: 24px;
-  color: #6c757d;
-  transition: color 0.2s;
+    width: 24px;
+    color: var(--accent-color) !important;
+    transition: color 0.2s;
 }
 
 .catalog-category:hover i {
-  color: #0d6efd;
+    color: rgb(109, 155, 155);
 }
 
 .hover-bg-primary:hover {
-  background-color: #0d6efd !important;
-  color: #fff !important;
-  transition: all 0.2s;
+    background-color: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+    transition: all 0.2s;
 }
-
 
 footer {
-  background-color: #000;
-  color: #fff;
-  border-top: 1px solid #333;
-  font-size: 0.9rem;
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border-top: 1px solid var(--border-color) !important;
+    font-size: 0.9rem;
 }
 
-ooter .text-muted,
+footer .text-muted,
 footer .small,
 footer p,
 footer li {
-    color: #b3b3b3 !important;
+    color: var(--text-secondary) !important;
 }
 
 footer h5, footer h6 {
-  color: #fff;
-  font-weight: 600;
-  margin-bottom: 1.25rem;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
+    color: var(--text-primary) !important;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
 }
 
 footer a {
-  color: #aaa;
-  text-decoration: none;
-  transition: color 0.2s ease;
-  display: inline-block;
+    color: var(--text-secondary) !important;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: inline-block;
 }
 
 footer a:hover {
-  color: #fff !important;
+    color: var(--accent-color) !important;
 }
 
 footer .list-unstyled li {
-  margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
-
 footer .social-links a {
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 1px solid #444;
-  margin-right: 0.5rem;
-  color: #aaa;
-  transition: all 0.2s ease;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--border-color) !important;
+    margin-right: 0.5rem;
+    color: var(--text-secondary) !important;
+    transition: all 0.2s ease;
 }
 
 footer .social-links a:hover {
-  background: #fff;
-  color: #000 !important;
-  border-color: #fff;
+    background: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+    border-color: var(--accent-color) !important;
 }
 
-
 footer .newsletter-form .form-control {
-  background: #1a1a1a;
-  border: 1px solid #444;
-  color: #fff;
-  border-radius: 4px;
+    background: var(--bg-tertiary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: 4px;
 }
 
 footer .newsletter-form .form-control::placeholder {
-  color: #666;
+    color: var(--text-secondary) !important;
 }
 
 footer .newsletter-form .form-control:focus {
-  background: #222;
-  border-color: #fff;
-  box-shadow: none;
-  color: #fff;
+    background: var(--bg-secondary) !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: none;
+    color: var(--text-primary) !important;
 }
 
 footer .newsletter-form .btn {
-  background: #fff;
-  color: #000;
-  border: 1px solid #fff;
-  border-radius: 4px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+    background: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
+    border: 1px solid var(--accent-color) !important;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
 footer .newsletter-form .btn:hover {
-  background: #000;
-  color: #fff;
+    background: transparent !important;
+    color: var(--accent-color) !important;
 }
 
-
 footer .footer-bottom {
-  border-top: 1px solid #333;
-  padding-top: 1.5rem;
-  margin-top: 2rem;
-  font-size: 0.8rem;
-  color: #666;
+    border-top: 1px solid var(--border-color) !important;
+    padding-top: 1.5rem;
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary) !important;
 }
 
 footer .footer-bottom a {
-  color: #666;
+    color: var(--text-secondary) !important;
 }
 
 footer .footer-bottom a:hover {
-  color: #fff !important;
+    color: var(--accent-color) !important;
 }
 
 footer .payment-badge {
-  background: #222;
-  color: #fff;
-  padding: 0.25rem 0.6rem;
-  border-radius: 3px;
-  font-weight: 500;
-  font-size: 0.75rem;
-  margin-right: 0.3rem;
-  border: 1px solid #444;
+    background: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    margin-right: 0.3rem;
+    border: 1px solid var(--border-color) !important;
 }
-
 
 @media (max-width: 768px) {
-  footer .row > [class*="col-"] {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  footer .social-links {
-    justify-content: center;
-  }
-
-  footer .newsletter-form {
-    max-width: 100%;
-  }
-
-  footer .newsletter-form .form-control {
-    margin-bottom: 0.5rem;
-  }
-
-  footer .footer-bottom {
-    text-align: center;
-  }
-
-  footer .footer-bottom .d-flex {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+    footer .row > [class*="col-"] {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    footer .social-links {
+        justify-content: center;
+    }
+    footer .newsletter-form {
+        max-width: 100%;
+    }
+    footer .newsletter-form .form-control {
+        margin-bottom: 0.5rem;
+    }
+    footer .footer-bottom {
+        text-align: center;
+    }
+    footer .footer-bottom .d-flex {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }
-
 
 .promo-carousel-section {
     padding-bottom: 20px;
-    position: relative !important;  
+    position: relative !important;
     z-index: 1 !important;
     overflow: hidden !important;
 }
@@ -285,12 +278,15 @@ footer .payment-badge {
     height: 450px !important;
     transition: transform 0.3s ease;
 }
+
 .promo-carousel-section .banner-wrapper:hover {
     transform: scale(1.01);
 }
+
 .promo-carousel-section .banner-wrapper img {
     transition: transform 0.5s ease;
 }
+
 .promo-carousel-section .banner-wrapper:hover img {
     transform: scale(1.05);
 }
@@ -300,18 +296,19 @@ footer .payment-badge {
 }
 
 .promo-banner-btn {
-    background: #111111 !important;
-    color: #ffffff !important;
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
     border-radius: 6px !important;
     border: none !important;
     box-shadow: 0 4px 10px rgba(0,0,0,0.25);
     transition: all 0.2s;
 }
+
 .promo-banner-btn:hover {
-    background: #333333 !important;
+    background: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
     transform: translateY(-2px);
 }
-
 
 .promo-pagination {
     display: flex;
@@ -319,23 +316,24 @@ footer .payment-badge {
     gap: 8px;
     margin-top: 15px;
 }
+
 .promo-pagination-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #d0d0d0;
+    background: var(--border-color) !important;
     cursor: pointer;
     transition: all 0.3s;
 }
+
 .promo-pagination-dot.active {
-    background: #111;
+    background: var(--accent-color) !important;
     transform: scale(1.3);
 }
 
-
 .promo-carousel-section .swiper-button-next,
 .promo-carousel-section .swiper-button-prev {
-    color: #333 !important;
+    color: var(--accent-color) !important;
     opacity: 0.9;
     width: 40px !important;
     height: 40px !important;
@@ -343,64 +341,55 @@ footer .payment-badge {
     cursor: pointer;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    background: rgba(255,255,255,0.9);
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
+
 .promo-carousel-section .swiper-button-next:hover,
 .promo-carousel-section .swiper-button-prev:hover {
     opacity: 1;
-    background: #fff;
+    background: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
 }
+
 .promo-carousel-section .swiper-button-next:after,
 .promo-carousel-section .swiper-button-prev:after {
     font-size: 20px !important;
     font-weight: bold;
 }
 
-
 .promo-carousel-section .col-4 {
     height: 100%;
 }
+
 .promo-carousel-section .col-4 .p-3 {
     height: 100%;
     padding: 1rem !important;
 }
+
 .promo-carousel-section .product-card {
     width: 100%;
     height: 100%;
 }
 
 @media (max-width: 991.98px) {
-    .promo-carousel-section .swiper {
-        height: 350px !important;
-    }
-    .promo-carousel-section .swiper-slide {
-        height: 350px !important;
-    }
-    .promo-carousel-section .banner-wrapper {
-        height: 350px !important;
-    }
+    .promo-carousel-section .swiper { height: 350px !important; }
+    .promo-carousel-section .swiper-slide { height: 350px !important; }
+    .promo-carousel-section .banner-wrapper { height: 350px !important; }
 }
 
 @media (max-width: 767.98px) {
-    .promo-carousel-section .swiper {
-        height: 300px !important;
-    }
-    .promo-carousel-section .swiper-slide {
-        height: 300px !important;
-    }
-    .promo-carousel-section .banner-wrapper {
-        height: 300px !important;
-    }
+    .promo-carousel-section .swiper { height: 300px !important; }
+    .promo-carousel-section .swiper-slide { height: 300px !important; }
+    .promo-carousel-section .banner-wrapper { height: 300px !important; }
 }
 
-
-
 .discount-carousel-section {
-    background: #f8f9fa;
+    background: rgb(0, 0, 0) !important;
     padding: 0.8rem 0 1.5rem !important;
-    border-radius: 12px;
+    border-radius: 6px;
     position: relative;
     margin-top: 10px;
 }
@@ -408,6 +397,7 @@ footer .payment-badge {
 .discount-carousel-section h3 {
     margin-bottom: 0.4rem !important;
     padding: 0 1rem;
+    color: var(--text-primary) !important;
 }
 
 .discount-carousel-section .swiper {
@@ -418,26 +408,23 @@ footer .payment-badge {
 
 .discount-carousel-section .swiper-wrapper {
     padding-bottom: 0px;
-    gap: 30px ;
-    height: 450px !important;  
-
+    gap: 30px;
+    height: 450px !important;
 }
 
 .discount-carousel-section .swiper-slide {
-    width: 245px !important;   
+    width: 245px !important;
     flex-shrink: 0 !important;
 }
-
 
 .discount-carousel-section .product-card {
     height: 100% !important;
     width: 100% !important;
 }
 
-
 .discount-carousel-section .swiper-button-prev,
 .discount-carousel-section .swiper-button-next {
-    color: #333 !important;
+    color: var(--accent-color) !important;
     opacity: 0.9;
     width: 40px !important;
     height: 40px !important;
@@ -445,7 +432,8 @@ footer .payment-badge {
     cursor: pointer;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    background: rgba(255,255,255,0.9);
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
@@ -453,7 +441,8 @@ footer .payment-badge {
 .discount-carousel-section .swiper-button-prev:hover,
 .discount-carousel-section .swiper-button-next:hover {
     opacity: 1;
-    background: #fff;
+    background: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
 }
 
 .discount-carousel-section .swiper-button-prev:after,
@@ -462,25 +451,22 @@ footer .payment-badge {
     font-weight: bold;
 }
 
-
 @media (max-width: 767.98px) {
-    .discount-carousel-section .swiper-slide div {
-        height: 370px !important;
-    }
+    .discount-carousel-section .swiper-slide div { height: 370px !important; }
 }
-
-
 
 .popular-carousel-section {
     padding: 0.8rem 0 1.5rem !important;
-    border-radius: 12px;
+    border-radius: 6px;
     position: relative;
     margin-top: 10px;
+    /* УБРАН ФОН — прозрачный */
 }
 
 .popular-carousel-section h3 {
     margin-bottom: 0.4rem !important;
     padding: 0 1rem;
+    color: var(--text-primary) !important;
 }
 
 .popular-carousel-section .swiper {
@@ -505,10 +491,9 @@ footer .payment-badge {
     width: 100% !important;
 }
 
-
 .popular-carousel-section .swiper-button-prev,
 .popular-carousel-section .swiper-button-next {
-    color: #333 !important;
+    color: var(--accent-color) !important;
     opacity: 0.9;
     width: 40px !important;
     height: 40px !important;
@@ -516,15 +501,19 @@ footer .payment-badge {
     cursor: pointer;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    background: rgba(255,255,255,0.9);
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
+
 .popular-carousel-section .swiper-button-prev:hover,
 .popular-carousel-section .swiper-button-next:hover {
     opacity: 1;
-    background: #fff;
+    background: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
 }
+
 .popular-carousel-section .swiper-button-prev:after,
 .popular-carousel-section .swiper-button-next:after {
     font-size: 20px !important;
@@ -532,21 +521,21 @@ footer .payment-badge {
 }
 
 @media (max-width: 767.98px) {
-    .popular-carousel-section .swiper-slide div {
-        height: 370px !important;
-    }
+    .popular-carousel-section .swiper-slide div { height: 370px !important; }
 }
 
 .new-carousel-section {
     padding: 0.8rem 0 1.5rem !important;
-    border-radius: 12px;
+    border-radius: 6px;
     position: relative;
     margin-top: 10px;
+    /* УБРАН ФОН — прозрачный */
 }
 
 .new-carousel-section h3 {
     margin-bottom: 0.4rem !important;
     padding: 0 1rem;
+    color: var(--text-primary) !important;
 }
 
 .new-carousel-section .swiper {
@@ -571,10 +560,9 @@ footer .payment-badge {
     width: 100% !important;
 }
 
-
 .new-carousel-section .swiper-button-prev,
 .new-carousel-section .swiper-button-next {
-    color: #333 !important;
+    color: var(--accent-color) !important;
     opacity: 0.9;
     width: 40px !important;
     height: 40px !important;
@@ -582,85 +570,172 @@ footer .payment-badge {
     cursor: pointer;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    background: rgba(255,255,255,0.9);
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
+
 .new-carousel-section .swiper-button-prev:hover,
 .new-carousel-section .swiper-button-next:hover {
     opacity: 1;
-    background: #fff;
+    background: var(--accent-color) !important;
+    color: var(--bg-primary) !important;
 }
+
 .new-carousel-section .swiper-button-prev:after,
 .new-carousel-section .swiper-button-next:after {
     font-size: 20px !important;
     font-weight: bold;
 }
 
-
-
 @media (max-width: 767.98px) {
-    .new-carousel-section .swiper-slide div {
-        height: 370px !important;
-    }
+    .new-carousel-section .swiper-slide div { height: 370px !important; }
 }
-
 
 .discount-carousel-section,
 .popular-carousel-section,
-.new-carousel-section
-{
-    width: 1377px !important;           
-    margin-left: calc(-105px / 2) !important;  
+.new-carousel-section {
+    width: 1377px !important;
+    margin-left: calc(-105px / 2) !important;
     position: relative !important;
     left: 0 !important;
+    /* УБРАН ФОН */
 }
 
-.promo-carousel-section
-{
+.promo-carousel-section {
     width: 1377px !important;
-    margin-left: calc(-85px / 2) !important;  
+    margin-left: calc(-85px / 2) !important;
     position: relative !important;
     left: 0 !important;
+    /* УБРАН ФОН */
 }
 
 .promo-carousel-section .banner-wrapper {
     width: 546px !important;
-    flex: 0 0 546px !important;  
+    flex: 0 0 546px !important;
 }
 
 .promo-carousel-section .col-lg-8 {
-    width: calc(100% - 546px) !important;  
+    width: calc(100% - 546px) !important;
     flex: 1 !important;
     max-width: none !important;
 }
-
-
-
 
 .product-card .text-warning i {
     font-size: 0.85rem;
     margin-right: 1px;
 }
 
-
 .product-card .text-decoration-line-through {
-    color: #999 !important;
+    color: var(--text-secondary) !important;
     font-weight: 400;
 }
-
 
 .product-card .badge.bg-danger {
     font-weight: 600;
     letter-spacing: 0.3px;
 }
 
-
 @media (max-width: 767.98px) {
-    .product-card .text-warning i {
-        font-size: 0.75rem;
-    }
-    .product-card .fs-5 {
-        font-size: 1.1rem !important;
-    }
+    .product-card .text-warning i { font-size: 0.75rem; }
+    .product-card .fs-5 { font-size: 1.1rem !important; }
+}
+
+/* Иконки подкатегорий — акцентные */
+.subcategory i,
+.category-icon,
+.offcanvas .bi {
+    color: var(--accent-color) !important;
+}
+
+/* Иконка "нет изображения" */
+.no-image i,
+.bi-box-seam {
+    color: rgb(80, 80, 80) !important;
+    font-size: 3rem;
+}
+
+.fs-5,
+.price {
+    color: rgb(127, 181, 181) !important;
+}
+
+.category-search {
+    color: rgb(240, 240, 240) !important;
+}
+.category-search.active {
+    background-color: rgb(0, 0, 0) !important;
+}
+.category-search.active .small,
+.category-search.active .text-muted {
+    color: rgb(127, 181, 181) !important;
+}
+
+.number-of-reviews,
+.delivery,
+.catalog-specs,
+.past-price,
+.additional-text {
+    color: rgb(120, 120, 120) !important;
+}
+
+/* Активная категория — меняем цвет иконки */
+.category-search.active i {
+    color: rgb(127, 181, 181) !important; /* золотой цвет, можете заменить на любой */
+}
+
+/* Активная категория — меняем цвет текста "X товаров" */
+.category-search.active .category-count {
+    color: rgb(127, 181, 181) !important;
+}
+
+/* Карточка категории */
+.category-card {
+    transition: all 0.3s ease;
+    background: #fff;
+    border-radius: 16px;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Иконка категории */
+.category-icon {
+    color: rgb(127, 181, 181) !important;  /* основной цвет иконки */
+    transition: color 0.3s ease;
+}
+
+.category-card:hover .category-icon {
+      /* цвет иконки при наведении */
+}
+
+/* Заголовок категории */
+.category-title {
+    color: rgb(120, 120, 120) !important;
+    transition: color 0.3s ease;
+}
+
+.category-card:hover .category-title {
+    color: rgb(127, 181, 181) !important;  /* цвет заголовка при наведении */
+}
+
+/* Ссылки подкатегорий */
+.subcategory-link {
+    color: rgb(120, 120, 120) !important;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.subcategory-link:hover {
+    color: rgb(127, 181, 181) !important;
+    padding-left: 5px;
+}
+
+/* Текст "ещё X категорий" */
+.more-categories {
+    color: #999999 !important;
+    font-style: italic;
 }

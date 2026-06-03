@@ -22,7 +22,7 @@
             <div class="col-lg-8">
                 
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-                    <h2 class="fw-bold mb-0">Корзина <span class="fs-6 text-muted fw-normal" id="header-count">{{ total_count }} товаров</span></h2>
+                    <h2 class="fw-bold mb-0">Корзина <span class="fs-6  fw-normal" id="header-count">{{ total_count }} товаров</span></h2>
                     <div class="d-flex align-items-center gap-3">
                         <div class="form-check mb-0">
                             <input class="form-check-input" type="checkbox" id="check-all-header" autocomplete="off">
@@ -36,10 +36,10 @@
 
                 <form method="post" action="{% url 'cart:bulk_action' %}" id="cart-bulk-form" autocomplete="off">
                     {% csrf_token %}
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 ">
                         <div class="table-responsive">
                             <table class="table align-middle mb-0 cart-table">
-                                <thead class="bg-light">
+                                <thead class="">
                                     <tr>
                                         <th style="width: 40px;"></th>
                                         <th>Товар</th>
@@ -62,16 +62,16 @@
                                             {% elif item.product.images.exists %}
                                                 <img src="{{ item.product.images.first.image.url }}" width="70" height="70" class="rounded" style="object-fit:cover;">
                                             {% else %}
-                                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:70px;height:70px;">
-                                                    <i class="bi bi-box-seam text-muted"></i>
+                                                <div class="rounded d-flex align-items-center justify-content-center" style="width:70px;height:70px;">
+                                                    <i class="bi bi-box-seam "></i>
                                                 </div>
                                             {% endif %}
-                                            <a href="{% url 'catalog:product_detail' item.product.slug %}" class="text-decoration-none text-dark fw-medium">{{ item.product.title }}</a>
+                                            <a href="{% url 'catalog:product_detail' item.product.slug %}" class="text-decoration-none  fw-medium" style="color: rgb(240, 240, 240)">{{ item.product.title }}</a>
                                         </div>
                                     </td>
                                     <td>
                                         {% if item.product.old_price and item.product.old_price > item.product.price %}
-                                            <span class="text-muted text-decoration-line-through small d-block">{{ item.product.old_price }} ₽</span>
+                                            <span class=" text-decoration-line-through small d-block">{{ item.product.old_price }} ₽</span>
                                             <span class="fw-bold text-danger">{{ item.product.price }} ₽</span>
                                         {% else %}
                                             <span class="fw-bold">{{ item.product.price }} ₽</span>
@@ -101,26 +101,26 @@
 
             
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm sticky-lg-top" style="top: 80px; z-index: 100;">
+                <div class="card border-0  sticky-lg-top" style="top: 80px; z-index: 100;">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-4">Оформление заказа</h5>
 
                         <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Товаров выбрано:</span>
+                            <span class="">Товаров выбрано:</span>
                             <span class="fw-bold" id="sidebar-count">0</span>
                         </div>
                         <div class="d-flex justify-content-between mb-4 pb-3 border-bottom">
-                            <span class="text-muted">Сумма:</span>
-                            <span class="fw-bold fs-5 text-primary" id="sidebar-total">0 ₽</span>
+                            <span class="">Сумма:</span>
+                            <span class="fw-bold fs-5 " id="sidebar-total">0 ₽</span>
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label small text-muted mb-1">Промокод</label>
+                            <label class="form-label small  mb-1">Промокод</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Введите промокод" id="promo-input">
                                 <button class="btn btn-outline-secondary" type="button" id="btn-apply-promo">Применить</button>
                             </div>
-                            <small class="text-muted d-block mt-1" id="promo-message"></small>
+                            <small class=" d-block mt-1" id="promo-message"></small>
                         </div>
 
                         <form method="post" action="{% url 'cart:checkout' %}" id="sidebar-checkout-form">
@@ -129,7 +129,7 @@
                             <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3" id="sidebar-checkout-btn" disabled>
                                 Перейти к оформлению
                             </button>
-                            <p class="text-center text-muted small mt-2 mb-0" id="sidebar-hint">Выберите товары для оформления</p>
+                            <p class="text-center  small mt-2 mb-0" id="sidebar-hint">Выберите товары для оформления</p>
                         </form>
                     </div>
                 </div>
@@ -139,11 +139,11 @@
     {% else %}
         
         <div class="text-center py-5">
-            <div class="bg-white rounded-4 shadow-sm p-5 mx-auto" style="max-width: 500px;">
-                <i class="bi bi-cart-x fs-1 text-muted d-block mb-3"></i>
+            <div class="rounded-4  p-5 mx-auto" style="max-width: 500px;">
+                <i class="bi bi-cart-x fs-1  d-block mb-3"></i>
                 <h4 class="fw-bold mb-3">Ваша корзина пуста</h4>
-                <p class="text-muted mb-4">Похоже, вы еще не добавили товары для покупки.<br>Загляните в наш каталог — там много интересного!</p>
-                <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-5 py-3 shadow-sm">
+                <p class=" mb-4">Похоже, вы еще не добавили товары для покупки.<br>Загляните в наш каталог — там много интересного!</p>
+                <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-5 py-3 ">
                     <i class="bi bi-shop me-2"></i> Перейти в каталог
                 </a>
             </div>
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             msg.className = 'text-danger d-block mt-1';
         } else {
             msg.textContent = 'Промокод применяется...';
-            msg.className = 'text-primary d-block mt-1';
+            msg.className = ' d-block mt-1';
         }
     });
 

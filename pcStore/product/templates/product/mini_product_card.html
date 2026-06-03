@@ -1,16 +1,14 @@
 ﻿{% load static %}
 <div class="col">
-  <div class="card h-100 shadow border-0 position-relative product-card">
+  <div class="card h-100 border-0 position-relative product-card" style="width: 245px; height: 410px;">
 
-    
     {% if product.old_price and product.old_price > product.price %}
-    <span class="position-absolute top-0 start-0 badge bg-danger rounded-0 m-3 px-2 py-1" style="z-index: 3; font-size: 0.75rem;">
+    <span class="position-absolute top-0 start-0 badge bg-danger rounded-0 m-3 px-2 py-1" style="z-index: 3; font-size: 0.75rem; border-radius: 4px;">
       -{{ product.discount_percent }}%
     </span>
     {% endif %}
 
-    
-    <div class="position-relative bg-light" style="height: 180px;">
+    <div class="position-relative" style="height: 180px; background: rgb(9, 9, 9);">
       {% if product.image %}
         <a href="{% url 'catalog:product_detail' product.slug %}" class="d-block h-100 w-100">
           <img src="{{ product.image.url }}" alt="{{ product.title }}" class="w-100 h-100" style="object-fit: contain; padding: 12px;" loading="lazy">
@@ -20,76 +18,66 @@
           <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}" class="w-100 h-100" style="object-fit: contain; padding: 12px;" loading="lazy">
         </a>
       {% else %}
-        <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+        <div class="d-flex align-items-center justify-content-center h-100 ">
           <i class="bi bi-box-seam fs-1"></i>
         </div>
       {% endif %}
     </div>
 
-    
-    <div class="card-body d-flex flex-column p-3">
+    <div class="card-body d-flex flex-column p-3" style="background: rgb(13, 13, 13);">
 
-      
       <h6 class="card-title mb-2" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; height: 4.2em;">
-        <a href="{% url 'catalog:product_detail' product.slug %}" class="text-decoration-none text-dark stretched-link">
+        <a href="{% url 'catalog:product_detail' product.slug %}" class="text-decoration-none stretched-link" style="color: rgb(194, 194, 194);">
           {{ product.title }}
         </a>
       </h6>
 
-      
-      
       {% with review_count=product.reviews_count|default:0 %}
       {% if review_count > 0 %}
         {% with avg_rating=product.avg_rating|default:0 %}
         <div class="d-flex align-items-center gap-1 mb-2">
           <div class="d-flex text-warning small">
             {% for i in "12345"|make_list %}
-              {# 🔥 Полная звезда: если номер звезды <= рейтинга #}
               {% if forloop.counter <= avg_rating %}
                 <i class="bi bi-star-fill"></i>
-              {# 🔥 Половинка: если номер звезды == округлённому рейтингу + 0.5 #}
               {% elif forloop.counter == avg_rating|add:"0.5" %}
                 <i class="bi bi-star-half"></i>
-              {# 🔥 Пустая звезда #}
               {% else %}
                 <i class="bi bi-star"></i>
               {% endif %}
             {% endfor %}
           </div>
-          <span class="text-muted small" style="font-size: 0.75rem;">
+          <span class=" small" style="font-size: 0.75rem">
             ({{ review_count }})
           </span>
         </div>
         {% endwith %}
       {% else %}
-        
         <div class="mb-2" style="height: 20px;"></div>
       {% endif %}
       {% endwith %}
 
-      
       <div class="d-flex align-items-center gap-2 mb-3">
-        <span class="fw-bold text-dark fs-5">{{ product.price }} ₽</span>
+        <span class="fw-bold fs-5" style="color: rgb(127, 181, 181);">{{ product.price }} ₽</span>
         {% if product.old_price and product.old_price > product.price %}
-        <span class="text-muted text-decoration-line-through small" style="font-size: 0.9rem;">
+        <span class="text-decoration-line-through small" style="font-size: 0.9rem; color: rgb(80, 80, 80);">
           {{ product.old_price }} ₽
         </span>
         {% endif %}
       </div>
 
-      
       <div class="mt-auto d-flex gap-2 position-relative" style="z-index: 2;">
           {% if product.is_in_cart %}
-          <button type="button" class="btn btn-success btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}">
+          <button type="button" class="btn btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}" style="border: 2px solid rgb(127, 181, 181); color: rgb(127, 181, 181); border-radius: 6px; font-weight: 700; text-transform: uppercase;">
               <i class="bi bi-check-lg me-1"></i> В корзине
           </button>
           {% else %}
-          <button type="button" class="btn btn-dark btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}">
+          <button type="button" class="btn btn-sm flex-grow-1 btn-add-cart" data-slug="{{ product.slug }}" style="background: rgb(127, 181, 181); border: 2px solid rgb(127, 181, 181); color: rgb(3, 3, 3); border-radius: 6px; font-weight: 700; text-transform: uppercase;">
               <i class="bi bi-cart-plus me-1"></i> Купить
           </button>
           {% endif %}
 
-          <button type="button" class="btn btn-outline-danger btn-sm btn-toggle-fav {% if product.is_favorited %}active{% endif %}" data-slug="{{ product.slug }}">
+          <button type="button" class="btn btn-sm btn-toggle-fav {% if product.is_favorited %}active{% endif %}" data-slug="{{ product.slug }}" style="border-radius: 6px; width: 36px; height: 36px; padding: 0; {% if product.is_favorited %}background: rgb(255, 71, 87); color: #ffffff; border: 2px solid rgb(255, 71, 87);{% else %}background: transparent; color: rgb(255, 71, 87); border: 2px solid rgb(255, 71, 87);{% endif %}">
               <i class="bi {% if product.is_favorited %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
           </button>
       </div>

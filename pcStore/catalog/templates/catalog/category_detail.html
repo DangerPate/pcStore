@@ -18,7 +18,7 @@
     </nav>
 
     <h1 class="h2 fw-bold mb-4">
-        <i class="bi {{ category.icon }} me-2 text-primary"></i>
+        <i class="bi {{ category.icon }} me-2 "></i>
         {{ category.title }}
     </h1>
 
@@ -30,11 +30,11 @@
             {% for child in category.children.all %}
             <div class="col-6 col-md-4 col-lg-3">
                 <a href="{% url 'catalog:category' child.slug %}" 
-                   class="card border-0 shadow-sm h-100 text-decoration-none hover-shadow">
+                   class="card border-0  h-100 text-decoration-none">
                     <div class="card-body p-3 text-center">
-                        <i class="bi {{ child.icon }} fs-1 text-primary mb-2 d-block"></i>
+                        <i class="bi {{ child.icon }} fs-1  mb-2 d-block"></i>
                         <h3 class="h6 fw-bold mb-1">{{ child.title }}</h3>
-                        <small class="text-muted">{{ child.products.count }} товаров</small>
+                        <small class="">{{ child.products.count }} товаров</small>
                     </div>
                 </a>
             </div>
@@ -54,11 +54,5 @@
     </div>
 </div>
 
-<style>
-.hover-shadow:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    transform: translateY(-2px);
-    transition: all 0.2s;
-}
-</style>
+
 {% endblock %}

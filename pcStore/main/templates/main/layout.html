@@ -5,20 +5,26 @@
 <head>
     <meta charset="UTF-8" />
     <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'main/css/theme.css' %}" />
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+    <!--<link rel="stylesheet" href="{% static 'main/css/main.css' %}" />-->
     <link rel="stylesheet" href="{% static 'main/css/main.css' %}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
     <!-- === НАВБАР === -->
-    <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <header class="navbar navbar-expand-lg navbar-light  fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
                 <img src="{% static 'main/img/logo-main.svg' %}" alt="Logo" width="40" height="40" class="me-2"/>
-                <span class="fw-bold fs-5 text-dark tracking-tight">pcStore</span>
+                <span class="fw-bold fs-5  tracking-tight">PCSTORE</span>
             </a>
 
             <!-- Кнопка каталога -->
@@ -45,11 +51,11 @@
                                aria-label="Поиск"
                                value="{{ request.GET.q|default:'' }}"
                                style="border-color: #ced4da;" />
-                        <button class="btn bg-white border-start-0"
+                        <button class="btn border-start-0"
                                 type="submit"
                                 style="border-color: #ced4da; padding-left: 0; padding-right: 12px;"
                                 title="Найти">
-                            <i class="bi bi-search text-muted"></i>
+                            <i class="bi bi-search "></i>
                         </button>
                     </div>
                 </form>
@@ -91,7 +97,7 @@
                                 {% endif %}
                                 <span class="d-none d-lg-inline">{{ user.email|truncatechars:20 }}</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end " aria-labelledby="userDropdown">
                                 <li>
                                     <a class="dropdown-item" href="{% url 'users:profile' %}">
                                         <i class="bi bi-person me-2"></i>Личный кабинет
@@ -128,7 +134,7 @@
                         </li>
                     {% else %}
                         <li class="nav-item ms-lg-3">
-                            <a class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" href="{% url 'users:login' %}"
+                            <a class="btn btn-primary btn-sm rounded-pill px-4 " href="{% url 'users:login' %}"
                                style="font-weight: 500; background-color: #0d6efd; border: none;">
                                 <i class="bi bi-box-arrow-in-right me-1"></i>Войти
                             </a>
@@ -149,7 +155,7 @@
 
         <div class="offcanvas-header border-bottom">
             <h5 class="offcanvas-title fw-bold" id="catalogOffcanvasLabel">
-                <i class="bi bi-grid-3x3-gap me-2 text-primary"></i>Каталог
+                <i class="bi bi-grid-3x3-gap me-2 "></i>Каталог
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
         </div>
@@ -162,56 +168,56 @@
 
                 <div class="row g-3">
                     <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'cpu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
-                            <i class="bi bi-cpu fs-4 me-3 text-primary"></i>
+                        <a href="{% url 'catalog:category' 'cpu' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3 ">
+                            <i class="bi bi-cpu fs-4 me-3 "></i>
                             <span class="fw-medium">Процессоры</span>
                         </a>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'gpu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
-                            <i class="bi bi-gpu-card fs-4 me-3 text-primary"></i>
+                        <a href="{% url 'catalog:category' 'gpu' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
+                            <i class="bi bi-gpu-card fs-4 me-3 "></i>
                             <span class="fw-medium">Видеокарты</span>
                         </a>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'ram' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
-                            <i class="bi bi-memory fs-4 me-3 text-primary"></i>
+                        <a href="{% url 'catalog:category' 'ram' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
+                            <i class="bi bi-memory fs-4 me-3 "></i>
                             <span class="fw-medium">Память</span>
                         </a>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'motherboard' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
-                            <i class="bi bi-motherboard fs-4 me-3 text-primary"></i>
+                        <a href="{% url 'catalog:category' 'motherboard' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
+                            <i class="bi bi-motherboard fs-4 me-3 "></i>
                             <span class="fw-medium">Материнские платы</span>
                         </a>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'psu' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
-                            <i class="bi bi-plug fs-4 me-3 text-primary"></i>
+                        <a href="{% url 'catalog:category' 'psu' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
+                            <i class="bi bi-plug fs-4 me-3 "></i>
                             <span class="fw-medium">Блоки питания</span>
                         </a>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'pc-case' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
-                            <i class="bi bi-pc fs-4 me-3 text-primary"></i>
+                        <a href="{% url 'catalog:category' 'pc-case' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
+                            <i class="bi bi-pc fs-4 me-3 "></i>
                             <span class="fw-medium">Корпуса</span>
                         </a>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'pc-cooling' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
-                            <i class="bi bi-fan fs-4 me-3 text-primary"></i>
+                        <a href="{% url 'catalog:category' 'pc-cooling' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
+                            <i class="bi bi-fan fs-4 me-3 "></i>
                             <span class="fw-medium">Охлаждение</span>
                         </a>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'hdd' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
-                            <i class="bi bi-device-hdd fs-4 me-3 text-primary"></i>
+                        <a href="{% url 'catalog:category' 'hdd' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
+                            <i class="bi bi-device-hdd fs-4 me-3 "></i>
                             <span class="fw-medium">HDD</span>
                         </a>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <a href="{% url 'catalog:category' 'ssd' %}" class="catalog-category d-flex align-items-center text-decoration-none text-dark p-3 rounded-3 hover-bg-light">
-                            <i class="bi bi-device-ssd fs-4 me-3 text-primary"></i>
+                        <a href="{% url 'catalog:category' 'ssd' %}" class="catalog-category d-flex align-items-center text-decoration-none  p-3 rounded-3">
+                            <i class="bi bi-device-ssd fs-4 me-3 "></i>
                             <span class="fw-medium">SSD</span>
                         </a>
                     </div>
@@ -345,6 +351,7 @@
             });
         }
     });
+
     </script>
 
     <!-- === ФУТЕР === -->
@@ -356,7 +363,7 @@
                         <img src="{% static 'main/img/logo-main.svg' %}" alt="pcStore" width="28" height="28" class="me-2" style="filter: brightness(0) invert(1);">
                         <span>pcStore</span>
                     </h5>
-                    <p class="small text-muted mb-4">
+                    <p class="small  mb-4">
                         Магазин компьютерных комплектующих.<br>
                         Гарантия. Доставка. Поддержка.
                     </p>
@@ -395,7 +402,7 @@
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h6>Контакты</h6>
-                    <ul class="list-unstyled small text-muted mb-3">
+                    <ul class="list-unstyled small  mb-3">
                         <li class="mb-1"><i class="bi bi-geo-alt me-2"></i>Киров, ул. Воровского, 77</li>
                         <li class="mb-1"><i class="bi bi-telephone me-2"></i><a href="tel:+79999999999">+7 (999) 999-99-99</a></li>
                         <li><i class="bi bi-envelope me-2"></i><a href="mailto:info@pcstore.ru">info@pcstore.ru</a></li>

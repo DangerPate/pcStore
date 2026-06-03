@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (list) {
                     const el = document.createElement('div');
                     el.className = 'd-flex gap-2 mb-2 small';
-                    el.innerHTML = `<strong>${data.user}:</strong> <span class="text-muted">${data.text}</span>`;
+                    el.innerHTML = `<strong>${data.user}:</strong> <span class="">${data.text}</span>`;
                     list.appendChild(el);
                     input.value = '';
 
